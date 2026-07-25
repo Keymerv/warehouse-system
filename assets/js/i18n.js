@@ -52,3 +52,5 @@ function toggleLanguage() {
 document.addEventListener('DOMContentLoaded', () => {
     applyLanguage(currentLang);
 });
+
+
