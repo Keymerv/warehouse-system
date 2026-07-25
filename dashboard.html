@@ -3,100 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="dash_title">لوحة التحكم - نظام المستودعات وفروع المطاعم</title>
+    <title data-i18n="dash_title">لوحة التحكم - Keymerv Warehouse</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+    </style>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden">
 
     <!-- القائمة الجانبية (Sidebar) -->
-    <aside class="w-64 bg-slate-900 border-l border-slate-800 flex flex-col justify-between hidden md:flex">
+    <aside class="w-64 bg-slate-900 border-l border-slate-800 flex flex-col justify-between hidden md:flex shrink-0">
         <div>
-            <!-- شعار لوحة التحكم -->
-            <div class="p-5 border-b border-slate-800 flex items-center gap-3">
-                <div class="bg-indigo-600 text-white font-bold px-3 py-1.5 rounded-xl text-md">M</div>
-                <span class="font-bold text-lg tracking-wide" data-i18n="brand_name">نظام المستودعات</span>
+            <!-- الشعار الموحد -->
+            <div class="p-5 border-b border-slate-800 flex items-center gap-2.5">
+                <div class="bg-indigo-600 text-white font-bold px-2.5 py-1.5 rounded-xl text-sm">K</div>
+                <span class="font-bold text-xs tracking-tight text-slate-200" data-i18n="brand_name">Keymerv Warehouse</span>
             </div>
 
             <!-- الروابط -->
-            <nav class="p-4 space-y-2">
-                <a href="dashboard.html" class="flex items-center gap-3 px-4 py-2.5 bg-indigo-600 text-white rounded-xl font-medium transition" data-i18n="nav_overview">الرئيسية</a>
-                <a href="inventory.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition" data-i18n="nav_inventory">إدارة المخزون</a>
-                <a href="branches.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition" data-i18n="nav_branches">فروع المطاعم</a>
-                <a href="orders.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition" data-i18n="nav_orders">طلبات التغذية</a>
-                <a href="settings.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition" data-i18n="nav_settings">الإعدادات</a>
+            <nav class="p-4 space-y-1.5">
+                <a href="dashboard.html" class="flex items-center gap-3 px-4 py-2.5 bg-indigo-600 text-white rounded-xl font-medium transition text-xs" data-i18n="nav_overview">الرئيسية</a>
+                <a href="inventory.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition text-xs" data-i18n="nav_inventory">إدارة المخزون</a>
+                <a href="suppliers.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition text-xs" data-i18n="nav_suppliers">التوريد والموردين</a>
+                <a href="branches.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition text-xs" data-i18n="nav_branches">فروع المطاعم</a>
+                <a href="orders.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition text-xs" data-i18n="nav_orders">طلبات التغذية</a>
+                <a href="settings.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition text-xs" data-i18n="nav_settings">الإعدادات</a>
             </nav>
         </div>
 
-        <!-- معلومات المستخدم السفلية -->
+        <!-- معلومات المستخدم -->
         <div class="p-4 border-t border-slate-800 flex items-center justify-between">
-            <div class="text-sm">
-                <p class="font-bold text-slate-200">المستودع الرئيسي</p>
-                <p class="text-xs text-slate-400">admin@warehouse.com</p>
+            <div class="text-xs">
+                <p class="font-bold text-slate-200" data-i18n="user_role_admin">الإدارة العامة (المالك)</p>
+                <p class="text-[10px] text-slate-400">admin@keymerv.com</p>
             </div>
             <a href="index.html" class="text-rose-400 hover:text-rose-300 text-xs font-semibold" data-i18n="logout">خروج</a>
         </div>
     </aside>
 
-    <!-- المحتوى الرئيسي للوحة التحكم -->
+    <!-- المحتوى الرئيسي -->
     <main class="flex-1 flex flex-col h-screen overflow-y-auto">
-        <!-- شريط علوي -->
         <header class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold" data-i18n="dash_header">لوحة متابعة الفروع والمستودع</h1>
-            
-            <div class="flex items-center gap-4">
-                <!-- زر تبديل اللغة داخل لوحة التحكم -->
-                <button onclick="toggleLanguage()" id="lang-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-sm font-medium transition">
-                    English
-                </button>
-            </div>
+            <h1 class="text-lg font-bold" data-i18n="dash_header">لوحة متابعة الفروع والمستودع</h1>
+            <button onclick="toggleLanguage()" id="lang-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition">
+                English
+            </button>
         </header>
 
-        <!-- محتوى الإحصائيات السريعة -->
         <div class="p-6 space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- بطاقة 1 -->
                 <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-                    <p class="text-slate-400 text-sm" data-i18n="stat_branches">إجمالي الفروع المرتبطة</p>
-                    <h3 class="text-3xl font-extrabold mt-2 text-indigo-400">12</h3>
+                    <p class="text-slate-400 text-xs" data-i18n="stat_branches">إجمالي الفروع المرتبطة</p>
+                    <h3 class="text-2xl font-extrabold mt-2 text-indigo-400">12</h3>
                 </div>
-                <!-- بطاقة 2 -->
                 <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-                    <p class="text-slate-400 text-sm" data-i18n="stat_orders">الطلبات المعلقة من الفروع</p>
-                    <h3 class="text-3xl font-extrabold mt-2 text-amber-400">5</h3>
+                    <p class="text-slate-400 text-xs" data-i18n="stat_orders">الطلبات المعلقة من الفروع</p>
+                    <h3 class="text-2xl font-extrabold mt-2 text-amber-400">5</h3>
                 </div>
-                <!-- بطاقة 3 -->
                 <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-                    <p class="text-slate-400 text-sm" data-i18n="stat_items"> الأصناف بالمستودع الرئيسي</p>
-                    <h3 class="text-3xl font-extrabold mt-2 text-emerald-400">142</h3>
+                    <p class="text-slate-400 text-xs" data-i18n="stat_items">الأصناف بالمستودع الرئيسي</p>
+                    <h3 class="text-2xl font-extrabold mt-2 text-emerald-400">142</h3>
                 </div>
             </div>
 
-            <!-- جدول أحدث طلبات الفروع -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-                <h3 class="text-lg font-bold mb-4" data-i18n="recent_orders_title">أحدث طلبات التوريد من الفروع</h3>
+                <h3 class="text-sm font-bold mb-4" data-i18n="recent_orders_title">أحدث طلبات التوريد من الفروع</h3>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-right border-collapse">
+                    <table class="w-full text-right border-collapse text-xs">
                         <thead>
-                            <tr class="border-b border-slate-800 text-slate-400 text-sm">
+                            <tr class="border-b border-slate-800 text-slate-400">
                                 <th class="py-3 px-4" data-i18n="th_order_id">رقم الطلب</th>
                                 <th class="py-3 px-4" data-i18n="th_branch_name">اسم الفرع</th>
                                 <th class="py-3 px-4" data-i18n="th_items">الأصناف المطلوبة</th>
                                 <th class="py-3 px-4" data-i18n="th_status">الحالة</th>
                             </tr>
                         </thead>
-                        <tbody class="text-sm divide-y divide-slate-800/50">
+                        <tbody class="divide-y divide-slate-800/50">
                             <tr>
-                                <td class="py-3 px-4 font-mono">#ORD-901</td>
+                                <td class="py-3 px-4 font-mono text-indigo-300">#ORD-901</td>
                                 <td class="py-3 px-4">فرع الوديعة / الرياض</td>
-                                <td class="py-3 px-4">لحوم، زيوت، بطاطس</td>
-                                <td class="py-3 px-4"><span class="bg-amber-500/10 text-amber-400 px-2.5 py-1 rounded-full text-xs" data-i18n="status_pending">قيد المعالجة</span></td>
+                                <td class="py-3 px-4 text-slate-400">لحوم، زيوت، بطاطس</td>
+                                <td class="py-3 px-4"><span class="bg-amber-500/10 text-amber-400 px-2.5 py-1 rounded-full text-[10px]" data-i18n="status_pending">قيد المعالجة</span></td>
                             </tr>
                             <tr>
-                                <td class="py-3 px-4 font-mono">#ORD-902</td>
+                                <td class="py-3 px-4 font-mono text-indigo-300">#ORD-902</td>
                                 <td class="py-3 px-4">فرع التحلية / جده</td>
-                                <td class="py-3 px-4">مشروبات، عبوات تغليف</td>
-                                <td class="py-3 px-4"><span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full text-xs" data-i18n="status_completed">تم التوريد</span></td>
+                                <td class="py-3 px-4 text-slate-400">مشروبات، عبوات تغليف</td>
+                                <td class="py-3 px-4"><span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full text-[10px]" data-i18n="status_completed">تم التوريد</span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -105,17 +102,18 @@
         </div>
     </main>
 
-    <!-- محرك الترجمة الخاص باللوحة (نفسه يكمل الكواد) -->
     <script>
         const dashboardTranslations = {
             ar: {
-                dash_title: "لوحة التحكم - نظام المستودعات وفروع المطاعم",
-                brand_name: "نظام المستودعات",
+                dash_title: "لوحة التحكم - Keymerv Warehouse",
+                brand_name: "Keymerv Warehouse",
                 nav_overview: "الرئيسية",
                 nav_inventory: "إدارة المخزون",
+                nav_suppliers: "التوريد والموردين",
                 nav_branches: "فروع المطاعم",
-                nav_orders: "طلبات التوريد",
+                nav_orders: "طلبات التغذية",
                 nav_settings: "الإعدادات",
+                user_role_admin: "الإدارة العامة (المالك)",
                 logout: "خروج",
                 dash_header: "لوحة متابعة الفروع والمستودع",
                 stat_branches: "إجمالي الفروع المرتبطة",
@@ -130,13 +128,15 @@
                 status_completed: "تم التوريد"
             },
             en: {
-                dash_title: "Dashboard - Warehouse & Restaurant Branches System",
-                brand_name: "Warehouse System",
+                dash_title: "Dashboard - Keymerv Warehouse",
+                brand_name: "Keymerv Warehouse",
                 nav_overview: "Overview",
                 nav_inventory: "Inventory",
+                nav_suppliers: "Suppliers & Supply",
                 nav_branches: "Branches",
                 nav_orders: "Supply Orders",
                 nav_settings: "Settings",
+                user_role_admin: "General Admin (Owner)",
                 logout: "Logout",
                 dash_header: "Branches & Warehouse Tracking Panel",
                 stat_branches: "Total Connected Branches",
@@ -152,38 +152,21 @@
             }
         };
 
-        // دمج الترجمات وتفعيلها
         let currentLang = localStorage.getItem('lang') || 'ar';
-
         function applyDashboardLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('lang', lang);
-            
             const htmlRoot = document.getElementById('html-root');
             htmlRoot.setAttribute('lang', lang);
             htmlRoot.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
-
-            const langBtn = document.getElementById('lang-btn');
-            if (langBtn) {
-                langBtn.innerText = lang === 'ar' ? 'English' : 'العربية';
-            }
-
-            document.querySelectorAll('[data-i18n]').forEach(element => {
-                const key = element.getAttribute('data-i18n');
-                if (dashboardTranslations[lang] && dashboardTranslations[lang][key]) {
-                    element.innerText = dashboardTranslations[lang][key];
-                }
+            document.getElementById('lang-btn').innerText = lang === 'ar' ? 'English' : 'العربية';
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dashboardTranslations[lang][key]) el.innerText = dashboardTranslations[lang][key];
             });
         }
-
-        function toggleLanguage() {
-            const newLang = currentLang === 'ar' ? 'en' : 'ar';
-            applyDashboardLanguage(newLang);
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            applyDashboardLanguage(currentLang);
-        });
+        function toggleLanguage() { applyDashboardLanguage(currentLang === 'ar' ? 'en' : 'ar'); }
+        document.addEventListener('DOMContentLoaded', () => applyDashboardLanguage(currentLang));
     </script>
 </body>
 </html>
