@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="supply_title">إدارة التوريد والموردين - Keymerv Warehouse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #020617;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden text-xs">
+
+    <!-- القائمة الجانبية (Sidebar) بالعرض القياسي الموحد w-64 -->
+    <aside class="w-64 bg-slate-900 border-l border-slate-800 flex flex-col justify-between shrink-0">
+        <div>
+            <div class="p-4 border-b border-slate-800 flex items-center gap-2">
+                <div class="bg-indigo-600 text-white font-bold px-2 py-1 rounded-lg text-xs">K</div>
+                <span class="font-bold text-xs tracking-tight text-slate-200" data-i18n="brand_name">Keymerv Warehouse</span>
+            </div>
+
+            <nav class="p-3 space-y-1.5">
+                <a href="dashboard.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_overview">الرئيسية</a>
+                <a href="inventory.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_inventory">إدارة المخزون</a>
+                <a href="branches.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_branches">فروع المطاعم</a>
+                <a href="orders.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_orders">طلبات التغذية</a>
+                <a href="supply.html" class="flex items-center gap-2.5 px-3 py-2 bg-indigo-600 text-white rounded-lg font-medium transition" data-i18n="nav_supply">التوريد والموردين</a>
+                <a href="settings.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_settings">الإعدادات</a>
+            </nav>
+        </div>
+
+        <div class="p-3 border-t border-slate-800 flex items-center justify-between">
+            <div>
+                <p class="font-bold text-slate-200 text-xs" data-i18n="user_role_admin">الإدارة العامة (المالك)</p>
+                <p class="text-[10px] text-slate-400">admin@keymerv.com</p>
+            </div>
+            <a href="login.html" class="text-rose-400 hover:text-rose-300 text-[11px] font-semibold" data-i18n="logout">خروج</a>
+        </div>
+    </aside>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+        <header class="bg-slate-900 border-b border-slate-800 px-5 py-3 flex justify-between items-center">
+            <h1 class="text-sm font-bold" data-i18n="supply_header">إدارة شحنات التوريد والموردين</h1>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleLanguage()" id="lang-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-md text-xs font-medium transition">
+                    English
+                </button>
+            </div>
+        </header>
+
+        <div class="p-5 space-y-4">
+            
+            <!-- إحصائيات سريعة للتوريد -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-[11px]" data-i18n="stat_active_suppliers">الموردين النشطين</p>
+                        <h3 class="text-lg font-extrabold mt-0.5 text-indigo-400" id="stat-suppliers-count">0</h3>
+                    </div>
+                    <div class="w-9 h-9 bg-indigo-600/10 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-sm">🏭</div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-[11px]" data-i18n="stat_incoming_shipments">شحنات في الطريق</p>
+                        <h3 class="text-lg font-extrabold mt-0.5 text-amber-400" id="stat-incoming-count">0</h3>
+                    </div>
+                    <div class="w-9 h-9 bg-amber-600/10 text-amber-400 rounded-lg flex items-center justify-center font-bold text-sm">🚢</div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-[11px]" data-i18n="stat_received_month">شحنات مستلمة هذا الشهر</p>
+                        <h3 class="text-lg font-extrabold mt-0.5 text-emerald-400" id="stat-received-count">0</h3>
+                    </div>
+                    <div class="w-9 h-9 bg-emerald-600/10 text-emerald-400 rounded-lg flex items-center justify-center font-bold text-sm">📥</div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-[11px]" data-i18n="stat_total_cost">إجمالي قيمة التوريدات</p>
+                        <h3 class="text-lg font-extrabold mt-0.5 text-sky-400" id="stat-cost-val">0 ر.س</h3>
+                    </div>
+                    <div class="w-9 h-9 bg-sky-600/10 text-sky-400 rounded-lg flex items-center justify-center font-bold text-sm">💰</div>
+                </div>
+            </div>
+
+            <!-- شريط الأدوات والفلترة -->
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 bg-slate-900 border border-slate-800 p-3 rounded-xl">
+                <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                    <select id="supplier-filter" onchange="filterShipments()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                        <option value="all" data-i18n="filter_all_suppliers">جميع الموردين</option>
+                        <option value="شركة الأغذية الكبرى">شركة الأغذية الكبرى</option>
+                        <option value="مطاحن ومخابز الخليج">مطاحن ومخابز الخليج</option>
+                        <option value="مؤسسة التغليف الحديث">مؤسسة التغليف الحديث</option>
+                    </select>
+
+                    <select id="shipment-status-filter" onchange="filterShipments()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                        <option value="all" data-i18n="filter_all_status">جميع الحالات</option>
+                        <option value="incoming" data-i18n="status_incoming">في الطريق</option>
+                        <option value="received" data-i18n="status_received">تم الاستلام والمراجعة</option>
+                        <option value="delayed" data-i18n="status_delayed">متأخرة</option>
+                    </select>
+
+                    <input type="text" id="search-input" onkeyup="filterShipments()" data-i18n-placeholder="search_placeholder" placeholder="ابحث برقم الشحنة أو المورد..." class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 w-full sm:w-56">
+                </div>
+
+                <div class="flex items-center gap-2 w-full lg:w-auto justify-end">
+                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 border border-slate-700" data-i18n="suppliers_list_btn">
+                        👥 إدارة الموردين
+                    </button>
+                    <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-md shadow-indigo-600/20" data-i18n="add_shipment_btn">
+                        + تسجيل شحنة توريد جديدة
+                    </button>
+                </div>
+            </div>
+
+            <!-- جدول شحنات التوريد -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+                
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pb-3 border-b border-slate-800 text-[11px] text-slate-400">
+                    <div class="flex items-center gap-2">
+                        <span data-i18n="pagination_show">عرض</span>
+                        <select id="items-per-page" class="bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs">
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span data-i18n="pagination_per_page">شحنة لكل صفحة</span>
+                    </div>
+                    <div>
+                        <span id="results-counter" class="font-bold text-indigo-400" data-i18n="pagination_info">عرض 0 من أصل 0 شحنة</span>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto relative">
+                    <table class="w-full text-right border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 text-[11px]">
+                                <th class="py-2.5 px-3" data-i18n="th_shipment_id">رقم الشحنة</th>
+                                <th class="py-2.5 px-3" data-i18n="th_supplier_name">اسم المورد</th>
+                                <th class="py-2.5 px-3" data-i18n="th_items_supplied">الأصناف الموردة</th>
+                                <th class="py-2.5 px-3" data-i18n="th_cost">التكلفة الإجمالية</th>
+                                <th class="py-2.5 px-3" data-i18n="th_expected_date">تاريخ الوصول المتوقع / الفعلي</th>
+                                <th class="py-2.5 px-3" data-i18n="th_shipment_status">حالة الشحنة</th>
+                                <th class="py-2.5 px-3 text-center" data-i18n="th_actions">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-xs divide-y divide-slate-800/40" id="shipments-table-body">
+                            <!-- صفوف الشحنات -->
+                        </tbody>
+                    </table>
+
+                    <!-- رسالة التنبيه عند عدم وجود نتائج -->
+                    <div id="no-results-row" class="hidden py-12 text-center text-slate-400">
+                        <div class="text-3xl mb-2">📦</div>
+                        <p class="font-semibold text-slate-200 text-sm" data-i18n="empty_title">لا توجد شحنات توريد مسجلة حالياً</p>
+                        <p class="text-slate-400 text-xs mt-1" data-i18n="empty_desc">ابدأ بتسجيل شحنات التوريد الجديدة لمتابعة المخزون والموردين.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- محرك التصفية والمنطق البرمجي -->
+    <script>
+        let shipmentsData = [
+            { id: "SHP-5011", supplier: "شركة الأغذية الكبرى", items: "لحوم برجر مجمدة (500 كجم)", cost: "14,500 ر.س", date: "2026-07-28 (متوقع)", status: "incoming" },
+            { id: "SHP-5010", supplier: "مطاحن ومخابز الخليج", items: "خبز برجر بطاطس (2,000 قطعة)", cost: "6,000 ر.س", date: "2026-07-25 (تم الاستلام)", status: "received" },
+            { id: "SHP-5009", supplier: "مؤسسة التغليف الحديث", items: "أكياس ورقية وعلب صوصات", cost: "3,200 ر.س", date: "2026-07-22 (تم الاستلام)", status: "received" },
+            { id: "SHP-5008", supplier: "شركة الأغذية الكبرى", items: "جبنة موزاريلا مبشورة (300 كجم)", cost: "9,800 ر.س", date: "2026-07-20 (متأخرة)", status: "delayed" }
+        ];
+
+        function renderShipmentsTable(dataToRender) {
+            const tbody = document.getElementById('shipments-table-body');
+            tbody.innerHTML = '';
+
+            dataToRender.forEach((shipment) => {
+                let badgeClass = '';
+                let statusKey = '';
+
+                switch(shipment.status) {
+                    case 'incoming': badgeClass = 'bg-amber-500/10 text-amber-400'; statusKey = 'status_incoming'; break;
+                    case 'received': badgeClass = 'bg-emerald-500/10 text-emerald-400'; statusKey = 'status_received'; break;
+                    case 'delayed': badgeClass = 'bg-rose-500/10 text-rose-400'; statusKey = 'status_delayed'; break;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = 'shipment-row';
+                tr.setAttribute('data-supplier', shipment.supplier);
+                tr.setAttribute('data-status', shipment.status);
+
+                tr.innerHTML = `
+                    <td class="py-3 px-3 font-mono text-indigo-300 font-semibold">${shipment.id}</td>
+                    <td class="py-3 px-3 font-bold text-slate-200">${shipment.supplier}</td>
+                    <td class="py-3 px-3 text-slate-300">${shipment.items}</td>
+                    <td class="py-3 px-3 font-bold text-sky-400">${shipment.cost}</td>
+                    <td class="py-3 px-3 text-slate-400 text-[11px]">${shipment.date}</td>
+                    <td class="py-3 px-3"><span class="${badgeClass} px-2 py-0.5 rounded-full text-[11px]" data-i18n="${statusKey}">${shipment.status}</span></td>
+                    <td class="py-3 px-3 text-center">
+                        <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded text-[11px] font-medium transition" data-i18n="details_btn">التفاصيل</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('stat-suppliers-count').innerText = "3";
+            document.getElementById('stat-incoming-count').innerText = shipmentsData.filter(s => s.status === 'incoming').length;
+            document.getElementById('stat-received-count').innerText = shipmentsData.filter(s => s.status === 'received').length;
+            document.getElementById('stat-cost-val').innerText = "33,500 ر.س";
+        }
+
+        function filterShipments() {
+            const supplierFilter = document.getElementById('supplier-filter').value;
+            const statusFilter = document.getElementById('shipment-status-filter').value;
+            const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
+            const rows = document.querySelectorAll('.shipment-row');
+            const noResultsRow = document.getElementById('no-results-row');
+            const lang = document.getElementById('html-root').getAttribute('lang') || 'ar';
+
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const rowSupplier = row.getAttribute('data-supplier');
+                const rowStatus = row.getAttribute('data-status');
+                const rowContent = row.innerText.toLowerCase();
+
+                const matchesSupplier = (supplierFilter === 'all' || rowSupplier === supplierFilter);
+                const matchesStatus = (statusFilter === 'all' || rowStatus === statusFilter);
+                const matchesSearch = (rowContent.includes(searchQuery));
+
+                if (matchesSupplier && matchesStatus && matchesSearch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            if (visibleCount === 0) {
+                noResultsRow.classList.remove('hidden');
+                noResultsRow.classList.add('block');
+            } else {
+                noResultsRow.classList.remove('block');
+                noResultsRow.classList.add('hidden');
+            }
+
+            const counterElement = document.getElementById('results-counter');
+            if (lang === 'ar') {
+                counterElement.innerText = `عرض ${visibleCount} من أصل ${shipmentsData.length} شحنة`;
+            } else {
+                counterElement.innerText = `Showing ${visibleCount} of ${shipmentsData.length} shipments`;
+            }
+        }
+
+        const supplyTranslations = {
+            ar: {
+                supply_title: "إدارة التوريد والموردين - Keymerv Warehouse",
+                brand_name: "Keymerv Warehouse",
+                nav_overview: "الرئيسية",
+                nav_inventory: "إدارة المخزون",
+                nav_branches: "فروع المطاعم",
+                nav_orders: "طلبات التغذية",
+                nav_supply: "التوريد والموردين",
+                nav_settings: "الإعدادات",
+                user_role_admin: "الإدارة العامة (المالك)",
+                logout: "خروج",
+                supply_header: "إدارة شحنات التوريد والموردين",
+                stat_active_suppliers: "الموردين النشطين",
+                stat_incoming_shipments: "شحنات في الطريق",
+                stat_received_month: "شحنات مستلمة هذا الشهر",
+                stat_total_cost: "إجمالي قيمة التوريدات",
+                filter_all_suppliers: "جميع الموردين",
+                filter_all_status: "جميع الحالات",
+                status_incoming: "في الطريق",
+                status_received: "تم الاستلام والمراجعة",
+                status_delayed: "متأخرة",
+                search_placeholder: "ابحث برقم الشحنة أو المورد...",
+                suppliers_list_btn: "👥 إدارة الموردين",
+                add_shipment_btn: "+ تسجيل شحنة توريد جديدة",
+                th_shipment_id: "رقم الشحنة",
+                th_supplier_name: "اسم المورد",
+                th_items_supplied: "الأصناف الموردة",
+                th_cost: "التكلفة الإجمالية",
+                th_expected_date: "تاريخ الوصول المتوقع / الفعلي",
+                th_shipment_status: "حالة الشحنة",
+                th_actions: "الإجراءات",
+                details_btn: "التفاصيل",
+                pagination_show: "عرض",
+                pagination_per_page: "شحنة لكل صفحة",
+                empty_title: "لا توجد شحنات توريد مسجلة حالياً",
+                empty_desc: "ابدأ بتسجيل شحنات التوريد الجديدة لمتابعة المخزون والموردين."
+            },
+            en: {
+                supply_title: "Supply & Suppliers Management - Keymerv Warehouse",
+                brand_name: "Keymerv Warehouse",
+                nav_overview: "Overview",
+                nav_inventory: "Inventory",
+                nav_branches: "Branches",
+                nav_orders: "Replenishment Orders",
+                nav_supply: "Supply & Suppliers",
+                nav_settings: "Settings",
+                user_role_admin: "General Admin (Owner)",
+                logout: "Logout",
+                supply_header: "Supply Shipments & Suppliers Management",
+                stat_active_suppliers: "Active Suppliers",
+                stat_incoming_shipments: "Incoming Shipments",
+                stat_received_month: "Received This Month",
+                stat_total_cost: "Total Supply Cost",
+                filter_all_suppliers: "All Suppliers",
+                filter_all_status: "All Statuses",
+                status_incoming: "Incoming",
+                status_received: "Received & Inspected",
+                status_delayed: "Delayed",
+                search_placeholder: "Search shipment ID or supplier...",
+                suppliers_list_btn: "👥 Manage Suppliers",
+                add_shipment_btn: "+ Register New Shipment",
+                th_shipment_id: "Shipment ID",
+                th_supplier_name: "Supplier Name",
+                th_items_supplied: "Supplied Items",
+                th_cost: "Total Cost",
+                th_expected_date: "Expected / Actual Date",
+                th_shipment_status: "Status",
+                th_actions: "Actions",
+                details_btn: "Details",
+                pagination_show: "Show",
+                pagination_per_page: "shipments per page",
+                empty_title: "No supply shipments registered yet",
+                empty_desc: "Start registering new supply shipments to track inventory and vendors."
+            }
+        };
+
+        let currentLang = localStorage.getItem('lang') || 'ar';
+
+        function applySupplyLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('lang', lang);
+            
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('lang', lang);
+            htmlRoot.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+
+            const langBtn = document.getElementById('lang-btn');
+            if (langBtn) {
+                langBtn.innerText = lang === 'ar' ? 'English' : 'العربية';
+            }
+
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (supplyTranslations[lang] && supplyTranslations[lang][key]) {
+                    element.innerText = supplyTranslations[lang][key];
+                }
+            });
+
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-i18n-placeholder');
+                if (supplyTranslations[lang] && supplyTranslations[lang][key]) {
+                    element.setAttribute('placeholder', supplyTranslations[lang][key]);
+                }
+            });
+        }
+
+        function toggleLanguage() {
+            const newLang = currentLang === 'ar' ? 'en' : 'ar';
+            applySupplyLanguage(newLang);
+            filterShipments();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderShipmentsTable(shipmentsData);
+            applySupplyLanguage(currentLang);
+            filterShipments();
+        });
+    </script>
+</body>
+</html>
