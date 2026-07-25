@@ -111,12 +111,29 @@
                 </div>
             </div>
 
-            <!-- شريط الأدوات والفلترة (الحالات + الفروع) وزر الإنشاء وتصدير إكسل -->
+            <!-- شريط الأدوات والفلترة بالترتيب الصحيح (البراند أولاً ثم الفرع ثم الحالة والبحث) -->
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 bg-slate-900 border border-slate-800 p-3 rounded-xl">
                 <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-                    <input type="text" id="search-input" onkeyup="filterOrders()" data-i18n-placeholder="search_placeholder" placeholder="ابحث برقم الطلب..." class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 w-full sm:w-48">
                     
-                    <!-- فلتر الحالات -->
+                    <!-- 1. فلتر البراند / السلسلة -->
+                    <select id="brand-filter" onchange="filterOrders()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                        <option value="all" data-i18n="filter_all_brands">جميع البراندات</option>
+                        <option value="بربريس برجر">بربريس برجر</option>
+                        <option value="ايس كريم فاير">ايس كريم فاير</option>
+                        <option value="بيتزا كراست">بيتزا كراست</option>
+                    </select>
+
+                    <!-- 2. فلتر الفروع التابعة -->
+                    <select id="branch-filter" onchange="filterOrders()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                        <option value="all" data-i18n="filter_all_branches">جميع الفروع</option>
+                        <option value="فرع العليا">فرع العليا</option>
+                        <option value="فرع النخيل مول">فرع النخيل مول</option>
+                        <option value="فرع الملك فهد">فرع الملك فهد</option>
+                        <option value="فرع التحلية">فرع التحلية</option>
+                        <option value="فرع الصحافة">فرع الصحافة</option>
+                    </select>
+
+                    <!-- 3. فلتر الحالات -->
                     <select id="status-filter" onchange="filterOrders()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
                         <option value="all" data-i18n="filter_all">جميع الحالات</option>
                         <option value="new" data-i18n="filter_new">جديد</option>
@@ -127,15 +144,8 @@
                         <option value="cancelled" data-i18n="filter_cancelled">ملغي</option>
                     </select>
 
-                    <!-- فلتر الفروع الجديد -->
-                    <select id="branch-filter" onchange="filterOrders()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
-                        <option value="all" data-i18n="filter_all_branches">جميع الفروع</option>
-                        <option value="فرع العليا">فرع العليا</option>
-                        <option value="فرع النخيل مول">فرع النخيل مول</option>
-                        <option value="فرع الملك فهد">فرع الملك فهد</option>
-                        <option value="فرع التحلية">فرع التحلية</option>
-                        <option value="فرع الصحافة">فرع الصحافة</option>
-                    </select>
+                    <!-- 4. شريط البحث -->
+                    <input type="text" id="search-input" onkeyup="filterOrders()" data-i18n-placeholder="search_placeholder" placeholder="ابحث برقم الطلب..." class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 w-full sm:w-48">
                 </div>
 
                 <div class="flex items-center gap-2 w-full lg:w-auto justify-end">
@@ -193,12 +203,12 @@
                         </thead>
                         <tbody class="text-xs divide-y divide-slate-800/40" id="orders-table-body">
                             <!-- طلب 1 - جديد -->
-                            <tr class="order-row" data-status="new" data-branch="فرع العليا">
+                            <tr class="order-row" data-brand="بربريس برجر" data-branch="فرع العليا" data-status="new">
                                 <td class="py-3 px-3">
                                     <input type="checkbox" onclick="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer w-3.5 h-3.5">
                                 </td>
                                 <td class="py-3 px-3 font-mono text-indigo-300 font-semibold">ORD-8015</td>
-                                <td class="py-3 px-3 font-bold text-slate-200">فرع العليا</td>
+                                <td class="py-3 px-3 font-bold text-slate-200">فرع العليا <span class="block text-[10px] text-slate-400 font-normal">بربريس برجر</span></td>
                                 <td class="py-3 px-3 text-slate-300">لحوم برجر، خبز بطاطس</td>
                                 <td class="py-3 px-3 font-bold text-indigo-400">200 وحدة</td>
                                 <td class="py-3 px-3 text-slate-400 text-[11px]">2026-07-25 / 04:30 م</td>
@@ -209,12 +219,12 @@
                                 </td>
                             </tr>
                             <!-- طلب 2 - جاري التجهيز -->
-                            <tr class="order-row" data-status="preparing" data-branch="فرع النخيل مول">
+                            <tr class="order-row" data-brand="بربريس برجر" data-branch="فرع النخيل مول" data-status="preparing">
                                 <td class="py-3 px-3">
                                     <input type="checkbox" onclick="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer w-3.5 h-3.5">
                                 </td>
                                 <td class="py-3 px-3 font-mono text-indigo-300 font-semibold">ORD-8012</td>
-                                <td class="py-3 px-3 font-bold text-slate-200">فرع النخيل مول</td>
+                                <td class="py-3 px-3 font-bold text-slate-200">فرع النخيل مول <span class="block text-[10px] text-slate-400 font-normal">بربريس برجر</span></td>
                                 <td class="py-3 px-3 text-slate-300">لحوم برجر، صوص خاص</td>
                                 <td class="py-3 px-3 font-bold text-indigo-400">350 وحدة</td>
                                 <td class="py-3 px-3 text-slate-400 text-[11px]">2026-07-25 / 04:15 م</td>
@@ -225,13 +235,13 @@
                                 </td>
                             </tr>
                             <!-- طلب 3 - جاهز -->
-                            <tr class="order-row" data-status="ready" data-branch="فرع الملك فهد">
+                            <tr class="order-row" data-brand="ايس كريم فاير" data-branch="فرع الملك فهد" data-status="ready">
                                 <td class="py-3 px-3">
                                     <input type="checkbox" onclick="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer w-3.5 h-3.5">
                                 </td>
                                 <td class="py-3 px-3 font-mono text-indigo-300 font-semibold">ORD-8010</td>
-                                <td class="py-3 px-3 font-bold text-slate-200">فرع الملك فهد</td>
-                                <td class="py-3 px-3 text-slate-300">بطاطس مقلية، مناديل</td>
+                                <td class="py-3 px-3 font-bold text-slate-200">فرع الملك فهد <span class="block text-[10px] text-slate-400 font-normal">ايس كريم فاير</span></td>
+                                <td class="py-3 px-3 text-slate-300">أقماع آيس كريم، صوص شوكولاتة</td>
                                 <td class="py-3 px-3 font-bold text-indigo-400">150 وحدة</td>
                                 <td class="py-3 px-3 text-slate-400 text-[11px]">2026-07-25 / 03:00 م</td>
                                 <td class="py-3 px-3 text-slate-400 text-[11px]">جاهز للاستلام من المستودع</td>
@@ -241,13 +251,13 @@
                                 </td>
                             </tr>
                             <!-- طلب 4 - جاري التوصيل -->
-                            <tr class="order-row" data-status="delivering" data-branch="فرع التحلية">
+                            <tr class="order-row" data-brand="بيتزا كراست" data-branch="فرع التحلية" data-status="delivering">
                                 <td class="py-3 px-3">
                                     <input type="checkbox" onclick="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer w-3.5 h-3.5">
                                 </td>
                                 <td class="py-3 px-3 font-mono text-indigo-300 font-semibold">ORD-8011</td>
-                                <td class="py-3 px-3 font-bold text-slate-200">فرع التحلية</td>
-                                <td class="py-3 px-3 text-slate-300">أكياس تعبئة ورق 1 كجم</td>
+                                <td class="py-3 px-3 font-bold text-slate-200">فرع التحلية <span class="block text-[10px] text-slate-400 font-normal">بيتزا كراست</span></td>
+                                <td class="py-3 px-3 text-slate-300">جبنة موزاريلا، عجينة بيتزا مجمدة</td>
                                 <td class="py-3 px-3 font-bold text-indigo-400">120 وحدة</td>
                                 <td class="py-3 px-3 text-slate-400 text-[11px]">2026-07-25 / 02:30 م</td>
                                 <td class="py-3 px-3 text-slate-400 text-[11px]">التسليم عبر مندوب الشركة</td>
@@ -257,12 +267,12 @@
                                 </td>
                             </tr>
                             <!-- طلب 5 - ملغي -->
-                            <tr class="order-row" data-status="cancelled" data-branch="فرع الصحافة">
+                            <tr class="order-row" data-brand="بربريس برجر" data-branch="فرع الصحافة" data-status="cancelled">
                                 <td class="py-3 px-3">
                                     <input type="checkbox" onclick="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer w-3.5 h-3.5">
                                 </td>
                                 <td class="py-3 px-3 font-mono text-indigo-300 font-semibold">ORD-8006</td>
-                                <td class="py-3 px-3 font-bold text-slate-200">فرع الصحافة</td>
+                                <td class="py-3 px-3 font-bold text-slate-200">فرع الصحافة <span class="block text-[10px] text-slate-400 font-normal">بربريس برجر</span></td>
                                 <td class="py-3 px-3 text-slate-300">بطاطس مقلية مجمدة</td>
                                 <td class="py-3 px-3 font-bold text-indigo-400">50 وحدة</td>
                                 <td class="py-3 px-3 text-slate-400 text-[11px]">2026-07-24 / 08:00 م</td>
@@ -279,7 +289,7 @@
         </div>
     </main>
 
-    <!-- محرك التصفية، التحديد والترجمة -->
+    <!-- محرك التصفية المحدث (براند ثم فرع ثم حالة وبحث) -->
     <script>
         function toggleSelectAll(source) {
             const checkboxes = document.querySelectorAll('.row-checkbox');
@@ -313,23 +323,26 @@
         }
 
         function filterOrders() {
-            const statusFilter = document.getElementById('status-filter').value;
+            const brandFilter = document.getElementById('brand-filter').value;
             const branchFilter = document.getElementById('branch-filter').value;
+            const statusFilter = document.getElementById('status-filter').value;
             const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
             const rows = document.querySelectorAll('.order-row');
             
             let visibleCount = 0;
 
             rows.forEach(row => {
-                const rowStatus = row.getAttribute('data-status');
+                const rowBrand = row.getAttribute('data-brand');
                 const rowBranch = row.getAttribute('data-branch');
+                const rowStatus = row.getAttribute('data-status');
                 const rowContent = row.innerText.toLowerCase();
 
-                const matchesStatus = (statusFilter === 'all' || rowStatus === statusFilter);
+                const matchesBrand = (brandFilter === 'all' || rowBrand === brandFilter);
                 const matchesBranch = (branchFilter === 'all' || rowBranch === branchFilter);
+                const matchesStatus = (statusFilter === 'all' || rowStatus === statusFilter);
                 const matchesSearch = (rowContent.includes(searchQuery));
 
-                if (matchesStatus && matchesBranch && matchesSearch) {
+                if (matchesBrand && matchesBranch && matchesStatus && matchesSearch) {
                     row.style.display = '';
                     visibleCount++;
                 } else {
@@ -370,8 +383,9 @@
                 stat_completed: "مكتمل",
                 stat_cancelled: "ملغي",
                 search_placeholder: "ابحث برقم الطلب...",
-                filter_all: "جميع الحالات",
+                filter_all_brands: "جميع البراندات",
                 filter_all_branches: "جميع الفروع",
+                filter_all: "جميع الحالات",
                 filter_new: "جديد",
                 filter_preparing: "جاري التجهيز",
                 filter_ready: "جاهز",
@@ -418,8 +432,9 @@
                 stat_completed: "Completed",
                 stat_cancelled: "Cancelled",
                 search_placeholder: "Search order ID...",
-                filter_all: "All Statuses",
+                filter_all_brands: "All Brands",
                 filter_all_branches: "All Branches",
+                filter_all: "All Statuses",
                 filter_new: "New",
                 filter_preparing: "Preparing",
                 filter_ready: "Ready",
