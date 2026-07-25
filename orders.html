@@ -24,43 +24,44 @@
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden text-xs">
+<body class="bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden text-xs flex-row-reverse">
 
-    <!-- القائمة الجانبية (Sidebar) بنفس الحجم القياسي w-64 المعتمد في باقي الصفحات -->
-    <!-- القائمة الجانبية (Sidebar) بالعرض القياسي الموحد w-64 -->
-<aside class="w-64 bg-slate-900 border-l border-slate-800 flex flex-col justify-between shrink-0">
+    <!-- القائمة الجانبية (Sidebar) على اليسار بنفس تصميم الصفحة الرئيسية -->
+    <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between shrink-0">
         <div>
-            <div class="p-4 border-b border-slate-800 flex items-center gap-2">
-                <div class="bg-indigo-600 text-white font-bold px-2 py-1 rounded-lg text-xs">K</div>
+            <div class="p-4 border-b border-slate-800 flex items-center justify-end gap-2">
                 <span class="font-bold text-xs tracking-tight text-slate-200" data-i18n="brand_name">Keymerv Warehouse</span>
+                <div class="bg-indigo-600 text-white font-bold px-2 py-1 rounded-lg text-xs">K</div>
             </div>
     
-            <nav class="p-3 space-y-1.5">
-                <a href="dashboard.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_overview">الرئيسية</a>
-                <a href="inventory.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_inventory">إدارة المخزون</a>
-                <a href="branches.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_branches">فروع المطاعم</a>
-                <a href="orders.html" class="flex items-center gap-2.5 px-3 py-2 bg-indigo-600 text-white rounded-lg font-medium transition" data-i18n="nav_orders">طلبات التغذية</a>
-                <a href="settings.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_settings">الإعدادات</a>
+            <nav class="p-3 space-y-1.5 text-right">
+                <a href="dashboard.html" class="flex items-center justify-end gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_overview">الرئيسية</a>
+                <a href="orders.html" class="flex items-center justify-end gap-2.5 px-3 py-2 bg-indigo-600 text-white rounded-lg font-medium transition" data-i18n="nav_orders">طلبات التغذية</a>
+                <a href="suppliers.html" class="flex items-center justify-end gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_suppliers">التوريد والموردين</a>
+                <a href="inventory.html" class="flex items-center justify-end gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_inventory">إدارة المخزون</a>
+                <a href="branches.html" class="flex items-center justify-end gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_branches">الفروع</a>
+                <a href="settings.html" class="flex items-center justify-end gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_settings">الإعدادات</a>
             </nav>
         </div>
     
         <div class="p-3 border-t border-slate-800 flex items-center justify-between">
-            <div>
+            <a href="login.html" class="text-rose-400 hover:text-rose-300 text-[11px] font-semibold" data-i18n="logout">خروج</a>
+            <div class="text-left">
                 <p class="font-bold text-slate-200 text-xs" data-i18n="user_role_admin">الإدارة العامة (المالك)</p>
                 <p class="text-[10px] text-slate-400">admin@keymerv.com</p>
             </div>
-            <a href="login.html" class="text-rose-400 hover:text-rose-300 text-[11px] font-semibold" data-i18n="logout">خروج</a>
         </div>
     </aside>
+
     <!-- المحتوى الرئيسي -->
     <main class="flex-1 flex flex-col h-screen overflow-y-auto">
         <header class="bg-slate-900 border-b border-slate-800 px-5 py-3 flex justify-between items-center">
-            <h1 class="text-sm font-bold" data-i18n="orders_header">إدارة طلبات التغذية للفروع</h1>
             <div class="flex items-center gap-3">
                 <button onclick="toggleLanguage()" id="lang-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-md text-xs font-medium transition">
                     English
                 </button>
             </div>
+            <h1 class="text-sm font-bold" data-i18n="orders_header">إدارة طلبات التغذية للفروع</h1>
         </header>
 
         <div class="p-5 space-y-4">
@@ -68,57 +69,71 @@
             <!-- إحصائيات سريعة بحجم أصغر وأنيق -->
             <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
                 <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
-                    <div>
+                    <div class="w-9 h-9 bg-sky-600/10 text-sky-400 rounded-lg flex items-center justify-center font-bold text-sm">🆕</div>
+                    <div class="text-left">
                         <p class="text-slate-400 text-[11px]" data-i18n="stat_new">جديد</p>
                         <h3 class="text-lg font-extrabold mt-0.5 text-sky-400" id="stat-new-count">0</h3>
                     </div>
-                    <div class="w-9 h-9 bg-sky-600/10 text-sky-400 rounded-lg flex items-center justify-center font-bold text-sm">🆕</div>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
-                    <div>
+                    <div class="w-9 h-9 bg-amber-600/10 text-amber-400 rounded-lg flex items-center justify-center font-bold text-sm">⏳</div>
+                    <div class="text-left">
                         <p class="text-slate-400 text-[11px]" data-i18n="stat_preparing">جاري التجهيز</p>
                         <h3 class="text-lg font-extrabold mt-0.5 text-amber-400" id="stat-preparing-count">0</h3>
                     </div>
-                    <div class="w-9 h-9 bg-amber-600/10 text-amber-400 rounded-lg flex items-center justify-center font-bold text-sm">⏳</div>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
-                    <div>
+                    <div class="w-9 h-9 bg-blue-600/10 text-blue-400 rounded-lg flex items-center justify-center font-bold text-sm">📦</div>
+                    <div class="text-left">
                         <p class="text-slate-400 text-[11px]" data-i18n="stat_ready">جاهز</p>
                         <h3 class="text-lg font-extrabold mt-0.5 text-blue-400" id="stat-ready-count">0</h3>
                     </div>
-                    <div class="w-9 h-9 bg-blue-600/10 text-blue-400 rounded-lg flex items-center justify-center font-bold text-sm">📦</div>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
-                    <div>
+                    <div class="w-9 h-9 bg-indigo-600/10 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-sm">🚚</div>
+                    <div class="text-left">
                         <p class="text-slate-400 text-[11px]" data-i18n="stat_delivering">جاري التوصيل</p>
                         <h3 class="text-lg font-extrabold mt-0.5 text-indigo-400" id="stat-delivering-count">0</h3>
                     </div>
-                    <div class="w-9 h-9 bg-indigo-600/10 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-sm">🚚</div>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
-                    <div>
+                    <div class="w-9 h-9 bg-emerald-600/10 text-emerald-400 rounded-lg flex items-center justify-center font-bold text-sm">✅</div>
+                    <div class="text-left">
                         <p class="text-slate-400 text-[11px]" data-i18n="stat_completed">مكتمل</p>
                         <h3 class="text-lg font-extrabold mt-0.5 text-emerald-400" id="stat-completed-count">0</h3>
                     </div>
-                    <div class="w-9 h-9 bg-emerald-600/10 text-emerald-400 rounded-lg flex items-center justify-center font-bold text-sm">✅</div>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
-                    <div>
+                    <div class="w-9 h-9 bg-rose-600/10 text-rose-400 rounded-lg flex items-center justify-center font-bold text-sm">❌</div>
+                    <div class="text-left">
                         <p class="text-slate-400 text-[11px]" data-i18n="stat_cancelled">ملغي</p>
                         <h3 class="text-lg font-extrabold mt-0.5 text-rose-400" id="stat-cancelled-count">0</h3>
                     </div>
-                    <div class="w-9 h-9 bg-rose-600/10 text-rose-400 rounded-lg flex items-center justify-center font-bold text-sm">❌</div>
                 </div>
             </div>
 
             <!-- شريط الأدوات والفلترة -->
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 bg-slate-900 border border-slate-800 p-3 rounded-xl">
-                <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-                    <select id="brand-filter" onchange="filterOrders()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
-                        <option value="all" data-i18n="filter_all_brands">جميع البراندات</option>
-                        <option value="بربريس برجر">بربريس برجر</option>
-                        <option value="ايس كريم فاير">ايس كريم فاير</option>
-                        <option value="بيتزا كراست">بيتزا كراست</option>
+                <div class="flex items-center gap-2 w-full lg:w-auto justify-end">
+                    <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-md shadow-indigo-600/20" data-i18n="add_order_btn">
+                        + إنشاء طلب تغذية لفرع
+                    </button>
+                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 border border-slate-700" data-i18n="export_excel_btn">
+                        📊 تصدير Excel
+                    </button>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end">
+                    <input type="text" id="search-input" onkeyup="filterOrders()" data-i18n-placeholder="search_placeholder" placeholder="ابحث برقم الطلب..." class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 w-full sm:w-48 text-right">
+                    
+                    <select id="status-filter" onchange="filterOrders()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                        <option value="all" data-i18n="filter_all">جميع الحالات</option>
+                        <option value="new" data-i18n="filter_new">جديد</option>
+                        <option value="preparing" data-i18n="filter_preparing">جاري التجهيز</option>
+                        <option value="ready" data-i18n="filter_ready">جاهز</option>
+                        <option value="delivering" data-i18n="filter_delivering">جاري التوصيل</option>
+                        <option value="completed" data-i18n="filter_completed">مكتمل</option>
+                        <option value="cancelled" data-i18n="filter_cancelled">ملغي</option>
                     </select>
 
                     <select id="branch-filter" onchange="filterOrders()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
@@ -130,26 +145,12 @@
                         <option value="فرع الصحافة">فرع الصحافة</option>
                     </select>
 
-                    <select id="status-filter" onchange="filterOrders()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
-                        <option value="all" data-i18n="filter_all">جميع الحالات</option>
-                        <option value="new" data-i18n="filter_new">جديد</option>
-                        <option value="preparing" data-i18n="filter_preparing">جاري التجهيز</option>
-                        <option value="ready" data-i18n="filter_ready">جاهز</option>
-                        <option value="delivering" data-i18n="filter_delivering">جاري التوصيل</option>
-                        <option value="completed" data-i18n="filter_completed">مكتمل</option>
-                        <option value="cancelled" data-i18n="filter_cancelled">ملغي</option>
+                    <select id="brand-filter" onchange="filterOrders()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                        <option value="all" data-i18n="filter_all_brands">جميع البراندات</option>
+                        <option value="بربريس برجر">بربريس برجر</option>
+                        <option value="ايس كريم فاير">ايس كريم فاير</option>
+                        <option value="بيتزا كراست">بيتزا كراست</option>
                     </select>
-
-                    <input type="text" id="search-input" onkeyup="filterOrders()" data-i18n-placeholder="search_placeholder" placeholder="ابحث برقم الطلب..." class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 w-full sm:w-48">
-                </div>
-
-                <div class="flex items-center gap-2 w-full lg:w-auto justify-end">
-                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 border border-slate-700" data-i18n="export_excel_btn">
-                        📊 تصدير Excel
-                    </button>
-                    <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-md shadow-indigo-600/20" data-i18n="add_order_btn">
-                        + إنشاء طلب تغذية لفرع
-                    </button>
                 </div>
             </div>
 
@@ -157,24 +158,24 @@
             <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
                 
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pb-3 border-b border-slate-800 text-[11px] text-slate-400">
+                    <div>
+                        <span id="results-counter" class="font-bold text-indigo-400" data-i18n="pagination_info">عرض 0 من أصل 0 طلب</span>
+                    </div>
                     <div class="flex items-center gap-2">
+                        <div id="bulk-actions-container" class="hidden items-center gap-2 pl-2 pr-2 border-l border-slate-800">
+                            <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2 py-0.5 rounded text-[11px] transition" data-i18n="bulk_status_btn">تغيير الحالة</button>
+                            <span class="text-indigo-400 font-semibold" id="selected-count">0 محدد</span>
+                        </div>
                         <div class="flex items-center gap-1.5">
-                            <span data-i18n="pagination_show">عرض</span>
+                            <span data-i18n="pagination_per_page">طلب لكل صفحة</span>
                             <select id="items-per-page" class="bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs">
                                 <option value="25">25</option>
                                 <option value="75">75</option>
                                 <option value="125">125</option>
                                 <option value="200">200</option>
                             </select>
-                            <span data-i18n="pagination_per_page">طلب لكل صفحة</span>
+                            <span data-i18n="pagination_show">عرض</span>
                         </div>
-                        <div id="bulk-actions-container" class="hidden items-center gap-2 pl-2 pr-2 border-r border-slate-800">
-                            <span class="text-indigo-400 font-semibold" id="selected-count">0 محدد</span>
-                            <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2 py-0.5 rounded text-[11px] transition" data-i18n="bulk_status_btn">تغيير الحالة</button>
-                        </div>
-                    </div>
-                    <div>
-                        <span id="results-counter" class="font-bold text-indigo-400" data-i18n="pagination_info">عرض 0 من أصل 0 طلب</span>
                     </div>
                 </div>
 
@@ -182,17 +183,17 @@
                     <table class="w-full text-right border-collapse">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 text-[11px]">
+                                <th class="py-2.5 px-3 text-center" data-i18n="th_actions">الإجراءات</th>
+                                <th class="py-2.5 px-3" data-i18n="th_status">حالة الطلب</th>
+                                <th class="py-2.5 px-3" data-i18n="th_notes">الملاحظات</th>
+                                <th class="py-2.5 px-3" data-i18n="th_date">التاريخ والوقت</th>
+                                <th class="py-2.5 px-3" data-i18n="th_items_count">العدد الإجمالي</th>
+                                <th class="py-2.5 px-3" data-i18n="th_items_name">الأصناف المطلوبة</th>
+                                <th class="py-2.5 px-3" data-i18n="th_branch_name">فرع المطعم</th>
+                                <th class="py-2.5 px-3" data-i18n="th_order_id">رقم الطلب</th>
                                 <th class="py-2.5 px-3 w-8">
                                     <input type="checkbox" id="select-all" onclick="toggleSelectAll(this)" class="rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer w-3.5 h-3.5">
                                 </th>
-                                <th class="py-2.5 px-3" data-i18n="th_order_id">رقم الطلب</th>
-                                <th class="py-2.5 px-3" data-i18n="th_branch_name">فرع المطعم</th>
-                                <th class="py-2.5 px-3" data-i18n="th_items_name">الأصناف المطلوبة</th>
-                                <th class="py-2.5 px-3" data-i18n="th_items_count">العدد الإجمالي</th>
-                                <th class="py-2.5 px-3" data-i18n="th_date">التاريخ والوقت</th>
-                                <th class="py-2.5 px-3" data-i18n="th_notes">الملاحظات</th>
-                                <th class="py-2.5 px-3" data-i18n="th_status">حالة الطلب</th>
-                                <th class="py-2.5 px-3 text-center" data-i18n="th_actions">الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody class="text-xs divide-y divide-slate-800/40" id="orders-table-body">
@@ -245,18 +246,18 @@
                 tr.setAttribute('data-status', order.status);
 
                 tr.innerHTML = `
-                    <td class="py-3 px-3">
-                        <input type="checkbox" onclick="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer w-3.5 h-3.5">
-                    </td>
-                    <td class="py-3 px-3 font-mono text-indigo-300 font-semibold">${order.id}</td>
-                    <td class="py-3 px-3 font-bold text-slate-200">${order.branch} <span class="block text-[10px] text-slate-400 font-normal">${order.brand}</span></td>
-                    <td class="py-3 px-3 text-slate-300">${order.items}</td>
-                    <td class="py-3 px-3 font-bold text-indigo-400">${order.qty}</td>
-                    <td class="py-3 px-3 text-slate-400 text-[11px]">${order.date}</td>
-                    <td class="py-3 px-3 text-slate-400 text-[11px]">${order.notes}</td>
-                    <td class="py-3 px-3"><span class="${statusBadgeClass} px-2 py-0.5 rounded-full text-[11px]" data-i18n="${statusTextKey}">${order.status}</span></td>
                     <td class="py-3 px-3 text-center">
                         <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded text-[11px] font-medium transition" data-i18n="view_btn">معاينة</button>
+                    </td>
+                    <td class="py-3 px-3"><span class="${statusBadgeClass} px-2 py-0.5 rounded-full text-[11px]" data-i18n="${statusTextKey}">${order.status}</span></td>
+                    <td class="py-3 px-3 text-slate-400 text-[11px]">${order.notes}</td>
+                    <td class="py-3 px-3 text-slate-400 text-[11px]">${order.date}</td>
+                    <td class="py-3 px-3 font-bold text-indigo-400">${order.qty}</td>
+                    <td class="py-3 px-3 text-slate-300">${order.items}</td>
+                    <td class="py-3 px-3 font-bold text-slate-200">${order.branch} <span class="block text-[10px] text-slate-400 font-normal">${order.brand}</span></td>
+                    <td class="py-3 px-3 font-mono text-indigo-300 font-semibold">${order.id}</td>
+                    <td class="py-3 px-3">
+                        <input type="checkbox" onclick="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer w-3.5 h-3.5">
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -376,7 +377,8 @@
                 brand_name: "Keymerv Warehouse",
                 nav_overview: "الرئيسية",
                 nav_inventory: "إدارة المخزون",
-                nav_branches: "فروع المطاعم",
+                nav_branches: "الفروع",
+                nav_suppliers: "التوريد والموردين",
                 nav_orders: "طلبات التغذية",
                 nav_settings: "الإعدادات",
                 user_role_admin: "الإدارة العامة (المالك)",
@@ -425,6 +427,7 @@
                 nav_overview: "Overview",
                 nav_inventory: "Inventory",
                 nav_branches: "Branches",
+                nav_suppliers: "Suppliers",
                 nav_orders: "Replenishment Orders",
                 nav_settings: "Settings",
                 user_role_admin: "General Admin (Owner)",
