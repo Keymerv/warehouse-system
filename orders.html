@@ -1,1 +1,333 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="orders_title">طلبات التغذية - Keymerv Warehouse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        /* تخصيص شريط التمرير (Scrollbar) ليصبح داكناً وأنيقاً */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #020617;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden">
 
+    <!-- القائمة الجانبية (Sidebar) -->
+    <aside class="w-64 bg-slate-900 border-l border-slate-800 flex flex-col justify-between hidden md:flex">
+        <div>
+            <div class="p-5 border-b border-slate-800 flex items-center gap-2.5">
+                <div class="bg-indigo-600 text-white font-bold px-2.5 py-1.5 rounded-xl text-sm">K</div>
+                <span class="font-bold text-xs tracking-tight text-slate-200" data-i18n="brand_name">Keymerv Warehouse</span>
+            </div>
+
+            <nav class="p-4 space-y-2">
+                <a href="dashboard.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition" data-i18n="nav_overview">الرئيسية</a>
+                <a href="inventory.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition" data-i18n="nav_inventory">إدارة المخزون</a>
+                <a href="branches.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition" data-i18n="nav_branches">فروع المطاعم</a>
+                <a href="orders.html" class="flex items-center gap-3 px-4 py-2.5 bg-indigo-600 text-white rounded-xl font-medium transition" data-i18n="nav_orders">طلبات التغذية</a>
+                <a href="settings.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition" data-i18n="nav_settings">الإعدادات</a>
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-slate-800 flex items-center justify-between">
+            <div class="text-sm">
+                <p class="font-bold text-slate-200" data-i18n="user_role_admin">الإدارة العامة (المالك)</p>
+                <p class="text-xs text-slate-400">admin@keymerv.com</p>
+            </div>
+            <a href="login.html" class="text-rose-400 hover:text-rose-300 text-xs font-semibold" data-i18n="logout">خروج</a>
+        </div>
+    </aside>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+        <header class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold" data-i18n="orders_header">إدارة طلبات التغذية للفروع</h1>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleLanguage()" id="lang-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-sm font-medium transition">
+                    English
+                </button>
+            </div>
+        </header>
+
+        <div class="p-6 space-y-6">
+            
+            <!-- إحصائيات سريعة لطلبات التغذية -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm" data-i18n="stat_pending_orders">طلبات قيد المعالجة</p>
+                        <h3 class="text-2xl font-extrabold mt-1 text-amber-400">12</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-amber-600/10 text-amber-400 rounded-xl flex items-center justify-center font-bold text-lg">⏳</div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm" data-i18n="stat_shipping_orders">جاري التجهيز والشحن</p>
+                        <h3 class="text-2xl font-extrabold mt-1 text-indigo-400">5</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-indigo-600/10 text-indigo-400 rounded-xl flex items-center justify-center font-bold text-lg">🚚</div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm" data-i18n="stat_completed_orders">الطلبات المكتملة اليوم</p>
+                        <h3 class="text-2xl font-extrabold mt-1 text-emerald-400">28</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-600/10 text-emerald-400 rounded-xl flex items-center justify-center font-bold text-lg">✅</div>
+                </div>
+            </div>
+
+            <!-- شريط الأدوات والفلترة وزر طلب جديد -->
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+                <div class="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
+                    <input type="text" id="search-input" onkeyup="filterOrders()" data-i18n-placeholder="search_placeholder" placeholder="ابحث برقم الطلب أو اسم الفرع..." class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 w-full sm:w-64">
+                    
+                    <select id="status-filter" onchange="filterOrders()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                        <option value="all" data-i18n="filter_all">جميع الحالات</option>
+                        <option value="pending" data-i18n="filter_pending">قيد المعالجة</option>
+                        <option value="shipping" data-i18n="filter_shipping">جاري الشحن</option>
+                        <option value="completed" data-i18n="filter_completed">مكتمل</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-2.5 w-full lg:w-auto justify-end">
+                    <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-semibold transition shadow-lg shadow-indigo-600/25" data-i18n="add_order_btn">
+                        + إنشاء طلب تغذية لفرع
+                    </button>
+                </div>
+            </div>
+
+            <!-- جدول طلبات التغذية -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                
+                <!-- إعدادات عدد الصفحات للسرعة وتنظيم العرض -->
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pb-4 border-b border-slate-800 text-xs text-slate-400">
+                    <div class="flex items-center gap-2">
+                        <span data-i18n="pagination_show">عرض</span>
+                        <select id="items-per-page" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <option value="25">25</option>
+                            <option value="75">75</option>
+                            <option value="125">125</option>
+                            <option value="200">200</option>
+                        </select>
+                        <span data-i18n="pagination_per_page">طلب لكل صفحة</span>
+                    </div>
+                    <div>
+                        <span id="results-counter" class="font-bold text-indigo-400" data-i18n="pagination_info">عرض 3 من أصل 45 طلب</span>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 text-xs">
+                                <th class="py-3 px-4" data-i18n="th_order_id">رقم الطلب</th>
+                                <th class="py-3 px-4" data-i18n="th_branch_name">فرع المطعم</th>
+                                <th class="py-3 px-4" data-i18n="th_items_count">الأصناف المطلوبة</th>
+                                <th class="py-3 px-4" data-i18n="th_date">التاريخ والوقت</th>
+                                <th class="py-3 px-4" data-i18n="th_status">حالة الطلب</th>
+                                <th class="py-3 px-4 text-center" data-i18n="th_actions">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-xs divide-y divide-slate-800/50" id="orders-table-body">
+                            <!-- طلب 1 - قيد المعالجة -->
+                            <tr class="order-row" data-status="pending">
+                                <td class="py-3.5 px-4 font-mono text-indigo-300">ORD-8012</td>
+                                <td class="py-3.5 px-4 font-bold text-slate-200">فرع النخيل مول</td>
+                                <td class="py-3.5 px-4 text-slate-400">14 صنف (لحوم، خبز، صوصات)</td>
+                                <td class="py-3.5 px-4 text-slate-400">2026-07-25 / 04:15 م</td>
+                                <td class="py-3.5 px-4"><span class="bg-amber-500/10 text-amber-400 px-2.5 py-1 rounded-full text-xs" data-i18n="status_pending">قيد المعالجة</span></td>
+                                <td class="py-3.5 px-4 text-center">
+                                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition" data-i18n="view_btn">معاينة</button>
+                                </td>
+                            </tr>
+                            <!-- طلب 2 - جاري الشحن -->
+                            <tr class="order-row" data-status="shipping">
+                                <td class="py-3.5 px-4 font-mono text-indigo-300">ORD-8011</td>
+                                <td class="py-3.5 px-4 font-bold text-slate-200">فرع التحلية</td>
+                                <td class="py-3.5 px-4 text-slate-400">8 أصناف (مستلزمات تغليف)</td>
+                                <td class="py-3.5 px-4 text-slate-400">2026-07-25 / 02:30 م</td>
+                                <td class="py-3.5 px-4"><span class="bg-indigo-500/10 text-indigo-400 px-2.5 py-1 rounded-full text-xs" data-i18n="status_shipping">جاري الشحن</span></td>
+                                <td class="py-3.5 px-4 text-center">
+                                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition" data-i18n="view_btn">معاينة</button>
+                                </td>
+                            </tr>
+                            <!-- طلب 3 - مكتمل -->
+                            <tr class="order-row" data-status="completed">
+                                <td class="py-3.5 px-4 font-mono text-indigo-300">ORD-8009</td>
+                                <td class="py-3.5 px-4 font-bold text-slate-200">فرع الياسمين</td>
+                                <td class="py-3.5 px-4 text-slate-400">22 صنف (تموين كامل للمستودع الفرعي)</td>
+                                <td class="py-3.5 px-4 text-slate-400">2026-07-25 / 11:00 ص</td>
+                                <td class="py-3.5 px-4"><span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full text-xs" data-i18n="status_completed">مكتمل</span></td>
+                                <td class="py-3.5 px-4 text-center">
+                                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition" data-i18n="view_btn">معاينة</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- محرك التصفية والترجمة -->
+    <script>
+        function filterOrders() {
+            const statusFilter = document.getElementById('status-filter').value;
+            const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
+            const rows = document.querySelectorAll('.order-row');
+            
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const rowStatus = row.getAttribute('data-status');
+                const rowContent = row.innerText.toLowerCase();
+
+                const matchesStatus = (statusFilter === 'all' || rowStatus === statusFilter);
+                const matchesSearch = (rowContent.includes(searchQuery));
+
+                if (matchesStatus && matchesSearch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            const counterElement = document.getElementById('results-counter');
+            const lang = document.getElementById('html-root').getAttribute('lang') || 'ar';
+            
+            if (lang === 'ar') {
+                counterElement.innerText = `عرض ${visibleCount} من أصل 45 طلب`;
+            } else {
+                counterElement.innerText = `Showing ${visibleCount} of 45 orders`;
+            }
+        }
+
+        const ordersTranslations = {
+            ar: {
+                orders_title: "طلبات التغذية - Keymerv Warehouse",
+                brand_name: "Keymerv Warehouse",
+                nav_overview: "الرئيسية",
+                nav_inventory: "إدارة المخزون",
+                nav_branches: "فروع المطاعم",
+                nav_orders: "طلبات التغذية",
+                nav_settings: "الإعدادات",
+                user_role_admin: "الإدارة العامة (المالك)",
+                logout: "خروج",
+                orders_header: "إدارة طلبات التغذية للفروع",
+                stat_pending_orders: "طلبات قيد المعالجة",
+                stat_shipping_orders: "جاري التجهيز والشحن",
+                stat_completed_orders: "الطلبات المكتملة اليوم",
+                search_placeholder: "ابحث برقم الطلب أو اسم الفرع...",
+                filter_all: "جميع الحالات",
+                filter_pending: "قيد المعالجة",
+                filter_shipping: "جاري الشحن",
+                filter_completed: "مكتمل",
+                add_order_btn: "+ إنشاء طلب تغذية لفرع",
+                th_order_id: "رقم الطلب",
+                th_branch_name: "فرع المطعم",
+                th_items_count: "الأصناف المطلوبة",
+                th_date: "التاريخ والوقت",
+                th_status: "حالة الطلب",
+                th_actions: "الإجراءات",
+                status_pending: "قيد المعالجة",
+                status_shipping: "جاري الشحن",
+                status_completed: "مكتمل",
+                view_btn: "معاينة",
+                pagination_show: "عرض",
+                pagination_per_page: "طلب لكل صفحة",
+                pagination_info: "عرض 3 من أصل 45 طلب"
+            },
+            en: {
+                orders_title: "Replenishment Orders - Keymerv Warehouse",
+                brand_name: "Keymerv Warehouse",
+                nav_overview: "Overview",
+                nav_inventory: "Inventory",
+                nav_branches: "Branches",
+                nav_orders: "Replenishment Orders",
+                nav_settings: "Settings",
+                user_role_admin: "General Admin (Owner)",
+                logout: "Logout",
+                orders_header: "Branch Replenishment Orders",
+                stat_pending_orders: "Pending Orders",
+                stat_shipping_orders: "In Transit / Shipping",
+                stat_completed_orders: "Completed Today",
+                search_placeholder: "Search order ID or branch...",
+                filter_all: "All Statuses",
+                filter_pending: "Pending",
+                filter_shipping: "Shipping",
+                filter_completed: "Completed",
+                add_order_btn: "+ Create Branch Order",
+                th_order_id: "Order ID",
+                th_branch_name: "Branch Name",
+                th_items_count: "Requested Items",
+                th_date: "Date & Time",
+                th_status: "Status",
+                th_actions: "Actions",
+                status_pending: "Pending",
+                status_shipping: "Shipping",
+                status_completed: "Completed",
+                view_btn: "View",
+                pagination_show: "Show",
+                pagination_per_page: "orders per page",
+                pagination_info: "Showing 3 of 45 orders"
+            }
+        };
+
+        let currentLang = localStorage.getItem('lang') || 'ar';
+
+        function applyOrdersLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('lang', lang);
+            
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('lang', lang);
+            htmlRoot.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+
+            const langBtn = document.getElementById('lang-btn');
+            if (langBtn) {
+                langBtn.innerText = lang === 'ar' ? 'English' : 'العربية';
+            }
+
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (ordersTranslations[lang] && ordersTranslations[lang][key]) {
+                    element.innerText = ordersTranslations[lang][key];
+                }
+            });
+
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-i18n-placeholder');
+                if (ordersTranslations[lang] && ordersTranslations[lang][key]) {
+                    element.setAttribute('placeholder', ordersTranslations[lang][key]);
+                }
+            });
+
+            filterOrders();
+        }
+
+        function toggleLanguage() {
+            const newLang = currentLang === 'ar' ? 'en' : 'ar';
+            applyOrdersLanguage(newLang);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            applyOrdersLanguage(currentLang);
+        });
+    </script>
+</body>
+</html>
