@@ -25,7 +25,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden text-xs">
 
-    <!-- القائمة الجانبية (Sidebar) بالعرض القياسي w-64 -->
+    <!-- القائمة الجانبية (Sidebar) -->
     <aside class="w-64 bg-slate-900 border-l border-slate-800 flex flex-col justify-between shrink-0">
         <div>
             <div class="p-4 border-b border-slate-800 flex items-center gap-2">
@@ -37,8 +37,9 @@
                 <a href="dashboard.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_overview">الرئيسية</a>
                 <a href="inventory.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_inventory">إدارة المخزون</a>
                 <a href="branches.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_branches">فروع المطاعم</a>
-                <a href="orders.html" class="flex items-center gap-2.5 px-3 py-2 bg-indigo-600 text-white rounded-lg font-medium transition" data-i18n="nav_orders">طلبات التغذية</a>
-                <a href="supply.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_supply">التوريد والموردين</a>
+                <a href="orders.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_orders">طلبات التغذية</a>
+                <!-- تم نقل الأكتيف هنا -->
+                <a href="supply.html" class="flex items-center gap-2.5 px-3 py-2 bg-indigo-600 text-white rounded-lg font-medium transition" data-i18n="nav_supply">التوريد والموردين</a>
                 <a href="settings.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_settings">الإعدادات</a>
             </nav>
         </div>
@@ -65,8 +66,8 @@
 
         <div class="p-5 space-y-4">
             
-            <!-- إحصائيات سريعة للحالات المحدثة (5 حالات) -->
-            <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+            <!-- إحصائيات سريعة (6 حالات الآن شاملة متأخر) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                 <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex items-center justify-between">
                     <div>
                         <p class="text-slate-400 text-[11px]" data-i18n="stat_requested">تم الطلب</p>
@@ -94,6 +95,14 @@
                         <h3 class="text-base font-extrabold mt-0.5 text-emerald-400" id="stat-completed-count">0</h3>
                     </div>
                     <div class="w-8 h-8 bg-emerald-600/10 text-emerald-400 rounded-lg flex items-center justify-center font-bold text-xs">✅</div>
+                </div>
+                <!-- حالة متأخر الجديدة -->
+                <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-[11px]" data-i18n="stat_late">متأخر</p>
+                        <h3 class="text-base font-extrabold mt-0.5 text-amber-400" id="stat-late-count">0</h3>
+                    </div>
+                    <div class="w-8 h-8 bg-amber-600/10 text-amber-400 rounded-lg flex items-center justify-center font-bold text-xs">⏰</div>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex items-center justify-between">
                     <div>
@@ -128,6 +137,7 @@
                         <option value="delivering" data-i18n="filter_delivering">جاري التوصيل</option>
                         <option value="inspecting" data-i18n="filter_inspecting">تم الاستلام للفحص</option>
                         <option value="completed" data-i18n="filter_completed">مكتمل</option>
+                        <option value="late" data-i18n="filter_late">متأخر</option>
                         <option value="cancelled" data-i18n="filter_cancelled">ملغي</option>
                     </select>
 
@@ -167,6 +177,7 @@
                                 <option value="delivering" data-i18n="status_delivering">جاري التوصيل</option>
                                 <option value="inspecting" data-i18n="status_inspecting">تم الاستلام للفحص</option>
                                 <option value="completed" data-i18n="status_completed">مكتمل</option>
+                                <option value="late" data-i18n="status_late">متأخر</option>
                                 <option value="cancelled" data-i18n="status_cancelled">ملغي</option>
                             </select>
                             <button onclick="applyBulkStatus()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 rounded text-xs font-medium transition" data-i18n="apply_btn">تطبيق</button>
@@ -214,6 +225,7 @@
             { id: "ORD-8015", brand: "بربريس برجر", branch: "فرع العليا", items: "لحوم برجر، خبز بطاطس", qty: "200 وحدة", date: "2026-07-25 / 04:30 م", notes: "طلب جديد بانتظار المراجعة", status: "requested" },
             { id: "ORD-8012", brand: "بربريس برجر", branch: "فرع النخيل مول", items: "لحوم برجر، صوص خاص", qty: "350 وحدة", date: "2026-07-25 / 04:15 م", notes: "توصيل عاجل قبل فترة الظهر", status: "delivering" },
             { id: "ORD-8010", brand: "ايس كريم فاير", branch: "فرع الملك فهد", items: "أقماع آيس كريم، صوص شوكولاتة", qty: "150 وحدة", date: "2026-07-25 / 03:00 م", notes: "جاري توصيل الطلب للفرع", status: "delivering" },
+            { id: "ORD-8009", brand: "بيتزا كراست", branch: "فرع الملك فهد", items: "صلصة طماطم، زيت زيتون", qty: "80 وحدة", date: "2026-07-24 / 11:00 ص", notes: "تأخر المندوب عن الموعد المحدد", status: "late" },
             { id: "ORD-8011", brand: "بيتزا كراست", branch: "فرع التحلية", items: "جبنة موزاريلا، عجينة بيتزا", qty: "120 وحدة", date: "2026-07-25 / 02:30 م", notes: "تم التسليم وبانتظار الفحص", status: "inspecting" },
             { id: "ORD-8006", brand: "بربريس برجر", branch: "فرع الصحافة", items: "بطاطس مقلية مجمدة", qty: "50 وحدة", date: "2026-07-24 / 08:00 م", notes: "تم استلام الطلب بنجاح", status: "completed" }
         ];
@@ -231,6 +243,7 @@
                     case 'delivering': badgeClass = 'bg-indigo-500/10 text-indigo-400'; statusTextKey = 'status_delivering'; break;
                     case 'inspecting': badgeClass = 'bg-purple-500/10 text-purple-400'; statusTextKey = 'status_inspecting'; break;
                     case 'completed': badgeClass = 'bg-emerald-500/10 text-emerald-400'; statusTextKey = 'status_completed'; break;
+                    case 'late': badgeClass = 'bg-amber-500/10 text-amber-400'; statusTextKey = 'status_late'; break;
                     case 'cancelled': badgeClass = 'bg-rose-500/10 text-rose-400'; statusTextKey = 'status_cancelled'; break;
                 }
 
@@ -263,13 +276,14 @@
         }
 
         function updateStats() {
-            const counts = { requested: 0, delivering: 0, inspecting: 0, completed: 0, cancelled: 0 };
+            const counts = { requested: 0, delivering: 0, inspecting: 0, completed: 0, late: 0, cancelled: 0 };
             ordersData.forEach(o => { if(counts[o.status] !== undefined) counts[o.status]++; });
 
             document.getElementById('stat-requested-count').innerText = counts.requested;
             document.getElementById('stat-delivering-count').innerText = counts.delivering;
             document.getElementById('stat-inspecting-count').innerText = counts.inspecting;
             document.getElementById('stat-completed-count').innerText = counts.completed;
+            document.getElementById('stat-late-count').innerText = counts.late;
             document.getElementById('stat-cancelled-count').innerText = counts.cancelled;
         }
 
@@ -405,6 +419,7 @@
                 stat_delivering: "جاري التوصيل",
                 stat_inspecting: "تم الاستلام للفحص",
                 stat_completed: "مكتمل",
+                stat_late: "متأخر",
                 stat_cancelled: "ملغي",
                 search_placeholder: "ابحث برقم الطلب...",
                 filter_all_brands: "جميع البراندات",
@@ -414,6 +429,7 @@
                 filter_delivering: "جاري التوصيل",
                 filter_inspecting: "تم الاستلام للفحص",
                 filter_completed: "مكتمل",
+                filter_late: "متأخر",
                 filter_cancelled: "ملغي",
                 export_excel_btn: "📊 تنزيل Excel",
                 add_order_btn: "+ إنشاء طلب تغذية لفرع",
@@ -431,6 +447,7 @@
                 status_delivering: "جاري التوصيل",
                 status_inspecting: "تم الاستلام للفحص",
                 status_completed: "مكتمل",
+                status_late: "متأخر",
                 status_cancelled: "ملغي",
                 view_btn: "معاينة",
                 pagination_show: "عرض",
@@ -453,6 +470,7 @@
                 stat_delivering: "Delivering",
                 stat_inspecting: "Inspecting",
                 stat_completed: "Completed",
+                stat_late: "Late",
                 stat_cancelled: "Cancelled",
                 search_placeholder: "Search order ID...",
                 filter_all_brands: "All Brands",
@@ -462,6 +480,7 @@
                 filter_delivering: "Delivering",
                 filter_inspecting: "Inspecting",
                 filter_completed: "Completed",
+                filter_late: "Late",
                 filter_cancelled: "Cancelled",
                 export_excel_btn: "📊 Download Excel",
                 add_order_btn: "+ Create Branch Order",
@@ -479,6 +498,7 @@
                 status_delivering: "Delivering",
                 status_inspecting: "Inspecting",
                 status_completed: "Completed",
+                status_late: "Late",
                 status_cancelled: "Cancelled",
                 view_btn: "View",
                 pagination_show: "Show",
