@@ -1,21 +1,23 @@
 const translations = {
     ar: {
         page_title: "نظام إدارة المستودعات وفروع المطاعم",
-        brand_name: "نظام المستودعات",
+        brand_name: "Keymerv Warehouse",
         login_btn: "تسجيل الدخول",
         hero_title: "الربط الذكي بين المستودع الرئيسي وفروع مطاعمك",
         hero_desc: "أدر مخزونك، تتبع طلبات التوريد لكل فرع بدقة، وتحكم بالكميات الحية بلحظة واحدة وبدون أي تعقيد.",
         start_now: "ابدأ الآن",
-        footer_text: "جميع الحقوق محفوظة © نظام المستودعات والفروع 2026"
+        platform_badge: "نظام تابع لـ Keymerv Platform لإدارة الأعمال والخدمات",
+        footer_text: "جميع الحقوق محفوظة © 2026 - Keymerv Warehouse (أحد مشاريع Keymerv Platform)"
     },
     en: {
         page_title: "Warehouse & Restaurant Branches Management System",
-        brand_name: "Warehouse System",
+        brand_name: "Keymerv Warehouse",
         login_btn: "Login",
         hero_title: "Smart Integration Between Main Warehouse & Restaurant Branches",
         hero_desc: "Manage your inventory, track branch supply orders precisely, and control live quantities effortlessly.",
         start_now: "Get Started",
-        footer_text: "All Rights Reserved © Warehouse & Branches System 2026"
+        platform_badge: "A subsidiary system of Keymerv Platform for business & services",
+        footer_text: "All Rights Reserved © 2026 - Keymerv Warehouse (A Keymerv Platform Project)"
     }
 };
 
@@ -29,13 +31,11 @@ function applyLanguage(lang) {
     htmlRoot.setAttribute('lang', lang);
     htmlRoot.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
 
-    // تغيير نص زر اللغة
     const langBtn = document.getElementById('lang-btn');
     if (langBtn) {
         langBtn.innerText = lang === 'ar' ? 'English' : 'العربية';
     }
 
-    // تحديث النصوص بناءً على مفاتيح البيانات
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
         if (translations[lang][key]) {
@@ -49,7 +49,6 @@ function toggleLanguage() {
     applyLanguage(newLang);
 }
 
-// تطبيق اللغة عند التحميل
 document.addEventListener('DOMContentLoaded', () => {
     applyLanguage(currentLang);
 });
