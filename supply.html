@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
+        /* تخصيص شريط التمرير (Scrollbar) ليصبح داكناً وأنيقاً */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -25,25 +26,24 @@
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden text-xs">
 
-    <!-- القائمة الجانبية (Sidebar) -->
-    <aside class="w-64 bg-slate-900 border-l border-slate-800 flex flex-col justify-between hidden md:flex shrink-0">
-        <div>
+    <!-- القائمة الجانبية (Sidebar) بنفس الحجم القياسي w-64 المعتمد في باقي الصفحات -->
+    <!-- القائمة الجانبية (Sidebar) بالعرض القياسي الموحد w-64 -->
+<aside class="w-64 bg-slate-900 border-l border-slate-800 flex flex-col justify-between hidden md:flex shrink-0">
+    <div>
             <div class="p-4 border-b border-slate-800 flex items-center gap-2">
                 <div class="bg-indigo-600 text-white font-bold px-2 py-1 rounded-lg text-xs">K</div>
                 <span class="font-bold text-xs tracking-tight text-slate-200" data-i18n="brand_name">Keymerv Warehouse</span>
             </div>
-
+    
             <nav class="p-3 space-y-1.5">
                 <a href="dashboard.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_overview">الرئيسية</a>
                 <a href="inventory.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_inventory">إدارة المخزون</a>
                 <a href="branches.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_branches">فروع المطاعم</a>
-                <a href="orders.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_orders">طلبات التغذية</a>
-                <!-- تم نقل الأكتيف هنا -->
-                <a href="supply.html" class="flex items-center gap-2.5 px-3 py-2 bg-indigo-600 text-white rounded-lg font-medium transition" data-i18n="nav_supply">التوريد والموردين</a>
+                <a href="orders.html" class="flex items-center gap-2.5 px-3 py-2 bg-indigo-600 text-white rounded-lg font-medium transition" data-i18n="nav_orders">طلبات التغذية</a>
                 <a href="settings.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_settings">الإعدادات</a>
             </nav>
         </div>
-
+    
         <div class="p-3 border-t border-slate-800 flex items-center justify-between">
             <div>
                 <p class="font-bold text-slate-200 text-xs" data-i18n="user_role_admin">الإدارة العامة (المالك)</p>
@@ -52,7 +52,6 @@
             <a href="login.html" class="text-rose-400 hover:text-rose-300 text-[11px] font-semibold" data-i18n="logout">خروج</a>
         </div>
     </aside>
-
     <!-- المحتوى الرئيسي -->
     <main class="flex-1 flex flex-col h-screen overflow-y-auto">
         <header class="bg-slate-900 border-b border-slate-800 px-5 py-3 flex justify-between items-center">
@@ -66,50 +65,49 @@
 
         <div class="p-5 space-y-4">
             
-            <!-- إحصائيات سريعة (6 حالات الآن شاملة متأخر) -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex items-center justify-between">
+            <!-- إحصائيات سريعة بحجم أصغر وأنيق -->
+            <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div>
-                        <p class="text-slate-400 text-[11px]" data-i18n="stat_requested">تم الطلب</p>
-                        <h3 class="text-base font-extrabold mt-0.5 text-sky-400" id="stat-requested-count">0</h3>
+                        <p class="text-slate-400 text-[11px]" data-i18n="stat_new">جديد</p>
+                        <h3 class="text-lg font-extrabold mt-0.5 text-sky-400" id="stat-new-count">0</h3>
                     </div>
-                    <div class="w-8 h-8 bg-sky-600/10 text-sky-400 rounded-lg flex items-center justify-center font-bold text-xs">📥</div>
+                    <div class="w-9 h-9 bg-sky-600/10 text-sky-400 rounded-lg flex items-center justify-center font-bold text-sm">🆕</div>
                 </div>
-                <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex items-center justify-between">
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-[11px]" data-i18n="stat_preparing">جاري التجهيز</p>
+                        <h3 class="text-lg font-extrabold mt-0.5 text-amber-400" id="stat-preparing-count">0</h3>
+                    </div>
+                    <div class="w-9 h-9 bg-amber-600/10 text-amber-400 rounded-lg flex items-center justify-center font-bold text-sm">⏳</div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-[11px]" data-i18n="stat_ready">جاهز</p>
+                        <h3 class="text-lg font-extrabold mt-0.5 text-blue-400" id="stat-ready-count">0</h3>
+                    </div>
+                    <div class="w-9 h-9 bg-blue-600/10 text-blue-400 rounded-lg flex items-center justify-center font-bold text-sm">📦</div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div>
                         <p class="text-slate-400 text-[11px]" data-i18n="stat_delivering">جاري التوصيل</p>
-                        <h3 class="text-base font-extrabold mt-0.5 text-indigo-400" id="stat-delivering-count">0</h3>
+                        <h3 class="text-lg font-extrabold mt-0.5 text-indigo-400" id="stat-delivering-count">0</h3>
                     </div>
-                    <div class="w-8 h-8 bg-indigo-600/10 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-xs">🚚</div>
+                    <div class="w-9 h-9 bg-indigo-600/10 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-sm">🚚</div>
                 </div>
-                <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex items-center justify-between">
-                    <div>
-                        <p class="text-slate-400 text-[11px]" data-i18n="stat_inspecting">تم الاستلام للفحص</p>
-                        <h3 class="text-base font-extrabold mt-0.5 text-purple-400" id="stat-inspecting-count">0</h3>
-                    </div>
-                    <div class="w-8 h-8 bg-purple-600/10 text-purple-400 rounded-lg flex items-center justify-center font-bold text-xs">🔍</div>
-                </div>
-                <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex items-center justify-between">
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div>
                         <p class="text-slate-400 text-[11px]" data-i18n="stat_completed">مكتمل</p>
-                        <h3 class="text-base font-extrabold mt-0.5 text-emerald-400" id="stat-completed-count">0</h3>
+                        <h3 class="text-lg font-extrabold mt-0.5 text-emerald-400" id="stat-completed-count">0</h3>
                     </div>
-                    <div class="w-8 h-8 bg-emerald-600/10 text-emerald-400 rounded-lg flex items-center justify-center font-bold text-xs">✅</div>
+                    <div class="w-9 h-9 bg-emerald-600/10 text-emerald-400 rounded-lg flex items-center justify-center font-bold text-sm">✅</div>
                 </div>
-                <!-- حالة متأخر الجديدة -->
-                <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex items-center justify-between">
-                    <div>
-                        <p class="text-slate-400 text-[11px]" data-i18n="stat_late">متأخر</p>
-                        <h3 class="text-base font-extrabold mt-0.5 text-amber-400" id="stat-late-count">0</h3>
-                    </div>
-                    <div class="w-8 h-8 bg-amber-600/10 text-amber-400 rounded-lg flex items-center justify-center font-bold text-xs">⏰</div>
-                </div>
-                <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex items-center justify-between">
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div>
                         <p class="text-slate-400 text-[11px]" data-i18n="stat_cancelled">ملغي</p>
-                        <h3 class="text-base font-extrabold mt-0.5 text-rose-400" id="stat-cancelled-count">0</h3>
+                        <h3 class="text-lg font-extrabold mt-0.5 text-rose-400" id="stat-cancelled-count">0</h3>
                     </div>
-                    <div class="w-8 h-8 bg-rose-600/10 text-rose-400 rounded-lg flex items-center justify-center font-bold text-xs">❌</div>
+                    <div class="w-9 h-9 bg-rose-600/10 text-rose-400 rounded-lg flex items-center justify-center font-bold text-sm">❌</div>
                 </div>
             </div>
 
@@ -129,15 +127,16 @@
                         <option value="فرع النخيل مول">فرع النخيل مول</option>
                         <option value="فرع الملك فهد">فرع الملك فهد</option>
                         <option value="فرع التحلية">فرع التحلية</option>
+                        <option value="فرع الصحافة">فرع الصحافة</option>
                     </select>
 
                     <select id="status-filter" onchange="filterOrders()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
                         <option value="all" data-i18n="filter_all">جميع الحالات</option>
-                        <option value="requested" data-i18n="filter_requested">تم الطلب</option>
+                        <option value="new" data-i18n="filter_new">جديد</option>
+                        <option value="preparing" data-i18n="filter_preparing">جاري التجهيز</option>
+                        <option value="ready" data-i18n="filter_ready">جاهز</option>
                         <option value="delivering" data-i18n="filter_delivering">جاري التوصيل</option>
-                        <option value="inspecting" data-i18n="filter_inspecting">تم الاستلام للفحص</option>
                         <option value="completed" data-i18n="filter_completed">مكتمل</option>
-                        <option value="late" data-i18n="filter_late">متأخر</option>
                         <option value="cancelled" data-i18n="filter_cancelled">ملغي</option>
                     </select>
 
@@ -145,8 +144,8 @@
                 </div>
 
                 <div class="flex items-center gap-2 w-full lg:w-auto justify-end">
-                    <button onclick="exportToExcel()" class="bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 border border-emerald-600/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5" data-i18n="export_excel_btn">
-                        📊 تنزيل Excel
+                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 border border-slate-700" data-i18n="export_excel_btn">
+                        📊 تصدير Excel
                     </button>
                     <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-md shadow-indigo-600/20" data-i18n="add_order_btn">
                         + إنشاء طلب تغذية لفرع
@@ -164,23 +163,14 @@
                             <select id="items-per-page" class="bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs">
                                 <option value="25">25</option>
                                 <option value="75">75</option>
+                                <option value="125">125</option>
+                                <option value="200">200</option>
                             </select>
                             <span data-i18n="pagination_per_page">طلب لكل صفحة</span>
                         </div>
-                        
-                        <!-- شريط التحديد الجماعي لتغيير الحالة -->
                         <div id="bulk-actions-container" class="hidden items-center gap-2 pl-2 pr-2 border-r border-slate-800">
                             <span class="text-indigo-400 font-semibold" id="selected-count">0 محدد</span>
-                            <select id="bulk-status-select" class="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-200 text-xs">
-                                <option value="" data-i18n="bulk_change_status">تغيير حالة المحددين إلى...</option>
-                                <option value="requested" data-i18n="status_requested">تم الطلب</option>
-                                <option value="delivering" data-i18n="status_delivering">جاري التوصيل</option>
-                                <option value="inspecting" data-i18n="status_inspecting">تم الاستلام للفحص</option>
-                                <option value="completed" data-i18n="status_completed">مكتمل</option>
-                                <option value="late" data-i18n="status_late">متأخر</option>
-                                <option value="cancelled" data-i18n="status_cancelled">ملغي</option>
-                            </select>
-                            <button onclick="applyBulkStatus()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 rounded text-xs font-medium transition" data-i18n="apply_btn">تطبيق</button>
+                            <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2 py-0.5 rounded text-[11px] transition" data-i18n="bulk_status_btn">تغيير الحالة</button>
                         </div>
                     </div>
                     <div>
@@ -210,9 +200,11 @@
                         </tbody>
                     </table>
 
+                    <!-- رسالة التنبيه الذكية -->
                     <div id="no-results-row" class="hidden py-12 text-center text-slate-400">
-                        <div class="text-3xl mb-2">📭</div>
-                        <p class="font-semibold text-slate-200 text-sm" data-i18n="empty_title">لا توجد طلبات في النظام حالياً</p>
+                        <div class="text-3xl mb-2" id="empty-state-icon">📭</div>
+                        <p class="font-semibold text-slate-200 text-sm" id="empty-state-title">لا توجد طلبات في النظام حالياً</p>
+                        <p class="text-slate-400 text-xs mt-1" id="empty-state-desc">سيتم عرض طلبات الفروع هنا بمجرد إرسالها من قبل المطاعم.</p>
                     </div>
                 </div>
             </div>
@@ -222,29 +214,28 @@
     <!-- محرك التصفية والمنطق البرمجي -->
     <script>
         let ordersData = [
-            { id: "ORD-8015", brand: "بربريس برجر", branch: "فرع العليا", items: "لحوم برجر، خبز بطاطس", qty: "200 وحدة", date: "2026-07-25 / 04:30 م", notes: "طلب جديد بانتظار المراجعة", status: "requested" },
-            { id: "ORD-8012", brand: "بربريس برجر", branch: "فرع النخيل مول", items: "لحوم برجر، صوص خاص", qty: "350 وحدة", date: "2026-07-25 / 04:15 م", notes: "توصيل عاجل قبل فترة الظهر", status: "delivering" },
-            { id: "ORD-8010", brand: "ايس كريم فاير", branch: "فرع الملك فهد", items: "أقماع آيس كريم، صوص شوكولاتة", qty: "150 وحدة", date: "2026-07-25 / 03:00 م", notes: "جاري توصيل الطلب للفرع", status: "delivering" },
-            { id: "ORD-8009", brand: "بيتزا كراست", branch: "فرع الملك فهد", items: "صلصة طماطم، زيت زيتون", qty: "80 وحدة", date: "2026-07-24 / 11:00 ص", notes: "تأخر المندوب عن الموعد المحدد", status: "late" },
-            { id: "ORD-8011", brand: "بيتزا كراست", branch: "فرع التحلية", items: "جبنة موزاريلا، عجينة بيتزا", qty: "120 وحدة", date: "2026-07-25 / 02:30 م", notes: "تم التسليم وبانتظار الفحص", status: "inspecting" },
-            { id: "ORD-8006", brand: "بربريس برجر", branch: "فرع الصحافة", items: "بطاطس مقلية مجمدة", qty: "50 وحدة", date: "2026-07-24 / 08:00 م", notes: "تم استلام الطلب بنجاح", status: "completed" }
+            { id: "ORD-8015", brand: "بربريس برجر", branch: "فرع العليا", items: "لحوم برجر، خبز بطاطس", qty: "200 وحدة", date: "2026-07-25 / 04:30 م", notes: "طلب جديد بانتظار المراجعة", status: "new" },
+            { id: "ORD-8012", brand: "بربريس برجر", branch: "فرع النخيل مول", items: "لحوم برجر، صوص خاص", qty: "350 وحدة", date: "2026-07-25 / 04:15 م", notes: "توصيل عاجل قبل فترة الظهر", status: "preparing" },
+            { id: "ORD-8010", brand: "ايس كريم فاير", branch: "فرع الملك فهد", items: "أقماع آيس كريم، صوص شوكولاتة", qty: "150 وحدة", date: "2026-07-25 / 03:00 م", notes: "جاهز للاستلام من المستودع", status: "ready" },
+            { id: "ORD-8011", brand: "بيتزا كراست", branch: "فرع التحلية", items: "جبنة موزاريلا، عجينة بيتزا مجمدة", qty: "120 وحدة", date: "2026-07-25 / 02:30 م", notes: "التسليم عبر مندوب الشركة", status: "delivering" },
+            { id: "ORD-8006", brand: "بربريس برجر", branch: "فرع الصحافة", items: "بطاطس مقلية مجمدة", qty: "50 وحدة", date: "2026-07-24 / 08:00 م", notes: "تم الإلغاء بناءً على طلب مدير الفرع", status: "cancelled" }
         ];
 
         function renderTable(dataToRender) {
             const tbody = document.getElementById('orders-table-body');
             tbody.innerHTML = '';
 
-            dataToRender.forEach((order, index) => {
-                let badgeClass = '';
+            dataToRender.forEach((order) => {
+                let statusBadgeClass = '';
                 let statusTextKey = '';
                 
                 switch(order.status) {
-                    case 'requested': badgeClass = 'bg-sky-500/10 text-sky-400'; statusTextKey = 'status_requested'; break;
-                    case 'delivering': badgeClass = 'bg-indigo-500/10 text-indigo-400'; statusTextKey = 'status_delivering'; break;
-                    case 'inspecting': badgeClass = 'bg-purple-500/10 text-purple-400'; statusTextKey = 'status_inspecting'; break;
-                    case 'completed': badgeClass = 'bg-emerald-500/10 text-emerald-400'; statusTextKey = 'status_completed'; break;
-                    case 'late': badgeClass = 'bg-amber-500/10 text-amber-400'; statusTextKey = 'status_late'; break;
-                    case 'cancelled': badgeClass = 'bg-rose-500/10 text-rose-400'; statusTextKey = 'status_cancelled'; break;
+                    case 'new': statusBadgeClass = 'bg-sky-500/10 text-sky-400'; statusTextKey = 'status_new'; break;
+                    case 'preparing': statusBadgeClass = 'bg-amber-500/10 text-amber-400'; statusTextKey = 'status_preparing'; break;
+                    case 'ready': statusBadgeClass = 'bg-blue-500/10 text-blue-400'; statusTextKey = 'status_ready'; break;
+                    case 'delivering': statusBadgeClass = 'bg-indigo-500/10 text-indigo-400'; statusTextKey = 'status_delivering'; break;
+                    case 'completed': statusBadgeClass = 'bg-emerald-500/10 text-emerald-400'; statusTextKey = 'status_completed'; break;
+                    case 'cancelled': statusBadgeClass = 'bg-rose-500/10 text-rose-400'; statusTextKey = 'status_cancelled'; break;
                 }
 
                 const tr = document.createElement('tr');
@@ -252,7 +243,6 @@
                 tr.setAttribute('data-brand', order.brand);
                 tr.setAttribute('data-branch', order.branch);
                 tr.setAttribute('data-status', order.status);
-                tr.setAttribute('data-id', order.id);
 
                 tr.innerHTML = `
                     <td class="py-3 px-3">
@@ -262,9 +252,9 @@
                     <td class="py-3 px-3 font-bold text-slate-200">${order.branch} <span class="block text-[10px] text-slate-400 font-normal">${order.brand}</span></td>
                     <td class="py-3 px-3 text-slate-300">${order.items}</td>
                     <td class="py-3 px-3 font-bold text-indigo-400">${order.qty}</td>
-                    <td class="py-3 px-3 text-slate-300 font-mono text-[11px]">${order.date}</td>
+                    <td class="py-3 px-3 text-slate-400 text-[11px]">${order.date}</td>
                     <td class="py-3 px-3 text-slate-400 text-[11px]">${order.notes}</td>
-                    <td class="py-3 px-3"><span class="${badgeClass} px-2 py-0.5 rounded-full text-[11px]" data-i18n="${statusTextKey}">${order.status}</span></td>
+                    <td class="py-3 px-3"><span class="${statusBadgeClass} px-2 py-0.5 rounded-full text-[11px]" data-i18n="${statusTextKey}">${order.status}</span></td>
                     <td class="py-3 px-3 text-center">
                         <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded text-[11px] font-medium transition" data-i18n="view_btn">معاينة</button>
                     </td>
@@ -276,14 +266,14 @@
         }
 
         function updateStats() {
-            const counts = { requested: 0, delivering: 0, inspecting: 0, completed: 0, late: 0, cancelled: 0 };
+            const counts = { new: 0, preparing: 0, ready: 0, delivering: 0, completed: 0, cancelled: 0 };
             ordersData.forEach(o => { if(counts[o.status] !== undefined) counts[o.status]++; });
 
-            document.getElementById('stat-requested-count').innerText = counts.requested;
+            document.getElementById('stat-new-count').innerText = counts.new;
+            document.getElementById('stat-preparing-count').innerText = counts.preparing;
+            document.getElementById('stat-ready-count').innerText = counts.ready;
             document.getElementById('stat-delivering-count').innerText = counts.delivering;
-            document.getElementById('stat-inspecting-count').innerText = counts.inspecting;
             document.getElementById('stat-completed-count').innerText = counts.completed;
-            document.getElementById('stat-late-count').innerText = counts.late;
             document.getElementById('stat-cancelled-count').innerText = counts.cancelled;
         }
 
@@ -316,42 +306,6 @@
             }
         }
 
-        function applyBulkStatus() {
-            const newStatus = document.getElementById('bulk-status-select').value;
-            if (!newStatus) return;
-
-            const rows = document.querySelectorAll('.order-row');
-            rows.forEach(row => {
-                const cb = row.querySelector('.row-checkbox');
-                if (cb && cb.checked) {
-                    const orderId = row.getAttribute('data-id');
-                    const orderObj = ordersData.find(o => o.id === orderId);
-                    if (orderObj) {
-                        orderObj.status = newStatus;
-                    }
-                }
-            });
-
-            renderTable(ordersData);
-            filterOrders();
-            document.getElementById('select-all').checked = false;
-        }
-
-        function exportToExcel() {
-            let csv = '\uFEFFرقم الطلب,البراند,الفرع,الأصناف,العدد,التاريخ والوقت,الملاحظات,الحالة\n';
-            ordersData.forEach(o => {
-                csv += `"${o.id}","${o.brand}","${o.branch}","${o.items}","${o.qty}","${o.date}","${o.notes}","${o.status}"\n`;
-            });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.setAttribute('href', url);
-            a.setAttribute('download', 'Keymerv_Replenishment_Orders.csv');
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
         function filterOrders() {
             const brandFilter = document.getElementById('brand-filter').value;
             const branchFilter = document.getElementById('branch-filter').value;
@@ -359,6 +313,10 @@
             const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
             const rows = document.querySelectorAll('.order-row');
             const noResultsRow = document.getElementById('no-results-row');
+            
+            const emptyIcon = document.getElementById('empty-state-icon');
+            const emptyTitle = document.getElementById('empty-state-title');
+            const emptyDesc = document.getElementById('empty-state-desc');
             const lang = document.getElementById('html-root').getAttribute('lang') || 'ar';
 
             let visibleCount = 0;
@@ -387,6 +345,16 @@
             if (visibleCount === 0) {
                 noResultsRow.classList.remove('hidden');
                 noResultsRow.classList.add('block');
+
+                if (ordersData.length === 0) {
+                    emptyIcon.innerText = "📭";
+                    emptyTitle.innerText = (lang === 'ar') ? "لا توجد طلبات في النظام حالياً" : "No orders in the system yet";
+                    emptyDesc.innerText = (lang === 'ar') ? "سيتم عرض طلبات التغذية للفروع هنا بمجرد إرسالها من قبل المطاعم." : "Branch replenishment orders will appear here once submitted.";
+                } else {
+                    emptyIcon.innerText = "🔍";
+                    emptyTitle.innerText = (lang === 'ar') ? "لا توجد طلبات مطابقة لنتائج البحث أو الفلترة" : "No orders matching your search or filter criteria";
+                    emptyDesc.innerText = (lang === 'ar') ? "جرب تغيير خيارات الفلترة أو مسح كلمات البحث للرجوع للقائمة." : "Try changing your filters or clearing search keywords.";
+                }
             } else {
                 noResultsRow.classList.remove('block');
                 noResultsRow.classList.add('hidden');
@@ -410,31 +378,29 @@
                 nav_inventory: "إدارة المخزون",
                 nav_branches: "فروع المطاعم",
                 nav_orders: "طلبات التغذية",
-                nav_supply: "التوريد والموردين",
                 nav_settings: "الإعدادات",
                 user_role_admin: "الإدارة العامة (المالك)",
                 logout: "خروج",
                 orders_header: "إدارة طلبات التغذية للفروع",
-                stat_requested: "تم الطلب",
+                stat_new: "جديد",
+                stat_preparing: "جاري التجهيز",
+                stat_ready: "جاهز",
                 stat_delivering: "جاري التوصيل",
-                stat_inspecting: "تم الاستلام للفحص",
                 stat_completed: "مكتمل",
-                stat_late: "متأخر",
                 stat_cancelled: "ملغي",
                 search_placeholder: "ابحث برقم الطلب...",
                 filter_all_brands: "جميع البراندات",
                 filter_all_branches: "جميع الفروع",
                 filter_all: "جميع الحالات",
-                filter_requested: "تم الطلب",
+                filter_new: "جديد",
+                filter_preparing: "جاري التجهيز",
+                filter_ready: "جاهز",
                 filter_delivering: "جاري التوصيل",
-                filter_inspecting: "تم الاستلام للفحص",
                 filter_completed: "مكتمل",
-                filter_late: "متأخر",
                 filter_cancelled: "ملغي",
-                export_excel_btn: "📊 تنزيل Excel",
+                export_excel_btn: "📊 تصدير Excel",
                 add_order_btn: "+ إنشاء طلب تغذية لفرع",
-                bulk_change_status: "تغيير حالة المحددين إلى...",
-                apply_btn: "تطبيق",
+                bulk_status_btn: "تغيير الحالة",
                 th_order_id: "رقم الطلب",
                 th_branch_name: "فرع المطعم",
                 th_items_name: "الأصناف المطلوبة",
@@ -443,16 +409,15 @@
                 th_notes: "الملاحظات",
                 th_status: "حالة الطلب",
                 th_actions: "الإجراءات",
-                status_requested: "تم الطلب",
+                status_new: "جديد",
+                status_preparing: "جاري التجهيز",
+                status_ready: "جاهز",
                 status_delivering: "جاري التوصيل",
-                status_inspecting: "تم الاستلام للفحص",
                 status_completed: "مكتمل",
-                status_late: "متأخر",
                 status_cancelled: "ملغي",
                 view_btn: "معاينة",
                 pagination_show: "عرض",
-                pagination_per_page: "طلب لكل صفحة",
-                empty_title: "لا توجد طلبات في النظام حالياً"
+                pagination_per_page: "طلب لكل صفحة"
             },
             en: {
                 orders_title: "Replenishment Orders - Keymerv Warehouse",
@@ -461,31 +426,29 @@
                 nav_inventory: "Inventory",
                 nav_branches: "Branches",
                 nav_orders: "Replenishment Orders",
-                nav_supply: "Supply & Suppliers",
                 nav_settings: "Settings",
                 user_role_admin: "General Admin (Owner)",
                 logout: "Logout",
                 orders_header: "Branch Replenishment Orders",
-                stat_requested: "Requested",
+                stat_new: "New",
+                stat_preparing: "Preparing",
+                stat_ready: "Ready",
                 stat_delivering: "Delivering",
-                stat_inspecting: "Inspecting",
                 stat_completed: "Completed",
-                stat_late: "Late",
                 stat_cancelled: "Cancelled",
                 search_placeholder: "Search order ID...",
                 filter_all_brands: "All Brands",
                 filter_all_branches: "All Branches",
                 filter_all: "All Statuses",
-                filter_requested: "Requested",
+                filter_new: "New",
+                filter_preparing: "Preparing",
+                filter_ready: "Ready",
                 filter_delivering: "Delivering",
-                filter_inspecting: "Inspecting",
                 filter_completed: "Completed",
-                filter_late: "Late",
                 filter_cancelled: "Cancelled",
-                export_excel_btn: "📊 Download Excel",
+                export_excel_btn: "📊 Export Excel",
                 add_order_btn: "+ Create Branch Order",
-                bulk_change_status: "Change selected status...",
-                apply_btn: "Apply",
+                bulk_status_btn: "Change Status",
                 th_order_id: "Order ID",
                 th_branch_name: "Branch Name",
                 th_items_name: "Requested Items",
@@ -494,16 +457,15 @@
                 th_notes: "Notes",
                 th_status: "Status",
                 th_actions: "Actions",
-                status_requested: "Requested",
+                status_new: "New",
+                status_preparing: "Preparing",
+                status_ready: "Ready",
                 status_delivering: "Delivering",
-                status_inspecting: "Inspecting",
                 status_completed: "Completed",
-                status_late: "Late",
                 status_cancelled: "Cancelled",
                 view_btn: "View",
                 pagination_show: "Show",
-                pagination_per_page: "orders per page",
-                empty_title: "No orders in the system yet"
+                pagination_per_page: "orders per page"
             }
         };
 
