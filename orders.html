@@ -66,7 +66,7 @@
         <div class="p-6 space-y-6">
             
             <!-- إحصائيات سريعة لطلبات التغذية -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
                     <div>
                         <p class="text-slate-400 text-sm" data-i18n="stat_pending_orders">طلبات قيد المعالجة</p>
@@ -83,14 +83,21 @@
                 </div>
                 <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
                     <div>
-                        <p class="text-slate-400 text-sm" data-i18n="stat_completed_orders">الطلبات المكتملة اليوم</p>
+                        <p class="text-slate-400 text-sm" data-i18n="stat_completed_orders">الطلبات المكتملة</p>
                         <h3 class="text-2xl font-extrabold mt-1 text-emerald-400">28</h3>
                     </div>
                     <div class="w-12 h-12 bg-emerald-600/10 text-emerald-400 rounded-xl flex items-center justify-center font-bold text-lg">✅</div>
                 </div>
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm" data-i18n="stat_cancelled_orders">الطلبات الملغية</p>
+                        <h3 class="text-2xl font-extrabold mt-1 text-rose-400">3</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-rose-600/10 text-rose-400 rounded-xl flex items-center justify-center font-bold text-lg">❌</div>
+                </div>
             </div>
 
-            <!-- شريط الأدوات والفلترة وزر طلب جديد -->
+            <!-- شريط الأدوات والفلترة وأزرار التصدير والإنشاء -->
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-slate-900 border border-slate-800 p-4 rounded-2xl">
                 <div class="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
                     <input type="text" id="search-input" onkeyup="filterOrders()" data-i18n-placeholder="search_placeholder" placeholder="ابحث برقم الطلب أو اسم الفرع..." class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 w-full sm:w-64">
@@ -100,10 +107,14 @@
                         <option value="pending" data-i18n="filter_pending">قيد المعالجة</option>
                         <option value="shipping" data-i18n="filter_shipping">جاري الشحن</option>
                         <option value="completed" data-i18n="filter_completed">مكتمل</option>
+                        <option value="cancelled" data-i18n="filter_cancelled">ملغي</option>
                     </select>
                 </div>
 
                 <div class="flex items-center gap-2.5 w-full lg:w-auto justify-end">
+                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2 border border-slate-700" data-i18n="export_excel_btn">
+                        📊 تصدير Excel
+                    </button>
                     <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-semibold transition shadow-lg shadow-indigo-600/25" data-i18n="add_order_btn">
                         + إنشاء طلب تغذية لفرع
                     </button>
@@ -113,20 +124,26 @@
             <!-- جدول طلبات التغذية -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
                 
-                <!-- إعدادات عدد الصفحات للسرعة وتنظيم العرض -->
+                <!-- إعدادات عدد الصفحات والتحكم الجماعي -->
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pb-4 border-b border-slate-800 text-xs text-slate-400">
-                    <div class="flex items-center gap-2">
-                        <span data-i18n="pagination_show">عرض</span>
-                        <select id="items-per-page" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
-                            <option value="25">25</option>
-                            <option value="75">75</option>
-                            <option value="125">125</option>
-                            <option value="200">200</option>
-                        </select>
-                        <span data-i18n="pagination_per_page">طلب لكل صفحة</span>
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-2">
+                            <span data-i18n="pagination_show">عرض</span>
+                            <select id="items-per-page" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                                <option value="25">25</option>
+                                <option value="75">75</option>
+                                <option value="125">125</option>
+                                <option value="200">200</option>
+                            </select>
+                            <span data-i18n="pagination_per_page">طلب لكل صفحة</span>
+                        </div>
+                        <div id="bulk-actions-container" class="hidden items-center gap-2 pr-3 border-r border-slate-800">
+                            <span class="text-indigo-400 font-semibold" id="selected-count">0 محدد</span>
+                            <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-lg text-xs transition" data-i18n="bulk_status_btn">تغيير الحالة</button>
+                        </div>
                     </div>
                     <div>
-                        <span id="results-counter" class="font-bold text-indigo-400" data-i18n="pagination_info">عرض 3 من أصل 45 طلب</span>
+                        <span id="results-counter" class="font-bold text-indigo-400" data-i18n="pagination_info">عرض 4 من أصل 45 طلب</span>
                     </div>
                 </div>
 
@@ -134,10 +151,15 @@
                     <table class="w-full text-right border-collapse">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 text-xs">
+                                <th class="py-3 px-4 w-10">
+                                    <input type="checkbox" id="select-all" onclick="toggleSelectAll(this)" class="rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer">
+                                </th>
                                 <th class="py-3 px-4" data-i18n="th_order_id">رقم الطلب</th>
                                 <th class="py-3 px-4" data-i18n="th_branch_name">فرع المطعم</th>
-                                <th class="py-3 px-4" data-i18n="th_items_count">الأصناف المطلوبة</th>
+                                <th class="py-3 px-4" data-i18n="th_items_name">الأصناف المطلوبة</th>
+                                <th class="py-3 px-4" data-i18n="th_items_count">العدد الإجمالي</th>
                                 <th class="py-3 px-4" data-i18n="th_date">التاريخ والوقت</th>
+                                <th class="py-3 px-4" data-i18n="th_notes">الملاحظات</th>
                                 <th class="py-3 px-4" data-i18n="th_status">حالة الطلب</th>
                                 <th class="py-3 px-4 text-center" data-i18n="th_actions">الإجراءات</th>
                             </tr>
@@ -145,10 +167,15 @@
                         <tbody class="text-xs divide-y divide-slate-800/50" id="orders-table-body">
                             <!-- طلب 1 - قيد المعالجة -->
                             <tr class="order-row" data-status="pending">
+                                <td class="py-3.5 px-4">
+                                    <input type="checkbox" onclick="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer">
+                                </td>
                                 <td class="py-3.5 px-4 font-mono text-indigo-300">ORD-8012</td>
                                 <td class="py-3.5 px-4 font-bold text-slate-200">فرع النخيل مول</td>
-                                <td class="py-3.5 px-4 text-slate-400">14 صنف (لحوم، خبز، صوصات)</td>
+                                <td class="py-3.5 px-4 text-slate-300">لحوم برجر، خبز بطاطس، صوص خاص</td>
+                                <td class="py-3.5 px-4 font-bold text-indigo-400">350 وحدة</td>
                                 <td class="py-3.5 px-4 text-slate-400">2026-07-25 / 04:15 م</td>
+                                <td class="py-3.5 px-4 text-slate-400">توصيل عاجل قبل فترة الظهر</td>
                                 <td class="py-3.5 px-4"><span class="bg-amber-500/10 text-amber-400 px-2.5 py-1 rounded-full text-xs" data-i18n="status_pending">قيد المعالجة</span></td>
                                 <td class="py-3.5 px-4 text-center">
                                     <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition" data-i18n="view_btn">معاينة</button>
@@ -156,10 +183,15 @@
                             </tr>
                             <!-- طلب 2 - جاري الشحن -->
                             <tr class="order-row" data-status="shipping">
+                                <td class="py-3.5 px-4">
+                                    <input type="checkbox" onclick="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer">
+                                </td>
                                 <td class="py-3.5 px-4 font-mono text-indigo-300">ORD-8011</td>
                                 <td class="py-3.5 px-4 font-bold text-slate-200">فرع التحلية</td>
-                                <td class="py-3.5 px-4 text-slate-400">8 أصناف (مستلزمات تغليف)</td>
+                                <td class="py-3.5 px-4 text-slate-300">أكياس تعبئة ورق 1 كجم، مناديل</td>
+                                <td class="py-3.5 px-4 font-bold text-indigo-400">120 وحدة</td>
                                 <td class="py-3.5 px-4 text-slate-400">2026-07-25 / 02:30 م</td>
+                                <td class="py-3.5 px-4 text-slate-400">التسليم عبر مندوب الشركة</td>
                                 <td class="py-3.5 px-4"><span class="bg-indigo-500/10 text-indigo-400 px-2.5 py-1 rounded-full text-xs" data-i18n="status_shipping">جاري الشحن</span></td>
                                 <td class="py-3.5 px-4 text-center">
                                     <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition" data-i18n="view_btn">معاينة</button>
@@ -167,11 +199,32 @@
                             </tr>
                             <!-- طلب 3 - مكتمل -->
                             <tr class="order-row" data-status="completed">
+                                <td class="py-3.5 px-4">
+                                    <input type="checkbox" onclick="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer">
+                                </td>
                                 <td class="py-3.5 px-4 font-mono text-indigo-300">ORD-8009</td>
                                 <td class="py-3.5 px-4 font-bold text-slate-200">فرع الياسمين</td>
-                                <td class="py-3.5 px-4 text-slate-400">22 صنف (تموين كامل للمستودع الفرعي)</td>
+                                <td class="py-3.5 px-4 text-slate-300">تموين كامل (لحوم، صوصات، خبز، تغليف)</td>
+                                <td class="py-3.5 px-4 font-bold text-indigo-400">890 وحدة</td>
                                 <td class="py-3.5 px-4 text-slate-400">2026-07-25 / 11:00 ص</td>
+                                <td class="py-3.5 px-4 text-slate-400">تم الاستلام والمراجعة من الفرع</td>
                                 <td class="py-3.5 px-4"><span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full text-xs" data-i18n="status_completed">مكتمل</span></td>
+                                <td class="py-3.5 px-4 text-center">
+                                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition" data-i18n="view_btn">معاينة</button>
+                                </td>
+                            </tr>
+                            <!-- طلب 4 - ملغي -->
+                            <tr class="order-row" data-status="cancelled">
+                                <td class="py-3.5 px-4">
+                                    <input type="checkbox" onclick="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer">
+                                </td>
+                                <td class="py-3.5 px-4 font-mono text-indigo-300">ORD-8006</td>
+                                <td class="py-3.5 px-4 font-bold text-slate-200">فرع الصحافة</td>
+                                <td class="py-3.5 px-4 text-slate-300">بطاطس مقلية مجمدة</td>
+                                <td class="py-3.5 px-4 font-bold text-indigo-400">50 وحدة</td>
+                                <td class="py-3.5 px-4 text-slate-400">2026-07-24 / 08:00 م</td>
+                                <td class="py-3.5 px-4 text-slate-400">تم الإلغاء بناءً على طلب مدير الفرع</td>
+                                <td class="py-3.5 px-4"><span class="bg-rose-500/10 text-rose-400 px-2.5 py-1 rounded-full text-xs" data-i18n="status_cancelled">ملغي</span></td>
                                 <td class="py-3.5 px-4 text-center">
                                     <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition" data-i18n="view_btn">معاينة</button>
                                 </td>
@@ -183,8 +236,41 @@
         </div>
     </main>
 
-    <!-- محرك التصفية والترجمة -->
+    <!-- محرك التصفية، التحديد الجماعي والترجمة -->
     <script>
+        function toggleSelectAll(source) {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(cb => {
+                // نحدد فقط الصفوف المرئية (التي لا تخفيها الفلترة)
+                if (cb.closest('tr').style.display !== 'none') {
+                    cb.checked = source.checked;
+                }
+            });
+            updateSelection();
+        }
+
+        function updateSelection() {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            let selectedCount = 0;
+            checkboxes.forEach(cb => {
+                if (cb.checked) selectedCount++;
+            });
+
+            const bulkContainer = document.getElementById('bulk-actions-container');
+            const countSpan = document.getElementById('selected-count');
+            
+            const lang = document.getElementById('html-root').getAttribute('lang') || 'ar';
+
+            if (selectedCount > 0) {
+                bulkContainer.classList.remove('hidden');
+                bulkContainer.classList.add('flex');
+                countSpan.innerText = lang === 'ar' ? `${selectedCount} محدد` : `${selectedCount} selected`;
+            } else {
+                bulkContainer.classList.remove('flex');
+                bulkContainer.classList.add('hidden');
+            }
+        }
+
         function filterOrders() {
             const statusFilter = document.getElementById('status-filter').value;
             const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
@@ -204,8 +290,13 @@
                     visibleCount++;
                 } else {
                     row.style.display = 'none';
+                    // إلغاء تحديد الصف المخفي لمنع أخطاء التحديد الجماعي
+                    const cb = row.querySelector('.row-checkbox');
+                    if (cb) cb.checked = false;
                 }
             });
+
+            updateSelection();
 
             const counterElement = document.getElementById('results-counter');
             const lang = document.getElementById('html-root').getAttribute('lang') || 'ar';
@@ -231,26 +322,33 @@
                 orders_header: "إدارة طلبات التغذية للفروع",
                 stat_pending_orders: "طلبات قيد المعالجة",
                 stat_shipping_orders: "جاري التجهيز والشحن",
-                stat_completed_orders: "الطلبات المكتملة اليوم",
+                stat_completed_orders: "الطلبات المكتملة",
+                stat_cancelled_orders: "الطلبات الملغية",
                 search_placeholder: "ابحث برقم الطلب أو اسم الفرع...",
                 filter_all: "جميع الحالات",
                 filter_pending: "قيد المعالجة",
                 filter_shipping: "جاري الشحن",
                 filter_completed: "مكتمل",
+                filter_cancelled: "ملغي",
+                export_excel_btn: "📊 تصدير Excel",
                 add_order_btn: "+ إنشاء طلب تغذية لفرع",
+                bulk_status_btn: "تغيير الحالة",
                 th_order_id: "رقم الطلب",
                 th_branch_name: "فرع المطعم",
-                th_items_count: "الأصناف المطلوبة",
+                th_items_name: "الأصناف المطلوبة",
+                th_items_count: "العدد الإجمالي",
                 th_date: "التاريخ والوقت",
+                th_notes: "الملاحظات",
                 th_status: "حالة الطلب",
                 th_actions: "الإجراءات",
                 status_pending: "قيد المعالجة",
                 status_shipping: "جاري الشحن",
                 status_completed: "مكتمل",
+                status_cancelled: "ملغي",
                 view_btn: "معاينة",
                 pagination_show: "عرض",
                 pagination_per_page: "طلب لكل صفحة",
-                pagination_info: "عرض 3 من أصل 45 طلب"
+                pagination_info: "عرض 4 من أصل 45 طلب"
             },
             en: {
                 orders_title: "Replenishment Orders - Keymerv Warehouse",
@@ -265,26 +363,33 @@
                 orders_header: "Branch Replenishment Orders",
                 stat_pending_orders: "Pending Orders",
                 stat_shipping_orders: "In Transit / Shipping",
-                stat_completed_orders: "Completed Today",
+                stat_completed_orders: "Completed Orders",
+                stat_cancelled_orders: "Cancelled Orders",
                 search_placeholder: "Search order ID or branch...",
                 filter_all: "All Statuses",
                 filter_pending: "Pending",
                 filter_shipping: "Shipping",
                 filter_completed: "Completed",
+                filter_cancelled: "Cancelled",
+                export_excel_btn: "📊 Export Excel",
                 add_order_btn: "+ Create Branch Order",
+                bulk_status_btn: "Change Status",
                 th_order_id: "Order ID",
                 th_branch_name: "Branch Name",
-                th_items_count: "Requested Items",
+                th_items_name: "Requested Items",
+                th_items_count: "Total Quantity",
                 th_date: "Date & Time",
+                th_notes: "Notes",
                 th_status: "Status",
                 th_actions: "Actions",
                 status_pending: "Pending",
                 status_shipping: "Shipping",
                 status_completed: "Completed",
+                status_cancelled: "Cancelled",
                 view_btn: "View",
                 pagination_show: "Show",
                 pagination_per_page: "orders per page",
-                pagination_info: "Showing 3 of 45 orders"
+                pagination_info: "Showing 4 of 45 orders"
             }
         };
 
