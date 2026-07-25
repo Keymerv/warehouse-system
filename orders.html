@@ -26,8 +26,8 @@
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden text-xs">
 
-    <!-- القائمة الجانبية (Sidebar) -->
-    <aside class="w-60 bg-slate-900 border-l border-slate-800 flex flex-col justify-between hidden md:flex">
+    <!-- القائمة الجانبية (Sidebar) بحجمها الثابت والصحيح المتناسق مع باقي الصفحات -->
+    <aside class="w-60 bg-slate-900 border-l border-slate-800 flex flex-col justify-between shrink-0">
         <div>
             <div class="p-4 border-b border-slate-800 flex items-center gap-2">
                 <div class="bg-indigo-600 text-white font-bold px-2 py-1 rounded-lg text-xs">K</div>
@@ -196,11 +196,11 @@
                             </tr>
                         </thead>
                         <tbody class="text-xs divide-y divide-slate-800/40" id="orders-table-body">
-                            <!-- يمكن إضافة صفوف الطلبات هنا برمجياً أو يدوياً عند توفرها -->
+                            <!-- صفوف الطلبات -->
                         </tbody>
                     </table>
 
-                    <!-- رسالة التنبيه الذكية (تتغير بناءً على حالة النظام: هل هو فارغ تماماً أم بسبب الفلترة) -->
+                    <!-- رسالة التنبيه الذكية -->
                     <div id="no-results-row" class="hidden py-12 text-center text-slate-400">
                         <div class="text-3xl mb-2" id="empty-state-icon">📭</div>
                         <p class="font-semibold text-slate-200 text-sm" id="empty-state-title">لا توجد طلبات في النظام حالياً</p>
@@ -211,9 +211,8 @@
         </div>
     </main>
 
-    <!-- محرك التصفية والمنطق البرمجي المحدث -->
+    <!-- محرك التصفية والمنطق البرمجي -->
     <script>
-        // مصفوفة الطلبات التجريبية (يمكن إفريغها [] لاختبار حالة النظام الجديد كلياً)
         let ordersData = [
             { id: "ORD-8015", brand: "بربريس برجر", branch: "فرع العليا", items: "لحوم برجر، خبز بطاطس", qty: "200 وحدة", date: "2026-07-25 / 04:30 م", notes: "طلب جديد بانتظار المراجعة", status: "new" },
             { id: "ORD-8012", brand: "بربريس برجر", branch: "فرع النخيل مول", items: "لحوم برجر، صوص خاص", qty: "350 وحدة", date: "2026-07-25 / 04:15 م", notes: "توصيل عاجل قبل فترة الظهر", status: "preparing" },
@@ -226,7 +225,7 @@
             const tbody = document.getElementById('orders-table-body');
             tbody.innerHTML = '';
 
-            dataToRender.forEach((order, index) => {
+            dataToRender.forEach((order) => {
                 let statusBadgeClass = '';
                 let statusTextKey = '';
                 
@@ -343,18 +342,15 @@
                 }
             });
 
-            // التفريق الذكي بين حالة: "النظام فارغ تماماً" أو "نتيجة فلترة لا توجد مطابقة"
             if (visibleCount === 0) {
                 noResultsRow.classList.remove('hidden');
                 noResultsRow.classList.add('block');
 
                 if (ordersData.length === 0) {
-                    // النظام جديد ولا توجد طلبات أبداً
                     emptyIcon.innerText = "📭";
                     emptyTitle.innerText = (lang === 'ar') ? "لا توجد طلبات في النظام حالياً" : "No orders in the system yet";
                     emptyDesc.innerText = (lang === 'ar') ? "سيتم عرض طلبات التغذية للفروع هنا بمجرد إرسالها من قبل المطاعم." : "Branch replenishment orders will appear here once submitted.";
                 } else {
-                    // يوجد طلبات في النظام، لكن الفلترة أو البحث لم تطابق شيئاً
                     emptyIcon.innerText = "🔍";
                     emptyTitle.innerText = (lang === 'ar') ? "لا توجد طلبات مطابقة لنتائج البحث أو الفلترة" : "No orders matching your search or filter criteria";
                     emptyDesc.innerText = (lang === 'ar') ? "جرب تغيير خيارات الفلترة أو مسح كلمات البحث للرجوع للقائمة." : "Try changing your filters or clearing search keywords.";
@@ -372,8 +368,6 @@
             } else {
                 counterElement.innerText = `Showing ${visibleCount} of ${ordersData.length} orders`;
             }
-
-            applyOrdersLanguage(lang);
         }
 
         const ordersTranslations = {
