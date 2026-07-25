@@ -27,13 +27,14 @@
 <body class="bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden text-xs">
 
     <!-- القائمة الجانبية (Sidebar) بنفس الحجم القياسي w-64 المعتمد في باقي الصفحات -->
-    <aside class="w-64 bg-slate-900 border-l border-slate-800 flex flex-col justify-between shrink-0">
+    <!-- القائمة الجانبية (Sidebar) بالعرض القياسي الموحد w-64 -->
+<aside class="w-64 bg-slate-900 border-l border-slate-800 flex flex-col justify-between shrink-0">
         <div>
             <div class="p-4 border-b border-slate-800 flex items-center gap-2">
                 <div class="bg-indigo-600 text-white font-bold px-2 py-1 rounded-lg text-xs">K</div>
                 <span class="font-bold text-xs tracking-tight text-slate-200" data-i18n="brand_name">Keymerv Warehouse</span>
             </div>
-
+    
             <nav class="p-3 space-y-1.5">
                 <a href="dashboard.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_overview">الرئيسية</a>
                 <a href="inventory.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_inventory">إدارة المخزون</a>
@@ -42,7 +43,7 @@
                 <a href="settings.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_settings">الإعدادات</a>
             </nav>
         </div>
-
+    
         <div class="p-3 border-t border-slate-800 flex items-center justify-between">
             <div>
                 <p class="font-bold text-slate-200 text-xs" data-i18n="user_role_admin">الإدارة العامة (المالك)</p>
@@ -51,7 +52,6 @@
             <a href="login.html" class="text-rose-400 hover:text-rose-300 text-[11px] font-semibold" data-i18n="logout">خروج</a>
         </div>
     </aside>
-
     <!-- المحتوى الرئيسي -->
     <main class="flex-1 flex flex-col h-screen overflow-y-auto">
         <header class="bg-slate-900 border-b border-slate-800 px-5 py-3 flex justify-between items-center">
