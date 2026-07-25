@@ -24,13 +24,13 @@
                 <span class="font-bold text-xs tracking-tight text-slate-200" data-i18n="brand_name">Keymerv Warehouse</span>
             </div>
 
-            <!-- الروابط -->
+            <!-- الروابط بالترتيب المطلوب مع تصحيح رابط التوريد -->
             <nav class="p-4 space-y-1.5">
                 <a href="dashboard.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition text-xs" data-i18n="nav_overview">الرئيسية</a>
-                <a href="inventory.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition text-xs" data-i18n="nav_inventory">إدارة المخزون</a>
-                <a href="suppliers.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition text-xs" data-i18n="nav_suppliers">التوريد والموردين</a>
-                <a href="branches.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition text-xs" data-i18n="nav_branches">فروع المطاعم</a>
                 <a href="orders.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition text-xs" data-i18n="nav_orders">طلبات التغذية</a>
+                <a href="supply.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition text-xs" data-i18n="nav_suppliers">التوريد والموردين</a>
+                <a href="inventory.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition text-xs" data-i18n="nav_inventory">إدارة المخزون</a>
+                <a href="branches.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition text-xs" data-i18n="nav_branches">الفروع</a>
                 <a href="settings.html" class="flex items-center gap-3 px-4 py-2.5 bg-indigo-600 text-white rounded-xl font-medium transition text-xs" data-i18n="nav_settings">الإعدادات</a>
             </nav>
         </div>
@@ -61,14 +61,14 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                     <div>
                         <label class="block text-slate-400 mb-1.5" data-i18n="label_warehouse_name">اسم المستودع / النظام</label>
-                        <input type="text" value="Keymerv Warehouse" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <input type="text" value="Keymerv Warehouse" disabled class="w-full bg-slate-900/50 border border-slate-800/80 rounded-xl px-4 py-2.5 text-slate-400 cursor-not-allowed select-none">
                     </div>
                     <div>
                         <label class="block text-slate-400 mb-1.5" data-i18n="label_admin_email">البريد الإلكتروني للإدارة</label>
-                        <input type="email" value="admin@keymerv.com" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <input type="email" value="admin@keymerv.com" disabled class="w-full bg-slate-900/50 border border-slate-800/80 rounded-xl px-4 py-2.5 text-slate-400 cursor-not-allowed select-none">
                     </div>
                     <div>
-                        <label class="block text-slate-400 mb-1.5" data-i18n="label_phone">رقم هاتف الدعم / الطوارئ</label>
+                        <label class="block text-slate-400 mb-1.5" data-i18n="label_phone">رقم هاتف الدعم</label>
                         <input type="text" value="+966 50 000 0000" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
                     </div>
                     <div>
@@ -128,10 +128,10 @@
                 settings_title: "الإعدادات - Keymerv Warehouse",
                 brand_name: "Keymerv Warehouse",
                 nav_overview: "الرئيسية",
-                nav_inventory: "إدارة المخزون",
-                nav_suppliers: "التوريد والموردين",
-                nav_branches: "فروع المطاعم",
                 nav_orders: "طلبات التغذية",
+                nav_suppliers: "التوريد والموردين",
+                nav_inventory: "إدارة المخزون",
+                nav_branches: "الفروع",
                 nav_settings: "الإعدادات",
                 user_role_admin: "الإدارة العامة (المالك)",
                 logout: "خروج",
@@ -139,7 +139,7 @@
                 general_settings_title: "بيانات المنشأة الرئيسية",
                 label_warehouse_name: "اسم المستودع / النظام",
                 label_admin_email: "البريد الإلكتروني للإدارة",
-                label_phone: "رقم هاتف الدعم / الطوارئ",
+                label_phone: "رقم هاتف الدعم",
                 label_currency: "العملة الافتراضية",
                 inventory_config_title: "إعدادات تنبيهات المخزون والطلبات",
                 alert_low_stock: "تنبيه تلقائي لوحة التحكم عند وصول الأصناف حد النفاذ",
@@ -154,10 +154,10 @@
                 settings_title: "Settings - Keymerv Warehouse",
                 brand_name: "Keymerv Warehouse",
                 nav_overview: "Overview",
-                nav_inventory: "Inventory",
-                nav_suppliers: "Suppliers & Supply",
-                nav_branches: "Branches",
                 nav_orders: "Supply Orders",
+                nav_suppliers: "Suppliers & Supply",
+                nav_inventory: "Inventory",
+                nav_branches: "Branches",
                 nav_settings: "Settings",
                 user_role_admin: "General Admin (Owner)",
                 logout: "Logout",
@@ -165,7 +165,7 @@
                 general_settings_title: "Main Organization Details",
                 label_warehouse_name: "Warehouse / System Name",
                 label_admin_email: "Admin Email",
-                label_phone: "Support / Emergency Phone",
+                label_phone: "Support Phone",
                 label_currency: "Default Currency",
                 inventory_config_title: "Inventory & Orders Alert Settings",
                 alert_low_stock: "Automatic dashboard alert when items reach low stock",
