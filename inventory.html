@@ -7,99 +7,96 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
-        /* تخصيص شريط التمرير (Scrollbar) ليصبح داكناً وأنيقاً متوافقاً مع التصميم */
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #020617; /* لون مطابق لـ bg-slate-950 */
+            background: #020617;
         }
         ::-webkit-scrollbar-thumb {
-            background: #1e293b; /* لون مطابق لـ bg-slate-800 */
+            background: #1e293b;
             border-radius: 9999px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #334155; /* لون عند التحويم مطابق لـ bg-slate-700 */
+            background: #334155;
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden">
+<body class="bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden text-xs">
 
-    <!-- القائمة الجانبية (Sidebar) -->
-    <aside class="w-64 bg-slate-900 border-l border-slate-800 flex flex-col justify-between hidden md:flex shrink-0">
+    <!-- القائمة الجانبية (Sidebar) بالعرض القياسي الموحد w-64 -->
+    <aside class="w-64 bg-slate-900 border-l border-slate-800 flex flex-col justify-between shrink-0">
         <div>
-            <div class="p-5 border-b border-slate-800 flex items-center gap-2.5">
-                <div class="bg-indigo-600 text-white font-bold px-2.5 py-1.5 rounded-xl text-sm">K</div>
+            <div class="p-4 border-b border-slate-800 flex items-center gap-2">
+                <div class="bg-indigo-600 text-white font-bold px-2 py-1 rounded-lg text-xs">K</div>
                 <span class="font-bold text-xs tracking-tight text-slate-200" data-i18n="brand_name">Keymerv Warehouse</span>
             </div>
 
-            <nav class="p-4 space-y-2">
-                <a href="dashboard.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition" data-i18n="nav_overview">الرئيسية</a>
-                <a href="orders.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition" data-i18n="nav_orders">طلبات التغذية</a>
-                <a href="supply.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition text-xs" data-i18n="nav_supply">التوريد والموردين</a>
-                <a href="inventory.html" class="flex items-center gap-3 px-4 py-2.5 bg-indigo-600 text-white rounded-xl font-medium transition" data-i18n="nav_inventory">إدارة المخزون</a>
-                <a href="branches.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition" data-i18n="nav_branches">الفروع</a>
-                <a href="settings.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition" data-i18n="nav_settings">الإعدادات</a>
+            <nav class="p-3 space-y-1.5">
+                <a href="dashboard.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_overview">الرئيسية</a>
+                <a href="inventory.html" class="flex items-center gap-2.5 px-3 py-2 bg-indigo-600 text-white rounded-lg font-medium transition" data-i18n="nav_inventory">إدارة المخزون</a>
+                <a href="orders.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_orders">طلبات التغذية</a>
+                <a href="supply.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_supply">التوريد والموردين</a>
+                <a href="branches.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_branches">الفروع</a>
+                <a href="settings.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_settings">الإعدادات</a>
             </nav>
         </div>
 
-        <div class="p-4 border-t border-slate-800 flex items-center justify-between">
-            <div class="text-sm">
-                <p class="font-bold text-slate-200" data-i18n="user_role_admin">الإدارة العامة (المالك)</p>
-                <p class="text-xs text-slate-400">admin@keymerv.com</p>
+        <div class="p-3 border-t border-slate-800 flex items-center justify-between">
+            <div>
+                <p class="font-bold text-slate-200 text-xs" data-i18n="user_role_admin">الإدارة العامة (المالك)</p>
+                <p class="text-[10px] text-slate-400">admin@keymerv.com</p>
             </div>
-            <a href="login.html" class="text-rose-400 hover:text-rose-300 text-xs font-semibold" data-i18n="logout">خروج</a>
+            <a href="login.html" class="text-rose-400 hover:text-rose-300 text-[11px] font-semibold" data-i18n="logout">خروج</a>
         </div>
     </aside>
 
     <!-- المحتوى الرئيسي -->
     <main class="flex-1 flex flex-col h-screen overflow-y-auto">
-        <header class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold" data-i18n="inventory_header">إدارة المخزون الرئيسي</h1>
-            <div class="flex items-center gap-4">
-                <button onclick="toggleLanguage()" id="lang-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-sm font-medium transition">
+        <header class="bg-slate-900 border-b border-slate-800 px-5 py-3 flex justify-between items-center">
+            <h1 class="text-sm font-bold" data-i18n="inventory_header">إدارة المخزون الرئيسي</h1>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleLanguage()" id="lang-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-md text-xs font-medium transition">
                     English
                 </button>
             </div>
         </header>
 
-        <div class="p-6 space-y-6">
+        <div class="p-5 space-y-4">
             
             <!-- إحصائيات المخزون العلوية -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div>
-                        <p class="text-slate-400 text-sm" data-i18n="stat_total_items">إجمالي الأصناف</p>
-                        <h3 class="text-2xl font-extrabold mt-1 text-indigo-400">128</h3>
+                        <p class="text-slate-400 text-[11px]" data-i18n="stat_total_items">إجمالي الأصناف</p>
+                        <h3 class="text-lg font-extrabold mt-0.5 text-indigo-400">128</h3>
                     </div>
-                    <div class="w-12 h-12 bg-indigo-600/10 text-indigo-400 rounded-xl flex items-center justify-center font-bold text-lg">📦</div>
+                    <div class="w-9 h-9 bg-indigo-600/10 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-sm">📦</div>
                 </div>
-                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div>
-                        <p class="text-slate-400 text-sm" data-i18n="stat_low_stock">أصناف وشيك نفاذها</p>
-                        <h3 class="text-2xl font-extrabold mt-1 text-amber-400">4</h3>
+                        <p class="text-slate-400 text-[11px]" data-i18n="stat_low_stock">أصناف وشيك نفاذها</p>
+                        <h3 class="text-lg font-extrabold mt-0.5 text-amber-400">4</h3>
                     </div>
-                    <div class="w-12 h-12 bg-amber-600/10 text-amber-400 rounded-xl flex items-center justify-center font-bold text-lg">⚠️</div>
+                    <div class="w-9 h-9 bg-amber-600/10 text-amber-400 rounded-lg flex items-center justify-center font-bold text-sm">⚠️</div>
                 </div>
-                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div>
-                        <p class="text-slate-400 text-sm" data-i18n="stat_out_stock">أصناف منتهية</p>
-                        <h3 class="text-2xl font-extrabold mt-1 text-rose-400">1</h3>
+                        <p class="text-slate-400 text-[11px]" data-i18n="stat_out_stock">أصناف منتهية</p>
+                        <h3 class="text-lg font-extrabold mt-0.5 text-rose-400">1</h3>
                     </div>
-                    <div class="w-12 h-12 bg-rose-600/10 text-rose-400 rounded-xl flex items-center justify-center font-bold text-lg">❌</div>
+                    <div class="w-9 h-9 bg-rose-600/10 text-rose-400 rounded-lg flex items-center justify-center font-bold text-sm">❌</div>
                 </div>
             </div>
 
             <!-- شريط الأدوات والفلترة وزر التحميل -->
-            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 bg-slate-900 border border-slate-800 p-3 rounded-xl">
                 
-                <!-- حقل البحث وقائمة الفلترة المنسدلة -->
-                <div class="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
-                    <input type="text" id="search-input" onkeyup="filterInventory()" data-i18n-placeholder="search_placeholder" placeholder="ابحث عن صنف أو كود SKU..." class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 w-full sm:w-64">
+                <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                    <input type="text" id="search-input" onkeyup="filterInventory()" data-i18n-placeholder="search_placeholder" placeholder="ابحث عن صنف أو كود SKU..." class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 w-full sm:w-64">
                     
-                    <!-- القائمة المنسدلة لفلترة الأصناف -->
-                    <select id="status-filter" onchange="filterInventory()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                    <select id="status-filter" onchange="filterInventory()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
                         <option value="all" data-i18n="filter_all">جميع الأصناف</option>
                         <option value="available" data-i18n="filter_available">الأصناف المتوفرة</option>
                         <option value="low" data-i18n="filter_low">قاربت على النفاذ</option>
@@ -107,25 +104,23 @@
                     </select>
                 </div>
 
-                <!-- أزرار الإجراءات (تنزيل وإضافة) -->
-                <div class="flex items-center gap-2.5 w-full lg:w-auto justify-end">
-                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2 border border-slate-700" data-i18n="download_all_btn">
+                <div class="flex items-center gap-2 w-full lg:w-auto justify-end">
+                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 border border-slate-700" data-i18n="download_all_btn">
                         📥 تنزيل جميع الأصناف
                     </button>
-                    <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-semibold transition shadow-lg shadow-indigo-600/25" data-i18n="add_item_btn">
+                    <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-md shadow-indigo-600/20" data-i18n="add_item_btn">
                         + إضافة صنف
                     </button>
                 </div>
             </div>
 
             <!-- جدول المخزون الرئيسي -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
                 
-                <!-- شريط إعدادات الصفحات والعدد في الأعلى -->
-                <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pb-4 border-b border-slate-800 text-xs text-slate-400">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pb-3 border-b border-slate-800 text-[11px] text-slate-400">
                     <div class="flex items-center gap-2">
                         <span data-i18n="pagination_show">عرض</span>
-                        <select id="items-per-page" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <select id="items-per-page" class="bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs">
                             <option value="25">25</option>
                             <option value="75">75</option>
                             <option value="125">125</option>
@@ -141,63 +136,59 @@
                 <div class="overflow-x-auto">
                     <table class="w-full text-right border-collapse">
                         <thead>
-                            <tr class="border-b border-slate-800 text-slate-400 text-xs">
-                                <th class="py-3 px-4" data-i18n="th_sku">كود SKU</th>
-                                <th class="py-3 px-4" data-i18n="th_item_name">اسم الصنف</th>
-                                <th class="py-3 px-4" data-i18n="th_category">التصنيف</th>
-                                <th class="py-3 px-4" data-i18n="th_quantity">الكمية الحالية</th>
-                                <th class="py-3 px-4" data-i18n="th_unit">الوحدة</th>
-                                <th class="py-3 px-4" data-i18n="th_status">الحالة</th>
-                                <th class="py-3 px-4 text-center" data-i18n="th_actions">الإجراءات</th>
+                            <tr class="border-b border-slate-800 text-slate-400 text-[11px]">
+                                <th class="py-2.5 px-3" data-i18n="th_sku">كود SKU</th>
+                                <th class="py-2.5 px-3" data-i18n="th_item_name">اسم الصنف</th>
+                                <th class="py-2.5 px-3" data-i18n="th_category">التصنيف</th>
+                                <th class="py-2.5 px-3" data-i18n="th_quantity">الكمية الحالية</th>
+                                <th class="py-2.5 px-3" data-i18n="th_unit">الوحدة</th>
+                                <th class="py-2.5 px-3" data-i18n="th_status">الحالة</th>
+                                <th class="py-2.5 px-3 text-center" data-i18n="th_actions">الإجراءات</th>
                             </tr>
                         </thead>
-                        <tbody class="text-xs divide-y divide-slate-800/50" id="inventory-table-body">
-                            <!-- صنف 1 - متوفر -->
+                        <tbody class="text-xs divide-y divide-slate-800/40" id="inventory-table-body">
                             <tr class="inventory-row" data-status="available">
-                                <td class="py-3.5 px-4 font-mono text-indigo-300">SKU-BRG-001</td>
-                                <td class="py-3.5 px-4 font-bold text-slate-200">لحم برجر مجمد (أصلي)</td>
-                                <td class="py-3.5 px-4 text-slate-400">مستودع اللحوم والبراندات</td>
-                                <td class="py-3.5 px-4 font-bold text-indigo-400">1,450</td>
-                                <td class="py-3.5 px-4 text-slate-400">قطعة</td>
-                                <td class="py-3.5 px-4"><span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full text-xs" data-i18n="status_available">متوفر</span></td>
-                                <td class="py-3.5 px-4 text-center">
-                                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition" data-i18n="edit_btn">تعديل</button>
+                                <td class="py-3 px-3 font-mono text-indigo-300">SKU-BRG-001</td>
+                                <td class="py-3 px-3 font-bold text-slate-200">لحم برجر مجمد (أصلي)</td>
+                                <td class="py-3 px-3 text-slate-400">مستودع اللحوم والبراندات</td>
+                                <td class="py-3 px-3 font-bold text-indigo-400">1,450</td>
+                                <td class="py-3 px-3 text-slate-400">قطعة</td>
+                                <td class="py-3 px-3"><span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full text-[11px]" data-i18n="status_available">متوفر</span></td>
+                                <td class="py-3 px-3 text-center">
+                                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded text-[11px] font-medium transition" data-i18n="edit_btn">تعديل</button>
                                 </td>
                             </tr>
-                            <!-- صنف 2 - قارب على النفاذ -->
                             <tr class="inventory-row" data-status="low">
-                                <td class="py-3.5 px-4 font-mono text-indigo-300">SKU-BAK-042</td>
-                                <td class="py-3.5 px-4 font-bold text-slate-200">خبز برجر بطاطس</td>
-                                <td class="py-3.5 px-4 text-slate-400">المخابز والمخازن الجافة</td>
-                                <td class="py-3.5 px-4 font-bold text-amber-400">85</td>
-                                <td class="py-3.5 px-4 text-slate-400">كيس</td>
-                                <td class="py-3.5 px-4"><span class="bg-amber-500/10 text-amber-400 px-2.5 py-1 rounded-full text-xs" data-i18n="status_low">قارب على النفاذ</span></td>
-                                <td class="py-3.5 px-4 text-center">
-                                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition" data-i18n="edit_btn">تعديل</button>
+                                <td class="py-3 px-3 font-mono text-indigo-300">SKU-BAK-042</td>
+                                <td class="py-3 px-3 font-bold text-slate-200">خبز برجر بطاطس</td>
+                                <td class="py-3 px-3 text-slate-400">المخابز والمخازن الجافة</td>
+                                <td class="py-3 px-3 font-bold text-amber-400">85</td>
+                                <td class="py-3 px-3 text-slate-400">كيس</td>
+                                <td class="py-3 px-3"><span class="bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-full text-[11px]" data-i18n="status_low">قارب على النفاذ</span></td>
+                                <td class="py-3 px-3 text-center">
+                                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded text-[11px] font-medium transition" data-i18n="edit_btn">تعديل</button>
                                 </td>
                             </tr>
-                            <!-- صنف 3 - متوفر -->
                             <tr class="inventory-row" data-status="available">
-                                <td class="py-3.5 px-4 font-mono text-indigo-300">SKU-SRC-105</td>
-                                <td class="py-3.5 px-4 font-bold text-slate-200">صوص الصيل الخاص</td>
-                                <td class="py-3.5 px-4 text-slate-400">الصلصات والمواد السائلة</td>
-                                <td class="py-3.5 px-4 font-bold text-indigo-400">620</td>
-                                <td class="py-3.5 px-4 text-slate-400">عبوة</td>
-                                <td class="py-3.5 px-4"><span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full text-xs" data-i18n="status_available">متوفر</span></td>
-                                <td class="py-3.5 px-4 text-center">
-                                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition" data-i18n="edit_btn">تعديل</button>
+                                <td class="py-3 px-3 font-mono text-indigo-300">SKU-SRC-105</td>
+                                <td class="py-3 px-3 font-bold text-slate-200">صوص الصيل الخاص</td>
+                                <td class="py-3 px-3 text-slate-400">الصلصات والمواد السائلة</td>
+                                <td class="py-3 px-3 font-bold text-indigo-400">620</td>
+                                <td class="py-3 px-3 text-slate-400">عبوة</td>
+                                <td class="py-3 px-3"><span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full text-[11px]" data-i18n="status_available">متوفر</span></td>
+                                <td class="py-3 px-3 text-center">
+                                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded text-[11px] font-medium transition" data-i18n="edit_btn">تعديل</button>
                                 </td>
                             </tr>
-                            <!-- صنف 4 - منتهي -->
                             <tr class="inventory-row" data-status="out">
-                                <td class="py-3.5 px-4 font-mono text-indigo-300">SKU-PKG-019</td>
-                                <td class="py-3.5 px-4 font-bold text-slate-200">أكياس تعبئة ورق 1 كجم</td>
-                                <td class="py-3.5 px-4 text-slate-400">مستودع التغليف</td>
-                                <td class="py-3.5 px-4 font-bold text-rose-400">0</td>
-                                <td class="py-3.5 px-4 text-slate-400">شدة</td>
-                                <td class="py-3.5 px-4"><span class="bg-rose-500/10 text-rose-400 px-2.5 py-1 rounded-full text-xs" data-i18n="status_out">منتهي</span></td>
-                                <td class="py-3.5 px-4 text-center">
-                                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition" data-i18n="edit_btn">تعديل</button>
+                                <td class="py-3 px-3 font-mono text-indigo-300">SKU-PKG-019</td>
+                                <td class="py-3 px-3 font-bold text-slate-200">أكياس تعبئة ورق 1 كجم</td>
+                                <td class="py-3 px-3 text-slate-400">مستودع التغليف</td>
+                                <td class="py-3 px-3 font-bold text-rose-400">0</td>
+                                <td class="py-3 px-3 text-slate-400">شدة</td>
+                                <td class="py-3 px-3"><span class="bg-rose-500/10 text-rose-400 px-2 py-0.5 rounded-full text-[11px]" data-i18n="status_out">منتهي</span></td>
+                                <td class="py-3 px-3 text-center">
+                                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded text-[11px] font-medium transition" data-i18n="edit_btn">تعديل</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -247,8 +238,9 @@
                 brand_name: "Keymerv Warehouse",
                 nav_overview: "الرئيسية",
                 nav_inventory: "إدارة المخزون",
-                nav_branches: "فروع المطاعم",
-                nav_orders: "طلبات التوريد",
+                nav_orders: "طلبات التغذية",
+                nav_supply: "التوريد والموردين",
+                nav_branches: "الفروع",
                 nav_settings: "الإعدادات",
                 user_role_admin: "الإدارة العامة (المالك)",
                 logout: "خروج",
@@ -283,8 +275,9 @@
                 brand_name: "Keymerv Warehouse",
                 nav_overview: "Overview",
                 nav_inventory: "Inventory",
+                nav_orders: "Replenishment Orders",
+                nav_supply: "Suppliers",
                 nav_branches: "Branches",
-                nav_orders: "Supply Orders",
                 nav_settings: "Settings",
                 user_role_admin: "General Admin (Owner)",
                 logout: "Logout",
