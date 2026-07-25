@@ -54,7 +54,7 @@
             </button>
         </header>
 
-        <div class="p-6 space-y-6 max-w-4xl">
+        <div class="p-6 space-y-6 max-w-5xl">
             <!-- قسم بيانات المنشأة -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <h3 class="text-sm font-bold text-indigo-400" data-i18n="general_settings_title">بيانات المنشأة الرئيسية</h3>
@@ -81,7 +81,7 @@
                 </div>
             </div>
 
-            <!-- قسم إعدادات الفريق الجديد -->
+            <!-- قسم إعدادات الفريق والصلاحيات المحدث -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <div class="flex justify-between items-center">
                     <h3 class="text-sm font-bold text-indigo-400" data-i18n="team_settings_title">إعدادات الفريق والصلاحيات</h3>
@@ -93,6 +93,9 @@
                             <tr class="border-b border-slate-800 text-slate-400">
                                 <th class="py-3 px-2" data-i18n="table_member_name">اسم العضو</th>
                                 <th class="py-3 px-2" data-i18n="table_member_email">البريد الإلكتروني</th>
+                                <th class="py-3 px-2" data-i18n="table_member_brand">البراند</th>
+                                <th class="py-3 px-2" data-i18n="table_member_branch">الفرع</th>
+                                <th class="py-3 px-2" data-i18n="table_member_code">رمز الدخول</th>
                                 <th class="py-3 px-2" data-i18n="table_member_role">الصلاحية</th>
                                 <th class="py-3 px-2 text-center" data-i18n="table_member_actions">الإجراءات</th>
                             </tr>
@@ -101,21 +104,27 @@
                             <tr>
                                 <td class="py-3 px-2 font-medium">أحمد محمد</td>
                                 <td class="py-3 px-2 text-slate-400">ahmed@keymerv.com</td>
+                                <td class="py-3 px-2 text-indigo-400 font-medium">براند مطاعم البرجر</td>
+                                <td class="py-3 px-2">فرع التحلية</td>
+                                <td class="py-3 px-2 font-mono text-slate-300">b1-tahliya</td>
                                 <td class="py-3 px-2">
                                     <span class="bg-indigo-500/10 text-indigo-400 px-2.5 py-1 rounded-lg text-[11px]" data-i18n="role_warehouse_manager">مدير مستودع</span>
                                 </td>
                                 <td class="py-3 px-2 text-center">
-                                    <button class="text-slate-400 hover:text-rose-400 transition text-[11px]" data-i18n="remove_btn">حذف</button>
+                                    <button class="text-slate-400 hover:text-indigo-400 transition text-[11px] font-medium" data-i18n="edit_btn">تعديل</button>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="py-3 px-2 font-medium">خالد عبدالله</td>
                                 <td class="py-3 px-2 text-slate-400">khaled@keymerv.com</td>
+                                <td class="py-3 px-2 text-indigo-400 font-medium">براند مطاعم البرجر</td>
+                                <td class="py-3 px-2">فرع النخيل</td>
+                                <td class="py-3 px-2 font-mono text-slate-300">b1-nakheel</td>
                                 <td class="py-3 px-2">
                                     <span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-lg text-[11px]" data-i18n="role_branch_supervisor">مشرف فروع</span>
                                 </td>
                                 <td class="py-3 px-2 text-center">
-                                    <button class="text-slate-400 hover:text-rose-400 transition text-[11px]" data-i18n="remove_btn">حذف</button>
+                                    <button class="text-slate-400 hover:text-indigo-400 transition text-[11px] font-medium" data-i18n="edit_btn">تعديل</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -123,26 +132,64 @@
                 </div>
             </div>
 
-            <!-- قسم إعدادات التنبيهات (مع أزرار تبديل تفاعلية Toggle Switches) -->
+            <!-- قسم إعدادات تنبيهات المخزون والطلبات (8 إعدادات متقدمة مع أزرار التبديل) -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <h3 class="text-sm font-bold text-indigo-400" data-i18n="inventory_config_title">إعدادات تنبيهات المخزون والطلبات</h3>
-                <div class="space-y-3.5 text-xs">
+                <div class="space-y-3 text-xs">
+                    <!-- 1 -->
                     <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
                         <span class="text-slate-300" data-i18n="alert_low_stock">تنبيه تلقائي لوحة التحكم عند وصول الأصناف حد النفاذ</span>
                         <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-indigo-600 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
-                            <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200 transform translate-x-5"></div>
+                            <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
                         </button>
                     </div>
+                    <!-- 2 -->
                     <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
                         <span class="text-slate-300" data-i18n="alert_branch_orders">إرسال إشعار فوري عند طلب فرع مطعم أصناف جديدة</span>
                         <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-indigo-600 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
-                            <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200 transform translate-x-5"></div>
+                            <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
                         </button>
                     </div>
-                    <div class="flex items-center justify-between py-2">
+                    <!-- 3 -->
+                    <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
                         <span class="text-slate-300" data-i18n="alert_weekly_report">تصدير تقرير أسبوعي لحركة المستودع تلقائياً</span>
                         <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-slate-700 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
-                            <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200 transform translate-x-0"></div>
+                            <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
+                        </button>
+                    </div>
+                    <!-- 4 -->
+                    <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
+                        <span class="text-slate-300" data-i18n="setting_auto_approval">قبول تلقائي لطلبات الفروع ضمن الحدار المسموح به للمخزون</span>
+                        <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-slate-700 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
+                            <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
+                        </button>
+                    </div>
+                    <!-- 5 -->
+                    <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
+                        <span class="text-slate-300" data-i18n="setting_expiry_alerts">تفعيل تنبيهات انتهاء صلاحية المواد الغذائية قبل الموعد بـ 30 يوماً</span>
+                        <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-indigo-600 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
+                            <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
+                        </button>
+                    </div>
+                    <!-- 6 -->
+                    <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
+                        <span class="text-slate-300" data-i18n="setting_sound_notifications">تشغيل المؤثرات الصوتية عند وصول طلب تغذية جديد من الفروع</span>
+                        <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-indigo-600 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
+                            <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
+                        </button>
+                    </div>
+                    <!-- 7 -->
+                    <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
+                        <span class="text-slate-300" data-i18n="setting_negative_inventory">منع اعتماد صرف المخزون في حال تجاوز الكمية المتاحة في المستودع</span>
+                        <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-indigo-600 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
+                            <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
+                        </button>
+                    </div>
+                    <!-- 8 -->
+                    <div class="flex items-center justify-between py-2">
+                        <span class="text-slate-300" data-i18n="setting_supplier_portal">إرسال طلبات التوريد للموردين تلقائياً عبر البريد عند وصول الحد الأدنى</span>
+                        <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-slate-700 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
+                            <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
                         </button>
                     </div>
                 </div>
@@ -179,11 +226,10 @@
             if (isActive) {
                 btn.classList.remove('bg-indigo-600');
                 btn.classList.add('bg-slate-700');
-                knob.style.transform = isRtl ? 'translateX(0px)' : 'translateX(0px)';
+                knob.style.transform = 'translateX(0px)';
             } else {
                 btn.classList.remove('bg-slate-700');
                 btn.classList.add('bg-indigo-600');
-                // في حالة RTL تحتاج لاتجاه عكسي لحركة الإزاحة للزر
                 const translateValue = isRtl ? '-20px' : '20px';
                 knob.style.transform = `translateX(${translateValue})`;
             }
@@ -207,11 +253,14 @@
                 add_team_member_btn: "+ إضافة عضو جديد",
                 table_member_name: "اسم العضو",
                 table_member_email: "البريد الإلكتروني",
+                table_member_brand: "البراند",
+                table_member_branch: "الفرع",
+                table_member_code: "رمز الدخول",
                 table_member_role: "الصلاحية",
                 table_member_actions: "الإجراءات",
                 role_warehouse_manager: "مدير مستودع",
                 role_branch_supervisor: "مشرف فروع",
-                remove_btn: "حذف",
+                edit_btn: "تعديل",
                 label_warehouse_name: "اسم المستودع / النظام",
                 label_admin_email: "البريد الإلكتروني للإدارة",
                 label_phone: "رقم هاتف الدعم",
@@ -220,6 +269,11 @@
                 alert_low_stock: "تنبيه تلقائي لوحة التحكم عند وصول الأصناف حد النفاذ",
                 alert_branch_orders: "إرسال إشعار فوري عند طلب فرع مطعم أصناف جديدة",
                 alert_weekly_report: "تصدير تقرير أسبوعي لحركة المستودع تلقائياً",
+                setting_auto_approval: "قبول تلقائي لطلبات الفروع ضمن الحد المسموح به للمخزون",
+                setting_expiry_alerts: "تفعيل تنبيهات انتهاء صلاحية المواد الغذائية قبل الموعد بـ 30 يوماً",
+                setting_sound_notifications: "تشغيل المؤثرات الصوتية عند وصول طلب تغذية جديد من الفروع",
+                setting_negative_inventory: "منع اعتماد صرف المخزون في حال تجاوز الكمية المتاحة في المستودع",
+                setting_supplier_portal: "إرسال طلبات التوريد للموردين تلقائياً عبر البريد عند وصول الحد الأدنى",
                 security_title: "أمان الحساب وكلمة المرور",
                 label_current_password: "كلمة المرور الحالية",
                 label_new_password: "كلمة المرور الجديدة",
@@ -242,11 +296,14 @@
                 add_team_member_btn: "+ Add New Member",
                 table_member_name: "Member Name",
                 table_member_email: "Email",
+                table_member_brand: "Brand",
+                table_member_branch: "Branch",
+                table_member_code: "Access Code",
                 table_member_role: "Role",
                 table_member_actions: "Actions",
                 role_warehouse_manager: "Warehouse Manager",
                 role_branch_supervisor: "Branch Supervisor",
-                remove_btn: "Remove",
+                edit_btn: "Edit",
                 label_warehouse_name: "Warehouse / System Name",
                 label_admin_email: "Admin Email",
                 label_phone: "Support Phone",
@@ -255,6 +312,11 @@
                 alert_low_stock: "Automatic dashboard alert when items reach low stock",
                 alert_branch_orders: "Instant notification when a branch requests items",
                 alert_weekly_report: "Auto-export weekly warehouse movement report",
+                setting_auto_approval: "Auto-approve branch orders within safe stock limits",
+                setting_expiry_alerts: "Enable food item expiration alerts 30 days prior",
+                setting_sound_notifications: "Enable sound effects on incoming branch replenishment orders",
+                setting_negative_inventory: "Prevent inventory dispatch if stock exceeds available balance",
+                setting_supplier_portal: "Auto-email purchase orders to suppliers when reaching minimum stock",
                 security_title: "Account Security & Password",
                 label_current_password: "Current Password",
                 label_new_password: "New Password",
@@ -275,7 +337,6 @@
                 if (settingsTranslations[lang][key]) el.innerText = settingsTranslations[lang][key];
             });
 
-            // ضبط اتجاه حركة أزرار التبديل بناءً على اللغة
             document.querySelectorAll('button[onclick="toggleSwitch(this)"]').forEach(btn => {
                 const isActive = btn.classList.contains('bg-indigo-600');
                 const knob = btn.querySelector('div');
