@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="orders_title">طلبات التغذية - Keymerv Warehouse</title>
+    <title data-i18n="supply_title">إدارة التوريد والموردين - Keymerv Warehouse</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
-        /* تخصيص شريط التمرير (Scrollbar) ليصبح داكناً وأنيقاً */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -26,24 +25,24 @@
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden text-xs">
 
-    <!-- القائمة الجانبية (Sidebar) بنفس الحجم القياسي w-64 المعتمد في باقي الصفحات -->
     <!-- القائمة الجانبية (Sidebar) بالعرض القياسي الموحد w-64 -->
-<aside class="w-64 bg-slate-900 border-l border-slate-800 flex flex-col justify-between hidden md:flex shrink-0">
-    <div>
+    <aside class="w-64 bg-slate-900 border-l border-slate-800 flex flex-col justify-between shrink-0">
+        <div>
             <div class="p-4 border-b border-slate-800 flex items-center gap-2">
                 <div class="bg-indigo-600 text-white font-bold px-2 py-1 rounded-lg text-xs">K</div>
                 <span class="font-bold text-xs tracking-tight text-slate-200" data-i18n="brand_name">Keymerv Warehouse</span>
             </div>
-    
+
             <nav class="p-3 space-y-1.5">
                 <a href="dashboard.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_overview">الرئيسية</a>
                 <a href="inventory.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_inventory">إدارة المخزون</a>
                 <a href="branches.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_branches">فروع المطاعم</a>
-                <a href="orders.html" class="flex items-center gap-2.5 px-3 py-2 bg-indigo-600 text-white rounded-lg font-medium transition" data-i18n="nav_orders">طلبات التغذية</a>
+                <a href="orders.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_orders">طلبات التغذية</a>
+                <a href="supply.html" class="flex items-center gap-2.5 px-3 py-2 bg-indigo-600 text-white rounded-lg font-medium transition" data-i18n="nav_supply">التوريد والموردين</a>
                 <a href="settings.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_settings">الإعدادات</a>
             </nav>
         </div>
-    
+
         <div class="p-3 border-t border-slate-800 flex items-center justify-between">
             <div>
                 <p class="font-bold text-slate-200 text-xs" data-i18n="user_role_admin">الإدارة العامة (المالك)</p>
@@ -52,10 +51,11 @@
             <a href="login.html" class="text-rose-400 hover:text-rose-300 text-[11px] font-semibold" data-i18n="logout">خروج</a>
         </div>
     </aside>
+
     <!-- المحتوى الرئيسي -->
     <main class="flex-1 flex flex-col h-screen overflow-y-auto">
         <header class="bg-slate-900 border-b border-slate-800 px-5 py-3 flex justify-between items-center">
-            <h1 class="text-sm font-bold" data-i18n="orders_header">إدارة طلبات التغذية للفروع</h1>
+            <h1 class="text-sm font-bold" data-i18n="supply_header">إدارة شحنات التوريد والموردين</h1>
             <div class="flex items-center gap-3">
                 <button onclick="toggleLanguage()" id="lang-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-md text-xs font-medium transition">
                     English
@@ -65,116 +65,82 @@
 
         <div class="p-5 space-y-4">
             
-            <!-- إحصائيات سريعة بحجم أصغر وأنيق -->
-            <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
+            <!-- إحصائيات سريعة للتوريد -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div>
-                        <p class="text-slate-400 text-[11px]" data-i18n="stat_new">جديد</p>
-                        <h3 class="text-lg font-extrabold mt-0.5 text-sky-400" id="stat-new-count">0</h3>
+                        <p class="text-slate-400 text-[11px]" data-i18n="stat_active_suppliers">الموردين النشطين</p>
+                        <h3 class="text-lg font-extrabold mt-0.5 text-indigo-400" id="stat-suppliers-count">0</h3>
                     </div>
-                    <div class="w-9 h-9 bg-sky-600/10 text-sky-400 rounded-lg flex items-center justify-center font-bold text-sm">🆕</div>
+                    <div class="w-9 h-9 bg-indigo-600/10 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-sm">🏭</div>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div>
-                        <p class="text-slate-400 text-[11px]" data-i18n="stat_preparing">جاري التجهيز</p>
-                        <h3 class="text-lg font-extrabold mt-0.5 text-amber-400" id="stat-preparing-count">0</h3>
+                        <p class="text-slate-400 text-[11px]" data-i18n="stat_incoming_shipments">شحنات في الطريق</p>
+                        <h3 class="text-lg font-extrabold mt-0.5 text-amber-400" id="stat-incoming-count">0</h3>
                     </div>
-                    <div class="w-9 h-9 bg-amber-600/10 text-amber-400 rounded-lg flex items-center justify-center font-bold text-sm">⏳</div>
+                    <div class="w-9 h-9 bg-amber-600/10 text-amber-400 rounded-lg flex items-center justify-center font-bold text-sm">🚢</div>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div>
-                        <p class="text-slate-400 text-[11px]" data-i18n="stat_ready">جاهز</p>
-                        <h3 class="text-lg font-extrabold mt-0.5 text-blue-400" id="stat-ready-count">0</h3>
+                        <p class="text-slate-400 text-[11px]" data-i18n="stat_received_month">شحنات مستلمة هذا الشهر</p>
+                        <h3 class="text-lg font-extrabold mt-0.5 text-emerald-400" id="stat-received-count">0</h3>
                     </div>
-                    <div class="w-9 h-9 bg-blue-600/10 text-blue-400 rounded-lg flex items-center justify-center font-bold text-sm">📦</div>
+                    <div class="w-9 h-9 bg-emerald-600/10 text-emerald-400 rounded-lg flex items-center justify-center font-bold text-sm">📥</div>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div>
-                        <p class="text-slate-400 text-[11px]" data-i18n="stat_delivering">جاري التوصيل</p>
-                        <h3 class="text-lg font-extrabold mt-0.5 text-indigo-400" id="stat-delivering-count">0</h3>
+                        <p class="text-slate-400 text-[11px]" data-i18n="stat_total_cost">إجمالي قيمة التوريدات</p>
+                        <h3 class="text-lg font-extrabold mt-0.5 text-sky-400" id="stat-cost-val">0 ر.س</h3>
                     </div>
-                    <div class="w-9 h-9 bg-indigo-600/10 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-sm">🚚</div>
-                </div>
-                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
-                    <div>
-                        <p class="text-slate-400 text-[11px]" data-i18n="stat_completed">مكتمل</p>
-                        <h3 class="text-lg font-extrabold mt-0.5 text-emerald-400" id="stat-completed-count">0</h3>
-                    </div>
-                    <div class="w-9 h-9 bg-emerald-600/10 text-emerald-400 rounded-lg flex items-center justify-center font-bold text-sm">✅</div>
-                </div>
-                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
-                    <div>
-                        <p class="text-slate-400 text-[11px]" data-i18n="stat_cancelled">ملغي</p>
-                        <h3 class="text-lg font-extrabold mt-0.5 text-rose-400" id="stat-cancelled-count">0</h3>
-                    </div>
-                    <div class="w-9 h-9 bg-rose-600/10 text-rose-400 rounded-lg flex items-center justify-center font-bold text-sm">❌</div>
+                    <div class="w-9 h-9 bg-sky-600/10 text-sky-400 rounded-lg flex items-center justify-center font-bold text-sm">💰</div>
                 </div>
             </div>
 
             <!-- شريط الأدوات والفلترة -->
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 bg-slate-900 border border-slate-800 p-3 rounded-xl">
                 <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-                    <select id="brand-filter" onchange="filterOrders()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
-                        <option value="all" data-i18n="filter_all_brands">جميع البراندات</option>
-                        <option value="بربريس برجر">بربريس برجر</option>
-                        <option value="ايس كريم فاير">ايس كريم فاير</option>
-                        <option value="بيتزا كراست">بيتزا كراست</option>
+                    <select id="supplier-filter" onchange="filterShipments()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                        <option value="all" data-i18n="filter_all_suppliers">جميع الموردين</option>
+                        <option value="شركة الأغذية الكبرى">شركة الأغذية الكبرى</option>
+                        <option value="مطاحن ومخابز الخليج">مطاحن ومخابز الخليج</option>
+                        <option value="مؤسسة التغليف الحديث">مؤسسة التغليف الحديث</option>
                     </select>
 
-                    <select id="branch-filter" onchange="filterOrders()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
-                        <option value="all" data-i18n="filter_all_branches">جميع الفروع</option>
-                        <option value="فرع العليا">فرع العليا</option>
-                        <option value="فرع النخيل مول">فرع النخيل مول</option>
-                        <option value="فرع الملك فهد">فرع الملك فهد</option>
-                        <option value="فرع التحلية">فرع التحلية</option>
-                        <option value="فرع الصحافة">فرع الصحافة</option>
+                    <select id="shipment-status-filter" onchange="filterShipments()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                        <option value="all" data-i18n="filter_all_status">جميع الحالات</option>
+                        <option value="incoming" data-i18n="status_incoming">في الطريق</option>
+                        <option value="received" data-i18n="status_received">تم الاستلام والمراجعة</option>
+                        <option value="delayed" data-i18n="status_delayed">متأخرة</option>
                     </select>
 
-                    <select id="status-filter" onchange="filterOrders()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
-                        <option value="all" data-i18n="filter_all">جميع الحالات</option>
-                        <option value="new" data-i18n="filter_new">جديد</option>
-                        <option value="preparing" data-i18n="filter_preparing">جاري التجهيز</option>
-                        <option value="ready" data-i18n="filter_ready">جاهز</option>
-                        <option value="delivering" data-i18n="filter_delivering">جاري التوصيل</option>
-                        <option value="completed" data-i18n="filter_completed">مكتمل</option>
-                        <option value="cancelled" data-i18n="filter_cancelled">ملغي</option>
-                    </select>
-
-                    <input type="text" id="search-input" onkeyup="filterOrders()" data-i18n-placeholder="search_placeholder" placeholder="ابحث برقم الطلب..." class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 w-full sm:w-48">
+                    <input type="text" id="search-input" onkeyup="filterShipments()" data-i18n-placeholder="search_placeholder" placeholder="ابحث برقم الشحنة أو المورد..." class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 w-full sm:w-56">
                 </div>
 
                 <div class="flex items-center gap-2 w-full lg:w-auto justify-end">
-                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 border border-slate-700" data-i18n="export_excel_btn">
-                        📊 تصدير Excel
+                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 border border-slate-700" data-i18n="suppliers_list_btn">
+                        👥 إدارة الموردين
                     </button>
-                    <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-md shadow-indigo-600/20" data-i18n="add_order_btn">
-                        + إنشاء طلب تغذية لفرع
+                    <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-md shadow-indigo-600/20" data-i18n="add_shipment_btn">
+                        + تسجيل شحنة توريد جديدة
                     </button>
                 </div>
             </div>
 
-            <!-- جدول طلبات التغذية -->
+            <!-- جدول شحنات التوريد -->
             <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
                 
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pb-3 border-b border-slate-800 text-[11px] text-slate-400">
                     <div class="flex items-center gap-2">
-                        <div class="flex items-center gap-1.5">
-                            <span data-i18n="pagination_show">عرض</span>
-                            <select id="items-per-page" class="bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs">
-                                <option value="25">25</option>
-                                <option value="75">75</option>
-                                <option value="125">125</option>
-                                <option value="200">200</option>
-                            </select>
-                            <span data-i18n="pagination_per_page">طلب لكل صفحة</span>
-                        </div>
-                        <div id="bulk-actions-container" class="hidden items-center gap-2 pl-2 pr-2 border-r border-slate-800">
-                            <span class="text-indigo-400 font-semibold" id="selected-count">0 محدد</span>
-                            <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2 py-0.5 rounded text-[11px] transition" data-i18n="bulk_status_btn">تغيير الحالة</button>
-                        </div>
+                        <span data-i18n="pagination_show">عرض</span>
+                        <select id="items-per-page" class="bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs">
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span data-i18n="pagination_per_page">شحنة لكل صفحة</span>
                     </div>
                     <div>
-                        <span id="results-counter" class="font-bold text-indigo-400" data-i18n="pagination_info">عرض 0 من أصل 0 طلب</span>
+                        <span id="results-counter" class="font-bold text-indigo-400" data-i18n="pagination_info">عرض 0 من أصل 0 شحنة</span>
                     </div>
                 </div>
 
@@ -182,29 +148,25 @@
                     <table class="w-full text-right border-collapse">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 text-[11px]">
-                                <th class="py-2.5 px-3 w-8">
-                                    <input type="checkbox" id="select-all" onclick="toggleSelectAll(this)" class="rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer w-3.5 h-3.5">
-                                </th>
-                                <th class="py-2.5 px-3" data-i18n="th_order_id">رقم الطلب</th>
-                                <th class="py-2.5 px-3" data-i18n="th_branch_name">فرع المطعم</th>
-                                <th class="py-2.5 px-3" data-i18n="th_items_name">الأصناف المطلوبة</th>
-                                <th class="py-2.5 px-3" data-i18n="th_items_count">العدد الإجمالي</th>
-                                <th class="py-2.5 px-3" data-i18n="th_date">التاريخ والوقت</th>
-                                <th class="py-2.5 px-3" data-i18n="th_notes">الملاحظات</th>
-                                <th class="py-2.5 px-3" data-i18n="th_status">حالة الطلب</th>
+                                <th class="py-2.5 px-3" data-i18n="th_shipment_id">رقم الشحنة</th>
+                                <th class="py-2.5 px-3" data-i18n="th_supplier_name">اسم المورد</th>
+                                <th class="py-2.5 px-3" data-i18n="th_items_supplied">الأصناف الموردة</th>
+                                <th class="py-2.5 px-3" data-i18n="th_cost">التكلفة الإجمالية</th>
+                                <th class="py-2.5 px-3" data-i18n="th_expected_date">تاريخ الوصول المتوقع / الفعلي</th>
+                                <th class="py-2.5 px-3" data-i18n="th_shipment_status">حالة الشحنة</th>
                                 <th class="py-2.5 px-3 text-center" data-i18n="th_actions">الإجراءات</th>
                             </tr>
                         </thead>
-                        <tbody class="text-xs divide-y divide-slate-800/40" id="orders-table-body">
-                            <!-- صفوف الطلبات -->
+                        <tbody class="text-xs divide-y divide-slate-800/40" id="shipments-table-body">
+                            <!-- صفوف الشحنات -->
                         </tbody>
                     </table>
 
-                    <!-- رسالة التنبيه الذكية -->
+                    <!-- رسالة التنبيه عند عدم وجود نتائج -->
                     <div id="no-results-row" class="hidden py-12 text-center text-slate-400">
-                        <div class="text-3xl mb-2" id="empty-state-icon">📭</div>
-                        <p class="font-semibold text-slate-200 text-sm" id="empty-state-title">لا توجد طلبات في النظام حالياً</p>
-                        <p class="text-slate-400 text-xs mt-1" id="empty-state-desc">سيتم عرض طلبات الفروع هنا بمجرد إرسالها من قبل المطاعم.</p>
+                        <div class="text-3xl mb-2">📦</div>
+                        <p class="font-semibold text-slate-200 text-sm" data-i18n="empty_title">لا توجد شحنات توريد مسجلة حالياً</p>
+                        <p class="text-slate-400 text-xs mt-1" data-i18n="empty_desc">ابدأ بتسجيل شحنات التوريد الجديدة لمتابعة المخزون والموردين.</p>
                     </div>
                 </div>
             </div>
@@ -213,50 +175,41 @@
 
     <!-- محرك التصفية والمنطق البرمجي -->
     <script>
-        let ordersData = [
-            { id: "ORD-8015", brand: "بربريس برجر", branch: "فرع العليا", items: "لحوم برجر، خبز بطاطس", qty: "200 وحدة", date: "2026-07-25 / 04:30 م", notes: "طلب جديد بانتظار المراجعة", status: "new" },
-            { id: "ORD-8012", brand: "بربريس برجر", branch: "فرع النخيل مول", items: "لحوم برجر، صوص خاص", qty: "350 وحدة", date: "2026-07-25 / 04:15 م", notes: "توصيل عاجل قبل فترة الظهر", status: "preparing" },
-            { id: "ORD-8010", brand: "ايس كريم فاير", branch: "فرع الملك فهد", items: "أقماع آيس كريم، صوص شوكولاتة", qty: "150 وحدة", date: "2026-07-25 / 03:00 م", notes: "جاهز للاستلام من المستودع", status: "ready" },
-            { id: "ORD-8011", brand: "بيتزا كراست", branch: "فرع التحلية", items: "جبنة موزاريلا، عجينة بيتزا مجمدة", qty: "120 وحدة", date: "2026-07-25 / 02:30 م", notes: "التسليم عبر مندوب الشركة", status: "delivering" },
-            { id: "ORD-8006", brand: "بربريس برجر", branch: "فرع الصحافة", items: "بطاطس مقلية مجمدة", qty: "50 وحدة", date: "2026-07-24 / 08:00 م", notes: "تم الإلغاء بناءً على طلب مدير الفرع", status: "cancelled" }
+        let shipmentsData = [
+            { id: "SHP-5011", supplier: "شركة الأغذية الكبرى", items: "لحوم برجر مجمدة (500 كجم)", cost: "14,500 ر.س", date: "2026-07-28 (متوقع)", status: "incoming" },
+            { id: "SHP-5010", supplier: "مطاحن ومخابز الخليج", items: "خبز برجر بطاطس (2,000 قطعة)", cost: "6,000 ر.س", date: "2026-07-25 (تم الاستلام)", status: "received" },
+            { id: "SHP-5009", supplier: "مؤسسة التغليف الحديث", items: "أكياس ورقية وعلب صوصات", cost: "3,200 ر.س", date: "2026-07-22 (تم الاستلام)", status: "received" },
+            { id: "SHP-5008", supplier: "شركة الأغذية الكبرى", items: "جبنة موزاريلا مبشورة (300 كجم)", cost: "9,800 ر.س", date: "2026-07-20 (متأخرة)", status: "delayed" }
         ];
 
-        function renderTable(dataToRender) {
-            const tbody = document.getElementById('orders-table-body');
+        function renderShipmentsTable(dataToRender) {
+            const tbody = document.getElementById('shipments-table-body');
             tbody.innerHTML = '';
 
-            dataToRender.forEach((order) => {
-                let statusBadgeClass = '';
-                let statusTextKey = '';
-                
-                switch(order.status) {
-                    case 'new': statusBadgeClass = 'bg-sky-500/10 text-sky-400'; statusTextKey = 'status_new'; break;
-                    case 'preparing': statusBadgeClass = 'bg-amber-500/10 text-amber-400'; statusTextKey = 'status_preparing'; break;
-                    case 'ready': statusBadgeClass = 'bg-blue-500/10 text-blue-400'; statusTextKey = 'status_ready'; break;
-                    case 'delivering': statusBadgeClass = 'bg-indigo-500/10 text-indigo-400'; statusTextKey = 'status_delivering'; break;
-                    case 'completed': statusBadgeClass = 'bg-emerald-500/10 text-emerald-400'; statusTextKey = 'status_completed'; break;
-                    case 'cancelled': statusBadgeClass = 'bg-rose-500/10 text-rose-400'; statusTextKey = 'status_cancelled'; break;
+            dataToRender.forEach((shipment) => {
+                let badgeClass = '';
+                let statusKey = '';
+
+                switch(shipment.status) {
+                    case 'incoming': badgeClass = 'bg-amber-500/10 text-amber-400'; statusKey = 'status_incoming'; break;
+                    case 'received': badgeClass = 'bg-emerald-500/10 text-emerald-400'; statusKey = 'status_received'; break;
+                    case 'delayed': badgeClass = 'bg-rose-500/10 text-rose-400'; statusKey = 'status_delayed'; break;
                 }
 
                 const tr = document.createElement('tr');
-                tr.className = 'order-row';
-                tr.setAttribute('data-brand', order.brand);
-                tr.setAttribute('data-branch', order.branch);
-                tr.setAttribute('data-status', order.status);
+                tr.className = 'shipment-row';
+                tr.setAttribute('data-supplier', shipment.supplier);
+                tr.setAttribute('data-status', shipment.status);
 
                 tr.innerHTML = `
-                    <td class="py-3 px-3">
-                        <input type="checkbox" onclick="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer w-3.5 h-3.5">
-                    </td>
-                    <td class="py-3 px-3 font-mono text-indigo-300 font-semibold">${order.id}</td>
-                    <td class="py-3 px-3 font-bold text-slate-200">${order.branch} <span class="block text-[10px] text-slate-400 font-normal">${order.brand}</span></td>
-                    <td class="py-3 px-3 text-slate-300">${order.items}</td>
-                    <td class="py-3 px-3 font-bold text-indigo-400">${order.qty}</td>
-                    <td class="py-3 px-3 text-slate-400 text-[11px]">${order.date}</td>
-                    <td class="py-3 px-3 text-slate-400 text-[11px]">${order.notes}</td>
-                    <td class="py-3 px-3"><span class="${statusBadgeClass} px-2 py-0.5 rounded-full text-[11px]" data-i18n="${statusTextKey}">${order.status}</span></td>
+                    <td class="py-3 px-3 font-mono text-indigo-300 font-semibold">${shipment.id}</td>
+                    <td class="py-3 px-3 font-bold text-slate-200">${shipment.supplier}</td>
+                    <td class="py-3 px-3 text-slate-300">${shipment.items}</td>
+                    <td class="py-3 px-3 font-bold text-sky-400">${shipment.cost}</td>
+                    <td class="py-3 px-3 text-slate-400 text-[11px]">${shipment.date}</td>
+                    <td class="py-3 px-3"><span class="${badgeClass} px-2 py-0.5 rounded-full text-[11px]" data-i18n="${statusKey}">${shipment.status}</span></td>
                     <td class="py-3 px-3 text-center">
-                        <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded text-[11px] font-medium transition" data-i18n="view_btn">معاينة</button>
+                        <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded text-[11px] font-medium transition" data-i18n="details_btn">التفاصيل</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -266,212 +219,135 @@
         }
 
         function updateStats() {
-            const counts = { new: 0, preparing: 0, ready: 0, delivering: 0, completed: 0, cancelled: 0 };
-            ordersData.forEach(o => { if(counts[o.status] !== undefined) counts[o.status]++; });
-
-            document.getElementById('stat-new-count').innerText = counts.new;
-            document.getElementById('stat-preparing-count').innerText = counts.preparing;
-            document.getElementById('stat-ready-count').innerText = counts.ready;
-            document.getElementById('stat-delivering-count').innerText = counts.delivering;
-            document.getElementById('stat-completed-count').innerText = counts.completed;
-            document.getElementById('stat-cancelled-count').innerText = counts.cancelled;
+            document.getElementById('stat-suppliers-count').innerText = "3";
+            document.getElementById('stat-incoming-count').innerText = shipmentsData.filter(s => s.status === 'incoming').length;
+            document.getElementById('stat-received-count').innerText = shipmentsData.filter(s => s.status === 'received').length;
+            document.getElementById('stat-cost-val').innerText = "33,500 ر.س";
         }
 
-        function toggleSelectAll(source) {
-            const checkboxes = document.querySelectorAll('.row-checkbox');
-            checkboxes.forEach(cb => {
-                if (cb.closest('tr').style.display !== 'none') {
-                    cb.checked = source.checked;
-                }
-            });
-            updateSelection();
-        }
-
-        function updateSelection() {
-            const checkboxes = document.querySelectorAll('.row-checkbox');
-            let selectedCount = 0;
-            checkboxes.forEach(cb => { if (cb.checked) selectedCount++; });
-
-            const bulkContainer = document.getElementById('bulk-actions-container');
-            const countSpan = document.getElementById('selected-count');
-            const lang = document.getElementById('html-root').getAttribute('lang') || 'ar';
-
-            if (selectedCount > 0) {
-                bulkContainer.classList.remove('hidden');
-                bulkContainer.classList.add('flex');
-                countSpan.innerText = lang === 'ar' ? `${selectedCount} محدد` : `${selectedCount} selected`;
-            } else {
-                bulkContainer.classList.remove('flex');
-                bulkContainer.classList.add('hidden');
-            }
-        }
-
-        function filterOrders() {
-            const brandFilter = document.getElementById('brand-filter').value;
-            const branchFilter = document.getElementById('branch-filter').value;
-            const statusFilter = document.getElementById('status-filter').value;
+        function filterShipments() {
+            const supplierFilter = document.getElementById('supplier-filter').value;
+            const statusFilter = document.getElementById('shipment-status-filter').value;
             const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
-            const rows = document.querySelectorAll('.order-row');
+            const rows = document.querySelectorAll('.shipment-row');
             const noResultsRow = document.getElementById('no-results-row');
-            
-            const emptyIcon = document.getElementById('empty-state-icon');
-            const emptyTitle = document.getElementById('empty-state-title');
-            const emptyDesc = document.getElementById('empty-state-desc');
             const lang = document.getElementById('html-root').getAttribute('lang') || 'ar';
 
             let visibleCount = 0;
 
             rows.forEach(row => {
-                const rowBrand = row.getAttribute('data-brand');
-                const rowBranch = row.getAttribute('data-branch');
+                const rowSupplier = row.getAttribute('data-supplier');
                 const rowStatus = row.getAttribute('data-status');
                 const rowContent = row.innerText.toLowerCase();
 
-                const matchesBrand = (brandFilter === 'all' || rowBrand === brandFilter);
-                const matchesBranch = (branchFilter === 'all' || rowBranch === branchFilter);
+                const matchesSupplier = (supplierFilter === 'all' || rowSupplier === supplierFilter);
                 const matchesStatus = (statusFilter === 'all' || rowStatus === statusFilter);
                 const matchesSearch = (rowContent.includes(searchQuery));
 
-                if (matchesBrand && matchesBranch && matchesStatus && matchesSearch) {
+                if (matchesSupplier && matchesStatus && matchesSearch) {
                     row.style.display = '';
                     visibleCount++;
                 } else {
                     row.style.display = 'none';
-                    const cb = row.querySelector('.row-checkbox');
-                    if (cb) cb.checked = false;
                 }
             });
 
             if (visibleCount === 0) {
                 noResultsRow.classList.remove('hidden');
                 noResultsRow.classList.add('block');
-
-                if (ordersData.length === 0) {
-                    emptyIcon.innerText = "📭";
-                    emptyTitle.innerText = (lang === 'ar') ? "لا توجد طلبات في النظام حالياً" : "No orders in the system yet";
-                    emptyDesc.innerText = (lang === 'ar') ? "سيتم عرض طلبات التغذية للفروع هنا بمجرد إرسالها من قبل المطاعم." : "Branch replenishment orders will appear here once submitted.";
-                } else {
-                    emptyIcon.innerText = "🔍";
-                    emptyTitle.innerText = (lang === 'ar') ? "لا توجد طلبات مطابقة لنتائج البحث أو الفلترة" : "No orders matching your search or filter criteria";
-                    emptyDesc.innerText = (lang === 'ar') ? "جرب تغيير خيارات الفلترة أو مسح كلمات البحث للرجوع للقائمة." : "Try changing your filters or clearing search keywords.";
-                }
             } else {
                 noResultsRow.classList.remove('block');
                 noResultsRow.classList.add('hidden');
             }
 
-            updateSelection();
-
             const counterElement = document.getElementById('results-counter');
             if (lang === 'ar') {
-                counterElement.innerText = `عرض ${visibleCount} من أصل ${ordersData.length} طلب`;
+                counterElement.innerText = `عرض ${visibleCount} من أصل ${shipmentsData.length} شحنة`;
             } else {
-                counterElement.innerText = `Showing ${visibleCount} of ${ordersData.length} orders`;
+                counterElement.innerText = `Showing ${visibleCount} of ${shipmentsData.length} shipments`;
             }
         }
 
-        const ordersTranslations = {
+        const supplyTranslations = {
             ar: {
-                orders_title: "طلبات التغذية - Keymerv Warehouse",
+                supply_title: "إدارة التوريد والموردين - Keymerv Warehouse",
                 brand_name: "Keymerv Warehouse",
                 nav_overview: "الرئيسية",
                 nav_inventory: "إدارة المخزون",
                 nav_branches: "فروع المطاعم",
                 nav_orders: "طلبات التغذية",
+                nav_supply: "التوريد والموردين",
                 nav_settings: "الإعدادات",
                 user_role_admin: "الإدارة العامة (المالك)",
                 logout: "خروج",
-                orders_header: "إدارة طلبات التغذية للفروع",
-                stat_new: "جديد",
-                stat_preparing: "جاري التجهيز",
-                stat_ready: "جاهز",
-                stat_delivering: "جاري التوصيل",
-                stat_completed: "مكتمل",
-                stat_cancelled: "ملغي",
-                search_placeholder: "ابحث برقم الطلب...",
-                filter_all_brands: "جميع البراندات",
-                filter_all_branches: "جميع الفروع",
-                filter_all: "جميع الحالات",
-                filter_new: "جديد",
-                filter_preparing: "جاري التجهيز",
-                filter_ready: "جاهز",
-                filter_delivering: "جاري التوصيل",
-                filter_completed: "مكتمل",
-                filter_cancelled: "ملغي",
-                export_excel_btn: "📊 تصدير Excel",
-                add_order_btn: "+ إنشاء طلب تغذية لفرع",
-                bulk_status_btn: "تغيير الحالة",
-                th_order_id: "رقم الطلب",
-                th_branch_name: "فرع المطعم",
-                th_items_name: "الأصناف المطلوبة",
-                th_items_count: "العدد الإجمالي",
-                th_date: "التاريخ والوقت",
-                th_notes: "الملاحظات",
-                th_status: "حالة الطلب",
+                supply_header: "إدارة شحنات التوريد والموردين",
+                stat_active_suppliers: "الموردين النشطين",
+                stat_incoming_shipments: "شحنات في الطريق",
+                stat_received_month: "شحنات مستلمة هذا الشهر",
+                stat_total_cost: "إجمالي قيمة التوريدات",
+                filter_all_suppliers: "جميع الموردين",
+                filter_all_status: "جميع الحالات",
+                status_incoming: "في الطريق",
+                status_received: "تم الاستلام والمراجعة",
+                status_delayed: "متأخرة",
+                search_placeholder: "ابحث برقم الشحنة أو المورد...",
+                suppliers_list_btn: "👥 إدارة الموردين",
+                add_shipment_btn: "+ تسجيل شحنة توريد جديدة",
+                th_shipment_id: "رقم الشحنة",
+                th_supplier_name: "اسم المورد",
+                th_items_supplied: "الأصناف الموردة",
+                th_cost: "التكلفة الإجمالية",
+                th_expected_date: "تاريخ الوصول المتوقع / الفعلي",
+                th_shipment_status: "حالة الشحنة",
                 th_actions: "الإجراءات",
-                status_new: "جديد",
-                status_preparing: "جاري التجهيز",
-                status_ready: "جاهز",
-                status_delivering: "جاري التوصيل",
-                status_completed: "مكتمل",
-                status_cancelled: "ملغي",
-                view_btn: "معاينة",
+                details_btn: "التفاصيل",
                 pagination_show: "عرض",
-                pagination_per_page: "طلب لكل صفحة"
+                pagination_per_page: "شحنة لكل صفحة",
+                empty_title: "لا توجد شحنات توريد مسجلة حالياً",
+                empty_desc: "ابدأ بتسجيل شحنات التوريد الجديدة لمتابعة المخزون والموردين."
             },
             en: {
-                orders_title: "Replenishment Orders - Keymerv Warehouse",
+                supply_title: "Supply & Suppliers Management - Keymerv Warehouse",
                 brand_name: "Keymerv Warehouse",
                 nav_overview: "Overview",
                 nav_inventory: "Inventory",
                 nav_branches: "Branches",
                 nav_orders: "Replenishment Orders",
+                nav_supply: "Supply & Suppliers",
                 nav_settings: "Settings",
                 user_role_admin: "General Admin (Owner)",
                 logout: "Logout",
-                orders_header: "Branch Replenishment Orders",
-                stat_new: "New",
-                stat_preparing: "Preparing",
-                stat_ready: "Ready",
-                stat_delivering: "Delivering",
-                stat_completed: "Completed",
-                stat_cancelled: "Cancelled",
-                search_placeholder: "Search order ID...",
-                filter_all_brands: "All Brands",
-                filter_all_branches: "All Branches",
-                filter_all: "All Statuses",
-                filter_new: "New",
-                filter_preparing: "Preparing",
-                filter_ready: "Ready",
-                filter_delivering: "Delivering",
-                filter_completed: "Completed",
-                filter_cancelled: "Cancelled",
-                export_excel_btn: "📊 Export Excel",
-                add_order_btn: "+ Create Branch Order",
-                bulk_status_btn: "Change Status",
-                th_order_id: "Order ID",
-                th_branch_name: "Branch Name",
-                th_items_name: "Requested Items",
-                th_items_count: "Total Qty",
-                th_date: "Date & Time",
-                th_notes: "Notes",
-                th_status: "Status",
+                supply_header: "Supply Shipments & Suppliers Management",
+                stat_active_suppliers: "Active Suppliers",
+                stat_incoming_shipments: "Incoming Shipments",
+                stat_received_month: "Received This Month",
+                stat_total_cost: "Total Supply Cost",
+                filter_all_suppliers: "All Suppliers",
+                filter_all_status: "All Statuses",
+                status_incoming: "Incoming",
+                status_received: "Received & Inspected",
+                status_delayed: "Delayed",
+                search_placeholder: "Search shipment ID or supplier...",
+                suppliers_list_btn: "👥 Manage Suppliers",
+                add_shipment_btn: "+ Register New Shipment",
+                th_shipment_id: "Shipment ID",
+                th_supplier_name: "Supplier Name",
+                th_items_supplied: "Supplied Items",
+                th_cost: "Total Cost",
+                th_expected_date: "Expected / Actual Date",
+                th_shipment_status: "Status",
                 th_actions: "Actions",
-                status_new: "New",
-                status_preparing: "Preparing",
-                status_ready: "Ready",
-                status_delivering: "Delivering",
-                status_completed: "Completed",
-                status_cancelled: "Cancelled",
-                view_btn: "View",
+                details_btn: "Details",
                 pagination_show: "Show",
-                pagination_per_page: "orders per page"
+                pagination_per_page: "shipments per page",
+                empty_title: "No supply shipments registered yet",
+                empty_desc: "Start registering new supply shipments to track inventory and vendors."
             }
         };
 
         let currentLang = localStorage.getItem('lang') || 'ar';
 
-        function applyOrdersLanguage(lang) {
+        function applySupplyLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('lang', lang);
             
@@ -486,29 +362,29 @@
 
             document.querySelectorAll('[data-i18n]').forEach(element => {
                 const key = element.getAttribute('data-i18n');
-                if (ordersTranslations[lang] && ordersTranslations[lang][key]) {
-                    element.innerText = ordersTranslations[lang][key];
+                if (supplyTranslations[lang] && supplyTranslations[lang][key]) {
+                    element.innerText = supplyTranslations[lang][key];
                 }
             });
 
             document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
                 const key = element.getAttribute('data-i18n-placeholder');
-                if (ordersTranslations[lang] && ordersTranslations[lang][key]) {
-                    element.setAttribute('placeholder', ordersTranslations[lang][key]);
+                if (supplyTranslations[lang] && supplyTranslations[lang][key]) {
+                    element.setAttribute('placeholder', supplyTranslations[lang][key]);
                 }
             });
         }
 
         function toggleLanguage() {
             const newLang = currentLang === 'ar' ? 'en' : 'ar';
-            applyOrdersLanguage(newLang);
-            filterOrders();
+            applySupplyLanguage(newLang);
+            filterShipments();
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            renderTable(ordersData);
-            applyOrdersLanguage(currentLang);
-            filterOrders();
+            renderShipmentsTable(shipmentsData);
+            applySupplyLanguage(currentLang);
+            filterShipments();
         });
     </script>
 </body>
