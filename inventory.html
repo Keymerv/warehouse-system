@@ -95,7 +95,7 @@
                 
                 <!-- حقل البحث وقائمة الفلترة المنسدلة -->
                 <div class="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
-                    <input type="text" id="search-input" onkeyup="filterInventory()" data-i18n-placeholder="search_placeholder" placeholder="ابحث عن صنف في المستودع..." class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 w-full sm:w-60">
+                    <input type="text" id="search-input" onkeyup="filterInventory()" data-i18n-placeholder="search_placeholder" placeholder="ابحث عن صنف أو كود SKU..." class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 w-full sm:w-64">
                     
                     <!-- القائمة المنسدلة لفلترة الأصناف -->
                     <select id="status-filter" onchange="filterInventory()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
@@ -141,6 +141,7 @@
                     <table class="w-full text-right border-collapse">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 text-xs">
+                                <th class="py-3 px-4" data-i18n="th_sku">كود SKU</th>
                                 <th class="py-3 px-4" data-i18n="th_item_name">اسم الصنف</th>
                                 <th class="py-3 px-4" data-i18n="th_category">التصنيف</th>
                                 <th class="py-3 px-4" data-i18n="th_quantity">الكمية الحالية</th>
@@ -152,6 +153,7 @@
                         <tbody class="text-xs divide-y divide-slate-800/50" id="inventory-table-body">
                             <!-- صنف 1 - متوفر -->
                             <tr class="inventory-row" data-status="available">
+                                <td class="py-3.5 px-4 font-mono text-indigo-300">SKU-BRG-001</td>
                                 <td class="py-3.5 px-4 font-bold text-slate-200">لحم برجر مجمد (أصلي)</td>
                                 <td class="py-3.5 px-4 text-slate-400">مستودع اللحوم والبراندات</td>
                                 <td class="py-3.5 px-4 font-bold text-indigo-400">1,450</td>
@@ -163,6 +165,7 @@
                             </tr>
                             <!-- صنف 2 - قارب على النفاذ -->
                             <tr class="inventory-row" data-status="low">
+                                <td class="py-3.5 px-4 font-mono text-indigo-300">SKU-BAK-042</td>
                                 <td class="py-3.5 px-4 font-bold text-slate-200">خبز برجر بطاطس</td>
                                 <td class="py-3.5 px-4 text-slate-400">المخابز والمخازن الجافة</td>
                                 <td class="py-3.5 px-4 font-bold text-amber-400">85</td>
@@ -174,6 +177,7 @@
                             </tr>
                             <!-- صنف 3 - متوفر -->
                             <tr class="inventory-row" data-status="available">
+                                <td class="py-3.5 px-4 font-mono text-indigo-300">SKU-SRC-105</td>
                                 <td class="py-3.5 px-4 font-bold text-slate-200">صوص الصيل الخاص</td>
                                 <td class="py-3.5 px-4 text-slate-400">الصلصات والمواد السائلة</td>
                                 <td class="py-3.5 px-4 font-bold text-indigo-400">620</td>
@@ -185,6 +189,7 @@
                             </tr>
                             <!-- صنف 4 - منتهي -->
                             <tr class="inventory-row" data-status="out">
+                                <td class="py-3.5 px-4 font-mono text-indigo-300">SKU-PKG-019</td>
                                 <td class="py-3.5 px-4 font-bold text-slate-200">أكياس تعبئة ورق 1 كجم</td>
                                 <td class="py-3.5 px-4 text-slate-400">مستودع التغليف</td>
                                 <td class="py-3.5 px-4 font-bold text-rose-400">0</td>
@@ -212,10 +217,10 @@
 
             rows.forEach(row => {
                 const rowStatus = row.getAttribute('data-status');
-                const rowName = row.innerText.toLowerCase();
+                const rowContent = row.innerText.toLowerCase();
 
                 const matchesStatus = (statusFilter === 'all' || rowStatus === statusFilter);
-                const matchesSearch = (rowName.includes(searchQuery));
+                const matchesSearch = (rowContent.includes(searchQuery));
 
                 if (matchesStatus && matchesSearch) {
                     row.style.display = '';
@@ -250,13 +255,14 @@
                 stat_total_items: "إجمالي الأصناف",
                 stat_low_stock: "أصناف وشيك نفاذها",
                 stat_out_stock: "أصناف منتهية",
-                search_placeholder: "ابحث عن صنف في المستودع...",
+                search_placeholder: "ابحث عن صنف أو كود SKU...",
                 filter_all: "جميع الأصناف",
                 filter_available: "الأصناف المتوفرة",
                 filter_low: "قاربت على النفاذ",
                 filter_out: "الأصناف المنتهية",
                 download_all_btn: "📥 تنزيل جميع الأصناف",
                 add_item_btn: "+ إضافة صنف",
+                th_sku: "كود SKU",
                 th_item_name: "اسم الصنف",
                 th_category: "التصنيف",
                 th_quantity: "الكمية الحالية",
@@ -285,13 +291,14 @@
                 stat_total_items: "Total Items",
                 stat_low_stock: "Low Stock Items",
                 stat_out_stock: "Out of Stock",
-                search_placeholder: "Search item in warehouse...",
+                search_placeholder: "Search item or SKU code...",
                 filter_all: "All Items",
                 filter_available: "Available Items",
                 filter_low: "Low Stock",
                 filter_out: "Out of Stock",
                 download_all_btn: "📥 Download All Items",
                 add_item_btn: "+ Add Item",
+                th_sku: "SKU Code",
                 th_item_name: "Item Name",
                 th_category: "Category",
                 th_quantity: "Current Qty",
