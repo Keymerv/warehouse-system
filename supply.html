@@ -65,21 +65,14 @@
 
         <div class="p-5 space-y-4">
             
-            <!-- إحصائيات سريعة للحالات -->
-            <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
+            <!-- إحصائيات سريعة للحالات المحدثة (5 حالات) -->
+            <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
                 <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex items-center justify-between">
                     <div>
                         <p class="text-slate-400 text-[11px]" data-i18n="stat_requested">تم الطلب</p>
                         <h3 class="text-base font-extrabold mt-0.5 text-sky-400" id="stat-requested-count">0</h3>
                     </div>
                     <div class="w-8 h-8 bg-sky-600/10 text-sky-400 rounded-lg flex items-center justify-center font-bold text-xs">📥</div>
-                </div>
-                <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex items-center justify-between">
-                    <div>
-                        <p class="text-slate-400 text-[11px]" data-i18n="stat_preparing">جاري التجهيز</p>
-                        <h3 class="text-base font-extrabold mt-0.5 text-amber-400" id="stat-preparing-count">0</h3>
-                    </div>
-                    <div class="w-8 h-8 bg-amber-600/10 text-amber-400 rounded-lg flex items-center justify-center font-bold text-xs">⏳</div>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex items-center justify-between">
                     <div>
@@ -97,8 +90,8 @@
                 </div>
                 <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex items-center justify-between">
                     <div>
-                        <p class="text-slate-400 text-[11px]" data-i18n="stat_received">تم الاستلام</p>
-                        <h3 class="text-base font-extrabold mt-0.5 text-emerald-400" id="stat-received-count">0</h3>
+                        <p class="text-slate-400 text-[11px]" data-i18n="stat_completed">مكتمل</p>
+                        <h3 class="text-base font-extrabold mt-0.5 text-emerald-400" id="stat-completed-count">0</h3>
                     </div>
                     <div class="w-8 h-8 bg-emerald-600/10 text-emerald-400 rounded-lg flex items-center justify-center font-bold text-xs">✅</div>
                 </div>
@@ -132,10 +125,9 @@
                     <select id="status-filter" onchange="filterOrders()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
                         <option value="all" data-i18n="filter_all">جميع الحالات</option>
                         <option value="requested" data-i18n="filter_requested">تم الطلب</option>
-                        <option value="preparing" data-i18n="filter_preparing">جاري التجهيز</option>
                         <option value="delivering" data-i18n="filter_delivering">جاري التوصيل</option>
                         <option value="inspecting" data-i18n="filter_inspecting">تم الاستلام للفحص</option>
-                        <option value="received" data-i18n="filter_received">تم الاستلام</option>
+                        <option value="completed" data-i18n="filter_completed">مكتمل</option>
                         <option value="cancelled" data-i18n="filter_cancelled">ملغي</option>
                     </select>
 
@@ -172,10 +164,9 @@
                             <select id="bulk-status-select" class="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-200 text-xs">
                                 <option value="" data-i18n="bulk_change_status">تغيير حالة المحددين إلى...</option>
                                 <option value="requested" data-i18n="status_requested">تم الطلب</option>
-                                <option value="preparing" data-i18n="status_preparing">جاري التجهيز</option>
                                 <option value="delivering" data-i18n="status_delivering">جاري التوصيل</option>
                                 <option value="inspecting" data-i18n="status_inspecting">تم الاستلام للفحص</option>
-                                <option value="received" data-i18n="status_received">تم الاستلام</option>
+                                <option value="completed" data-i18n="status_completed">مكتمل</option>
                                 <option value="cancelled" data-i18n="status_cancelled">ملغي</option>
                             </select>
                             <button onclick="applyBulkStatus()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 rounded text-xs font-medium transition" data-i18n="apply_btn">تطبيق</button>
@@ -221,10 +212,10 @@
     <script>
         let ordersData = [
             { id: "ORD-8015", brand: "بربريس برجر", branch: "فرع العليا", items: "لحوم برجر، خبز بطاطس", qty: "200 وحدة", date: "2026-07-25 / 04:30 م", notes: "طلب جديد بانتظار المراجعة", status: "requested" },
-            { id: "ORD-8012", brand: "بربريس برجر", branch: "فرع النخيل مول", items: "لحوم برجر، صوص خاص", qty: "350 وحدة", date: "2026-07-25 / 04:15 م", notes: "توصيل عاجل قبل فترة الظهر", status: "preparing" },
+            { id: "ORD-8012", brand: "بربريس برجر", branch: "فرع النخيل مول", items: "لحوم برجر، صوص خاص", qty: "350 وحدة", date: "2026-07-25 / 04:15 م", notes: "توصيل عاجل قبل فترة الظهر", status: "delivering" },
             { id: "ORD-8010", brand: "ايس كريم فاير", branch: "فرع الملك فهد", items: "أقماع آيس كريم، صوص شوكولاتة", qty: "150 وحدة", date: "2026-07-25 / 03:00 م", notes: "جاري توصيل الطلب للفرع", status: "delivering" },
             { id: "ORD-8011", brand: "بيتزا كراست", branch: "فرع التحلية", items: "جبنة موزاريلا، عجينة بيتزا", qty: "120 وحدة", date: "2026-07-25 / 02:30 م", notes: "تم التسليم وبانتظار الفحص", status: "inspecting" },
-            { id: "ORD-8006", brand: "بربريس برجر", branch: "فرع الصحافة", items: "بطاطس مقلية مجمدة", qty: "50 وحدة", date: "2026-07-24 / 08:00 م", notes: "تم استلام الطلب بنجاح", status: "received" }
+            { id: "ORD-8006", brand: "بربريس برجر", branch: "فرع الصحافة", items: "بطاطس مقلية مجمدة", qty: "50 وحدة", date: "2026-07-24 / 08:00 م", notes: "تم استلام الطلب بنجاح", status: "completed" }
         ];
 
         function renderTable(dataToRender) {
@@ -237,10 +228,9 @@
                 
                 switch(order.status) {
                     case 'requested': badgeClass = 'bg-sky-500/10 text-sky-400'; statusTextKey = 'status_requested'; break;
-                    case 'preparing': badgeClass = 'bg-amber-500/10 text-amber-400'; statusTextKey = 'status_preparing'; break;
                     case 'delivering': badgeClass = 'bg-indigo-500/10 text-indigo-400'; statusTextKey = 'status_delivering'; break;
                     case 'inspecting': badgeClass = 'bg-purple-500/10 text-purple-400'; statusTextKey = 'status_inspecting'; break;
-                    case 'received': badgeClass = 'bg-emerald-500/10 text-emerald-400'; statusTextKey = 'status_received'; break;
+                    case 'completed': badgeClass = 'bg-emerald-500/10 text-emerald-400'; statusTextKey = 'status_completed'; break;
                     case 'cancelled': badgeClass = 'bg-rose-500/10 text-rose-400'; statusTextKey = 'status_cancelled'; break;
                 }
 
@@ -273,14 +263,13 @@
         }
 
         function updateStats() {
-            const counts = { requested: 0, preparing: 0, delivering: 0, inspecting: 0, received: 0, cancelled: 0 };
+            const counts = { requested: 0, delivering: 0, inspecting: 0, completed: 0, cancelled: 0 };
             ordersData.forEach(o => { if(counts[o.status] !== undefined) counts[o.status]++; });
 
             document.getElementById('stat-requested-count').innerText = counts.requested;
-            document.getElementById('stat-preparing-count').innerText = counts.preparing;
             document.getElementById('stat-delivering-count').innerText = counts.delivering;
             document.getElementById('stat-inspecting-count').innerText = counts.inspecting;
-            document.getElementById('stat-received-count').innerText = counts.received;
+            document.getElementById('stat-completed-count').innerText = counts.completed;
             document.getElementById('stat-cancelled-count').innerText = counts.cancelled;
         }
 
@@ -413,20 +402,18 @@
                 logout: "خروج",
                 orders_header: "إدارة طلبات التغذية للفروع",
                 stat_requested: "تم الطلب",
-                stat_preparing: "جاري التجهيز",
                 stat_delivering: "جاري التوصيل",
                 stat_inspecting: "تم الاستلام للفحص",
-                stat_received: "تم الاستلام",
+                stat_completed: "مكتمل",
                 stat_cancelled: "ملغي",
                 search_placeholder: "ابحث برقم الطلب...",
                 filter_all_brands: "جميع البراندات",
                 filter_all_branches: "جميع الفروع",
                 filter_all: "جميع الحالات",
                 filter_requested: "تم الطلب",
-                filter_preparing: "جاري التجهيز",
                 filter_delivering: "جاري التوصيل",
                 filter_inspecting: "تم الاستلام للفحص",
-                filter_received: "تم الاستلام",
+                filter_completed: "مكتمل",
                 filter_cancelled: "ملغي",
                 export_excel_btn: "📊 تنزيل Excel",
                 add_order_btn: "+ إنشاء طلب تغذية لفرع",
@@ -441,10 +428,9 @@
                 th_status: "حالة الطلب",
                 th_actions: "الإجراءات",
                 status_requested: "تم الطلب",
-                status_preparing: "جاري التجهيز",
                 status_delivering: "جاري التوصيل",
                 status_inspecting: "تم الاستلام للفحص",
-                status_received: "تم الاستلام",
+                status_completed: "مكتمل",
                 status_cancelled: "ملغي",
                 view_btn: "معاينة",
                 pagination_show: "عرض",
@@ -464,20 +450,18 @@
                 logout: "Logout",
                 orders_header: "Branch Replenishment Orders",
                 stat_requested: "Requested",
-                stat_preparing: "Preparing",
                 stat_delivering: "Delivering",
                 stat_inspecting: "Inspecting",
-                stat_received: "Received",
+                stat_completed: "Completed",
                 stat_cancelled: "Cancelled",
                 search_placeholder: "Search order ID...",
                 filter_all_brands: "All Brands",
                 filter_all_branches: "All Branches",
                 filter_all: "All Statuses",
                 filter_requested: "Requested",
-                filter_preparing: "Preparing",
                 filter_delivering: "Delivering",
                 filter_inspecting: "Inspecting",
-                filter_received: "Received",
+                filter_completed: "Completed",
                 filter_cancelled: "Cancelled",
                 export_excel_btn: "📊 Download Excel",
                 add_order_btn: "+ Create Branch Order",
@@ -492,10 +476,9 @@
                 th_status: "Status",
                 th_actions: "Actions",
                 status_requested: "Requested",
-                status_preparing: "Preparing",
                 status_delivering: "Delivering",
                 status_inspecting: "Inspecting",
-                status_received: "Received",
+                status_completed: "Completed",
                 status_cancelled: "Cancelled",
                 view_btn: "View",
                 pagination_show: "Show",
