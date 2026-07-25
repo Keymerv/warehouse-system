@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="branches_title">إدارة الفروع والبراندات - Keymerv Warehouse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden">
+
+    <!-- القائمة الجانبية (Sidebar) -->
+    <aside class="w-64 bg-slate-900 border-l border-slate-800 flex flex-col justify-between hidden md:flex">
+        <div>
+            <div class="p-5 border-b border-slate-800 flex items-center gap-3">
+                <div class="bg-indigo-600 text-white font-bold px-3 py-1.5 rounded-xl text-md">K</div>
+                <span class="font-bold text-lg tracking-wide" data-i18n="brand_name">Keymerv Warehouse</span>
+            </div>
+
+            <nav class="p-4 space-y-2">
+                <a href="dashboard.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition" data-i18n="nav_overview">الرئيسية</a>
+                <a href="inventory.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition" data-i18n="nav_inventory">إدارة المخزون</a>
+                <a href="branches.html" class="flex items-center gap-3 px-4 py-2.5 bg-indigo-600 text-white rounded-xl font-medium transition" data-i18n="nav_branches">فروع المطاعم</a>
+                <a href="orders.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition" data-i18n="nav_orders">طلبات التوريد</a>
+                <a href="settings.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition" data-i18n="nav_settings">الإعدادات</a>
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-slate-800 flex items-center justify-between">
+            <div class="text-sm">
+                <p class="font-bold text-slate-200" data-i18n="user_role_admin">الإدارة العامة (المالك)</p>
+                <p class="text-xs text-slate-400">admin@keymerv.com</p>
+            </div>
+            <a href="login.html" class="text-rose-400 hover:text-rose-300 text-xs font-semibold" data-i18n="logout">خروج</a>
+        </div>
+    </aside>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+        <header class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold" data-i18n="branches_header">إدارة البراندات وفروع المطاعم</h1>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleLanguage()" id="lang-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-sm font-medium transition">
+                    English
+                </button>
+            </div>
+        </header>
+
+        <div class="p-6 space-y-6">
+            <!-- شريط الأزرار العلوية -->
+            <div class="flex justify-between items-center">
+                <p class="text-slate-400 text-sm" data-i18n="branches_desc">قائمة البراندات التابعة للشركة وفروعها التشغيلية الحالية</p>
+                <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition shadow-lg shadow-indigo-600/20" data-i18n="add_branch_btn">
+                    + إضافة فرع / براند جديد
+                </button>
+            </div>
+
+            <!-- جدول الفروع والبراندات -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 text-sm">
+                                <th class="py-3 px-4" data-i18n="th_brand">اسم البراند</th>
+                                <th class="py-3 px-4" data-i18n="th_branch_name">اسم الفرع</th>
+                                <th class="py-3 px-4" data-i18n="th_branch_code">كود الدخول</th>
+                                <th class="py-3 px-4" data-i18n="th_manager">مدير الفرع</th>
+                                <th class="py-3 px-4" data-i18n="th_status">الحالة التشغيلية</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm divide-y divide-slate-800/50">
+                            <!-- براند 1 - الفرع الأول -->
+                            <tr>
+                                <td class="py-3 px-4 font-bold text-indigo-400">براند مطاعم البرجر (مثلاً)</td>
+                                <td class="py-3 px-4">فرع التحلية</td>
+                                <td class="py-3 px-4 font-mono text-slate-400">brand1-riyadh</td>
+                                <td class="py-3 px-4">أحمد محمد</td>
+                                <td class="py-3 px-4"><span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full text-xs" data-i18n="status_active">نشط</span></td>
+                            </tr>
+                            <!-- براند 2 - الفرع الثاني -->
+                            <tr>
+                                <td class="py-3 px-4 font-bold text-indigo-400">براند مطاعم المشاوي (مثلاً)</td>
+                                <td class="py-3 px-4">فرع الوديعة</td>
+                                <td class="py-3 px-4 font-mono text-slate-400">brand2-jeddah</td>
+                                <td class="py-3 px-4">خالد عبدالله</td>
+                                <td class="py-3 px-4"><span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full text-xs" data-i18n="status_active">نشط</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- محرك الترجمة -->
+    <script>
+        const branchesTranslations = {
+            ar: {
+                branches_title: "إدارة الفروع والبراندات - Keymerv Warehouse",
+                brand_name: "Keymerv Warehouse",
+                nav_overview: "الرئيسية",
+                nav_inventory: "إدارة المخزون",
+                nav_branches: "فروع المطاعم",
+                nav_orders: "طلبات التوريد",
+                nav_settings: "الإعدادات",
+                user_role_admin: "الإدارة العامة (المالك)",
+                logout: "خروج",
+                branches_header: "إدارة البراندات وفروع المطاعم",
+                branches_desc: "قائمة البراندات التابعة للشركة وفروعها التشغيلية الحالية",
+                add_branch_btn: "+ إضافة فرع / براند جديد",
+                th_brand: "اسم البراند",
+                th_branch_name: "اسم الفرع",
+                th_branch_code: "كود الدخول",
+                th_manager: "مدير الفرع",
+                th_status: "الحالة التشغيلية",
+                status_active: "نشط"
+            },
+            en: {
+                branches_title: "Branches & Brands - Keymerv Warehouse",
+                brand_name: "Keymerv Warehouse",
+                nav_overview: "Overview",
+                nav_inventory: "Inventory",
+                nav_branches: "Branches",
+                nav_orders: "Supply Orders",
+                nav_settings: "Settings",
+                user_role_admin: "General Admin (Owner)",
+                logout: "Logout",
+                branches_header: "Brands & Restaurant Branches",
+                branches_desc: "List of company brands and their current operational branches",
+                add_branch_btn: "+ Add New Branch / Brand",
+                th_brand: "Brand Name",
+                th_branch_name: "Branch Name",
+                th_branch_code: "Login Code",
+                th_manager: "Branch Manager",
+                th_status: "Operational Status",
+                status_active: "Active"
+            }
+        };
+
+        let currentLang = localStorage.getItem('lang') || 'ar';
+
+        function applyBranchesLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('lang', lang);
+            
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('lang', lang);
+            htmlRoot.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+
+            const langBtn = document.getElementById('lang-btn');
+            if (langBtn) {
+                langBtn.innerText = lang === 'ar' ? 'English' : 'العربية';
+            }
+
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (branchesTranslations[lang] && branchesTranslations[lang][key]) {
+                    element.innerText = branchesTranslations[lang][key];
+                }
+            });
+        }
+
+        function toggleLanguage() {
+            const newLang = currentLang === 'ar' ? 'en' : 'ar';
+            applyBranchesLanguage(newLang);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            applyBranchesLanguage(currentLang);
+        });
+    </script>
+</body>
+</html>
