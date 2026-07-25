@@ -26,7 +26,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden text-xs" id="body-layout">
 
-    <!-- القائمة الجانبية (Sidebar) -->
+    <!-- القائمة الجانبية (Sidebar): في اليمين بالعربي وفي اليسار بالإنجليزي -->
     <aside id="sidebar" class="w-64 bg-slate-900 border-slate-800 flex flex-col justify-between shrink-0">
         <div>
             <div id="sidebar-brand" class="p-4 border-b border-slate-800 flex items-center gap-2">
@@ -56,12 +56,12 @@
     <!-- المحتوى الرئيسي -->
     <main class="flex-1 flex flex-col h-screen overflow-y-auto">
         <header class="bg-slate-900 border-b border-slate-800 px-5 py-3 flex justify-between items-center">
+            <h1 class="text-sm font-bold" data-i18n="orders_header">إدارة طلبات التغذية للفروع</h1>
             <div class="flex items-center gap-3">
                 <button onclick="toggleLanguage()" id="lang-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-md text-xs font-medium transition">
                     English
                 </button>
             </div>
-            <h1 class="text-sm font-bold" data-i18n="orders_header">إدارة طلبات التغذية للفروع</h1>
         </header>
 
         <div class="p-5 space-y-4">
@@ -70,70 +70,56 @@
             <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
                 <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div class="w-9 h-9 bg-sky-600/10 text-sky-400 rounded-lg flex items-center justify-center font-bold text-sm">🆕</div>
-                    <div class="stat-text-box">
+                    <div class="text-left">
                         <p class="text-slate-400 text-[11px]" data-i18n="stat_new">جديد</p>
                         <h3 class="text-lg font-extrabold mt-0.5 text-sky-400" id="stat-new-count">0</h3>
                     </div>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div class="w-9 h-9 bg-amber-600/10 text-amber-400 rounded-lg flex items-center justify-center font-bold text-sm">⏳</div>
-                    <div class="stat-text-box">
+                    <div class="text-left">
                         <p class="text-slate-400 text-[11px]" data-i18n="stat_preparing">جاري التجهيز</p>
                         <h3 class="text-lg font-extrabold mt-0.5 text-amber-400" id="stat-preparing-count">0</h3>
                     </div>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div class="w-9 h-9 bg-blue-600/10 text-blue-400 rounded-lg flex items-center justify-center font-bold text-sm">📦</div>
-                    <div class="stat-text-box">
+                    <div class="text-left">
                         <p class="text-slate-400 text-[11px]" data-i18n="stat_ready">جاهز</p>
                         <h3 class="text-lg font-extrabold mt-0.5 text-blue-400" id="stat-ready-count">0</h3>
                     </div>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div class="w-9 h-9 bg-indigo-600/10 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-sm">🚚</div>
-                    <div class="stat-text-box">
+                    <div class="text-left">
                         <p class="text-slate-400 text-[11px]" data-i18n="stat_delivering">جاري التوصيل</p>
                         <h3 class="text-lg font-extrabold mt-0.5 text-indigo-400" id="stat-delivering-count">0</h3>
                     </div>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div class="w-9 h-9 bg-emerald-600/10 text-emerald-400 rounded-lg flex items-center justify-center font-bold text-sm">✅</div>
-                    <div class="stat-text-box">
+                    <div class="text-left">
                         <p class="text-slate-400 text-[11px]" data-i18n="stat_completed">مكتمل</p>
                         <h3 class="text-lg font-extrabold mt-0.5 text-emerald-400" id="stat-completed-count">0</h3>
                     </div>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div class="w-9 h-9 bg-rose-600/10 text-rose-400 rounded-lg flex items-center justify-center font-bold text-sm">❌</div>
-                    <div class="stat-text-box">
+                    <div class="text-left">
                         <p class="text-slate-400 text-[11px]" data-i18n="stat_cancelled">ملغي</p>
                         <h3 class="text-lg font-extrabold mt-0.5 text-rose-400" id="stat-cancelled-count">0</h3>
                     </div>
                 </div>
             </div>
 
-            <!-- شريط الأدوات والفلترة -->
+            <!-- شريط الأدوات والفلترة (ترتيب صحيح: الفلاتر والبحث أولاً، ثم الأزرار) -->
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 bg-slate-900 border border-slate-800 p-3 rounded-xl">
-                <div class="flex items-center gap-2 w-full lg:w-auto" id="action-buttons-wrapper">
-                    <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-md shadow-indigo-600/20" data-i18n="add_order_btn">
-                        + إنشاء طلب تغذية لفرع
-                    </button>
-                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 border border-slate-700" data-i18n="export_excel_btn">
-                        📊 تصدير Excel
-                    </button>
-                </div>
-
-                <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto" id="filters-wrapper">
-                    <input type="text" id="search-input" onkeyup="filterOrders()" data-i18n-placeholder="search_placeholder" placeholder="ابحث برقم الطلب..." class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 w-full sm:w-48">
-                    
-                    <select id="status-filter" onchange="filterOrders()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
-                        <option value="all" data-i18n="filter_all">جميع الحالات</option>
-                        <option value="new" data-i18n="filter_new">جديد</option>
-                        <option value="preparing" data-i18n="filter_preparing">جاري التجهيز</option>
-                        <option value="ready" data-i18n="filter_ready">جاهز</option>
-                        <option value="delivering" data-i18n="filter_delivering">جاري التوصيل</option>
-                        <option value="completed" data-i18n="filter_completed">مكتمل</option>
-                        <option value="cancelled" data-i18n="filter_cancelled">ملغي</option>
+                <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                    <select id="brand-filter" onchange="filterOrders()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                        <option value="all" data-i18n="filter_all_brands">جميع البراندات</option>
+                        <option value="بربريس برجر">بربريس برجر</option>
+                        <option value="ايس كريم فاير">ايس كريم فاير</option>
+                        <option value="بيتزا كراست">بيتزا كراست</option>
                     </select>
 
                     <select id="branch-filter" onchange="filterOrders()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
@@ -145,37 +131,50 @@
                         <option value="فرع الصحافة">فرع الصحافة</option>
                     </select>
 
-                    <select id="brand-filter" onchange="filterOrders()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
-                        <option value="all" data-i18n="filter_all_brands">جميع البراندات</option>
-                        <option value="بربريس برجر">بربريس برجر</option>
-                        <option value="ايس كريم فاير">ايس كريم فاير</option>
-                        <option value="بيتزا كراست">بيتزا كراست</option>
+                    <select id="status-filter" onchange="filterOrders()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                        <option value="all" data-i18n="filter_all">جميع الحالات</option>
+                        <option value="new" data-i18n="filter_new">جديد</option>
+                        <option value="preparing" data-i18n="filter_preparing">جاري التجهيز</option>
+                        <option value="ready" data-i18n="filter_ready">جاهز</option>
+                        <option value="delivering" data-i18n="filter_delivering">جاري التوصيل</option>
+                        <option value="completed" data-i18n="filter_completed">مكتمل</option>
+                        <option value="cancelled" data-i18n="filter_cancelled">ملغي</option>
                     </select>
+
+                    <input type="text" id="search-input" onkeyup="filterOrders()" data-i18n-placeholder="search_placeholder" placeholder="ابحث برقم الطلب..." class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 w-full sm:w-48">
+                </div>
+
+                <div class="flex items-center gap-2 w-full lg:w-auto">
+                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 border border-slate-700" data-i18n="export_excel_btn">
+                        📊 تصدير Excel
+                    </button>
+                    <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-md shadow-indigo-600/20" data-i18n="add_order_btn">
+                        + إنشاء طلب تغذية لفرع
+                    </button>
                 </div>
             </div>
 
             <!-- جدول طلبات التغذية -->
             <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
                 
-                <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pb-3 border-b border-slate-800 text-[11px] text-slate-400" id="table-pagination-header">
+                <!-- الترتيب الصحيح: عرض عدد الصفحات يمين، والنتائج يسار (أو العكس حسب الاتجاه) -->
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pb-3 border-b border-slate-800 text-[11px] text-slate-400">
+                    <div class="flex items-center gap-1.5">
+                        <span data-i18n="pagination_show">عرض</span>
+                        <select id="items-per-page" class="bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs">
+                            <option value="25">25</option>
+                            <option value="75">75</option>
+                            <option value="125">125</option>
+                            <option value="200">200</option>
+                        </select>
+                        <span data-i18n="pagination_per_page">طلب لكل صفحة</span>
+                        <div id="bulk-actions-container" class="hidden items-center gap-2 ml-3 pl-3 border-l border-slate-800">
+                            <span class="text-indigo-400 font-semibold" id="selected-count">0 محدد</span>
+                            <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2 py-0.5 rounded text-[11px] transition" data-i18n="bulk_status_btn">تغيير الحالة</button>
+                        </div>
+                    </div>
                     <div>
                         <span id="results-counter" class="font-bold text-indigo-400" data-i18n="pagination_info">عرض 0 من أصل 0 طلب</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <div id="bulk-actions-container" class="hidden items-center gap-2">
-                            <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2 py-0.5 rounded text-[11px] transition" data-i18n="bulk_status_btn">تغيير الحالة</button>
-                            <span class="text-indigo-400 font-semibold" id="selected-count">0 محدد</span>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <span data-i18n="pagination_show">عرض</span>
-                            <select id="items-per-page" class="bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs">
-                                <option value="25">25</option>
-                                <option value="75">75</option>
-                                <option value="125">125</option>
-                                <option value="200">200</option>
-                            </select>
-                            <span data-i18n="pagination_per_page">طلب لكل صفحة</span>
-                        </div>
                     </div>
                 </div>
 
@@ -225,7 +224,6 @@
         function renderTable(dataToRender) {
             const tbody = document.getElementById('orders-table-body');
             tbody.innerHTML = '';
-            const lang = document.getElementById('html-root').getAttribute('lang') || 'ar';
 
             dataToRender.forEach((order) => {
                 let statusBadgeClass = '';
@@ -490,17 +488,17 @@
             htmlRoot.setAttribute('lang', lang);
             htmlRoot.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
 
-            // التحكم باتجاه السايد بار والمحتوى تلقائياً
+            // التحكم باتجاه السايد بار (يمين بالعربي، يسار بالإنجليزي) واتجاه الجدول
             if (lang === 'ar') {
-                bodyLayout.className = "bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden text-xs flex-row";
-                sidebarBrand.className = "p-4 border-b border-slate-800 flex items-center justify-end gap-2 text-right";
+                bodyLayout.className = "bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden text-xs flex-row-reverse";
+                sidebarBrand.className = "p-4 border-b border-slate-800 flex items-center justify-end gap-2";
                 sidebarNav.className = "p-3 space-y-1.5 text-right";
                 sidebarFooter.className = "p-3 border-t border-slate-800 flex items-center justify-between";
                 userInfo.className = "text-left";
                 mainDataTable.className = "w-full text-right border-collapse";
             } else {
                 bodyLayout.className = "bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden text-xs flex-row";
-                sidebarBrand.className = "p-4 border-b border-slate-800 flex items-center justify-start gap-2 text-left";
+                sidebarBrand.className = "p-4 border-b border-slate-800 flex items-center justify-start gap-2";
                 sidebarNav.className = "p-3 space-y-1.5 text-left";
                 sidebarFooter.className = "p-3 border-t border-slate-800 flex items-center justify-between";
                 userInfo.className = "text-right";
