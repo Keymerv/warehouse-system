@@ -12,9 +12,10 @@
     <!-- القائمة الجانبية (Sidebar) -->
     <aside class="w-64 bg-slate-900 border-l border-slate-800 flex flex-col justify-between hidden md:flex">
         <div>
-            <div class="p-5 border-b border-slate-800 flex items-center gap-3">
-                <div class="bg-indigo-600 text-white font-bold px-3 py-1.5 rounded-xl text-md">K</div>
-                <span class="font-bold text-lg tracking-wide" data-i18n="brand_name">Keymerv Warehouse</span>
+            <!-- تم تعديل الهيدر ليصبح الخط أصغر ومرتباً في سطر واحد -->
+            <div class="p-5 border-b border-slate-800 flex items-center gap-2.5">
+                <div class="bg-indigo-600 text-white font-bold px-2.5 py-1.5 rounded-xl text-sm">K</div>
+                <span class="font-bold text-xs tracking-tight text-slate-200" data-i18n="brand_name">Keymerv Warehouse</span>
             </div>
 
             <nav class="p-4 space-y-2">
@@ -47,53 +48,112 @@
         </header>
 
         <div class="p-6 space-y-6">
-            <!-- شريط الأزرار العلوية -->
-            <div class="flex justify-between items-center">
-                <p class="text-slate-400 text-sm" data-i18n="branches_desc">قائمة البراندات التابعة للشركة وفروعها التشغيلية الحالية</p>
-                <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition shadow-lg shadow-indigo-600/20" data-i18n="add_branch_btn">
+            
+            <!-- إحصائيات علوية سريعة -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm" data-i18n="stat_total_brands">إجمالي البراندات</p>
+                        <h3 class="text-2xl font-extrabold mt-1 text-indigo-400">2</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-indigo-600/10 text-indigo-400 rounded-xl flex items-center justify-center font-bold text-lg">🍔</div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm" data-i18n="stat_total_branches">إجمالي الفروع النشطة</p>
+                        <h3 class="text-2xl font-extrabold mt-1 text-emerald-400">3</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-600/10 text-emerald-400 rounded-xl flex items-center justify-center font-bold text-lg">🏢</div>
+                </div>
+            </div>
+
+            <!-- شريط الفلترة والأزرار -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-slate-400 text-xs font-semibold ml-2" data-i18n="filter_label">تصفية حسب:</span>
+                    <button onclick="filterBranches('all')" id="btn-all" class="bg-indigo-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold transition" data-i18n="filter_all">كل البراندات</button>
+                    <button onclick="filterBranches('brand-1')" id="btn-brand-1" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition" data-i18n="brand_one_name">براند مطاعم البرجر</button>
+                    <button onclick="filterBranches('brand-2')" id="btn-brand-2" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition" data-i18n="brand_two_name">براند مطاعم المشاوي</button>
+                </div>
+                
+                <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition shadow-lg shadow-indigo-600/25" data-i18n="add_branch_btn">
                     + إضافة فرع / براند جديد
                 </button>
             </div>
 
-            <!-- جدول الفروع والبراندات -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-right border-collapse">
-                        <thead>
-                            <tr class="border-b border-slate-800 text-slate-400 text-sm">
-                                <th class="py-3 px-4" data-i18n="th_brand">اسم البراند</th>
-                                <th class="py-3 px-4" data-i18n="th_branch_name">اسم الفرع</th>
-                                <th class="py-3 px-4" data-i18n="th_branch_code">كود الدخول</th>
-                                <th class="py-3 px-4" data-i18n="th_manager">مدير الفرع</th>
-                                <th class="py-3 px-4" data-i18n="th_status">الحالة التشغيلية</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-sm divide-y divide-slate-800/50">
-                            <!-- براند 1 - الفرع الأول -->
-                            <tr>
-                                <td class="py-3 px-4 font-bold text-indigo-400">براند مطاعم البرجر (مثلاً)</td>
-                                <td class="py-3 px-4">فرع التحلية</td>
-                                <td class="py-3 px-4 font-mono text-slate-400">brand1-riyadh</td>
-                                <td class="py-3 px-4">أحمد محمد</td>
-                                <td class="py-3 px-4"><span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full text-xs" data-i18n="status_active">نشط</span></td>
-                            </tr>
-                            <!-- براند 2 - الفرع الثاني -->
-                            <tr>
-                                <td class="py-3 px-4 font-bold text-indigo-400">براند مطاعم المشاوي (مثلاً)</td>
-                                <td class="py-3 px-4">فرع الوديعة</td>
-                                <td class="py-3 px-4 font-mono text-slate-400">brand2-jeddah</td>
-                                <td class="py-3 px-4">خالد عبدالله</td>
-                                <td class="py-3 px-4"><span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full text-xs" data-i18n="status_active">نشط</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <!-- قائمة الفروع -->
+            <div class="space-y-4" id="branches-container">
+                
+                <!-- فرع 1 -->
+                <div class="branch-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4" data-brand="brand-1">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 bg-indigo-600/10 text-indigo-400 rounded-xl flex items-center justify-center font-bold">🍔</div>
+                        <div>
+                            <span class="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-md" data-i18n="brand_one_name">براند مطاعم البرجر</span>
+                            <h3 class="font-bold text-lg text-slate-100 mt-1">فرع التحلية</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">كود الدخول: <span class="font-mono text-slate-200">b1-tahliya</span> | المدير: أحمد محمد</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+                        <span class="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-xs font-semibold" data-i18n="status_active">نشط</span>
+                        <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3.5 py-2 rounded-xl text-xs font-medium transition" data-i18n="edit_manager_btn">تعديل المدير</button>
+                    </div>
                 </div>
+
+                <!-- فرع 2 -->
+                <div class="branch-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4" data-brand="brand-1">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 bg-indigo-600/10 text-indigo-400 rounded-xl flex items-center justify-center font-bold">🍔</div>
+                        <div>
+                            <span class="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-md" data-i18n="brand_one_name">براند مطاعم البرجر</span>
+                            <h3 class="font-bold text-lg text-slate-100 mt-1">فرع النخيل</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">كود الدخول: <span class="font-mono text-slate-200">b1-nakheel</span> | المدير: خالد عبدالله</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+                        <span class="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-xs font-semibold" data-i18n="status_active">نشط</span>
+                        <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3.5 py-2 rounded-xl text-xs font-medium transition" data-i18n="edit_manager_btn">تعديل المدير</button>
+                    </div>
+                </div>
+
+                <!-- فرع 3 -->
+                <div class="branch-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4" data-brand="brand-2">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 bg-amber-600/10 text-amber-400 rounded-xl flex items-center justify-center font-bold">🥩</div>
+                        <div>
+                            <span class="text-xs font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md" data-i18n="brand_two_name">براند مطاعم المشاوي</span>
+                            <h3 class="font-bold text-lg text-slate-100 mt-1">فرع الوديعة</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">كود الدخول: <span class="font-mono text-slate-200">b2-wadia</span> | المدير: طارق سعيد</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+                        <span class="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-xs font-semibold" data-i18n="status_active">نشط</span>
+                        <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3.5 py-2 rounded-xl text-xs font-medium transition" data-i18n="edit_manager_btn">تعديل المدير</button>
+                    </div>
+                </div>
+
             </div>
         </div>
     </main>
 
-    <!-- محرك الترجمة -->
+    <!-- محرك الترجمة والتصفية -->
     <script>
+        function filterBranches(brandId) {
+            document.querySelectorAll('.flex.flex-wrap.items-center.gap-2 button').forEach(btn => {
+                btn.className = "bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition";
+            });
+            document.getElementById('btn-' + brandId).className = "bg-indigo-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold transition";
+
+            const cards = document.querySelectorAll('.branch-card');
+            cards.forEach(card => {
+                if (brandId === 'all' || card.getAttribute('data-brand') === brandId) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
         const branchesTranslations = {
             ar: {
                 branches_title: "إدارة الفروع والبراندات - Keymerv Warehouse",
@@ -106,14 +166,15 @@
                 user_role_admin: "الإدارة العامة (المالك)",
                 logout: "خروج",
                 branches_header: "إدارة البراندات وفروع المطاعم",
-                branches_desc: "قائمة البراندات التابعة للشركة وفروعها التشغيلية الحالية",
+                stat_total_brands: "إجمالي البراندات",
+                stat_total_branches: "إجمالي الفروع النشطة",
+                filter_label: "تصفية حسب:",
+                filter_all: "كل البراندات",
+                brand_one_name: "براند مطاعم البرجر",
+                brand_two_name: "براند مطاعم المشاوي",
                 add_branch_btn: "+ إضافة فرع / براند جديد",
-                th_brand: "اسم البراند",
-                th_branch_name: "اسم الفرع",
-                th_branch_code: "كود الدخول",
-                th_manager: "مدير الفرع",
-                th_status: "الحالة التشغيلية",
-                status_active: "نشط"
+                status_active: "نشط",
+                edit_manager_btn: "تعديل المدير"
             },
             en: {
                 branches_title: "Branches & Brands - Keymerv Warehouse",
@@ -126,14 +187,15 @@
                 user_role_admin: "General Admin (Owner)",
                 logout: "Logout",
                 branches_header: "Brands & Restaurant Branches",
-                branches_desc: "List of company brands and their current operational branches",
+                stat_total_brands: "Total Brands",
+                stat_total_branches: "Active Branches",
+                filter_label: "Filter by:",
+                filter_all: "All Brands",
+                brand_one_name: "Burger Restaurant Brand",
+                brand_two_name: "Grills Restaurant Brand",
                 add_branch_btn: "+ Add New Branch / Brand",
-                th_brand: "Brand Name",
-                th_branch_name: "Branch Name",
-                th_branch_code: "Login Code",
-                th_manager: "Branch Manager",
-                th_status: "Operational Status",
-                status_active: "Active"
+                status_active: "Active",
+                edit_manager_btn: "Edit Manager"
             }
         };
 
