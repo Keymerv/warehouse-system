@@ -1,1 +1,230 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="inventory_title">إدارة المخزون - Keymerv Warehouse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden">
 
+    <!-- القائمة الجانبية (Sidebar) -->
+    <aside class="w-64 bg-slate-900 border-l border-slate-800 flex flex-col justify-between hidden md:flex">
+        <div>
+            <div class="p-5 border-b border-slate-800 flex items-center gap-2.5">
+                <div class="bg-indigo-600 text-white font-bold px-2.5 py-1.5 rounded-xl text-sm">K</div>
+                <span class="font-bold text-xs tracking-tight text-slate-200" data-i18n="brand_name">Keymerv Warehouse</span>
+            </div>
+
+            <nav class="p-4 space-y-2">
+                <a href="dashboard.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition" data-i18n="nav_overview">الرئيسية</a>
+                <a href="inventory.html" class="flex items-center gap-3 px-4 py-2.5 bg-indigo-600 text-white rounded-xl font-medium transition" data-i18n="nav_inventory">إدارة المخزون</a>
+                <a href="branches.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition" data-i18n="nav_branches">فروع المطاعم</a>
+                <a href="orders.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition" data-i18n="nav_orders">طلبات التوريد</a>
+                <a href="settings.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition" data-i18n="nav_settings">الإعدادات</a>
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-slate-800 flex items-center justify-between">
+            <div class="text-sm">
+                <p class="font-bold text-slate-200" data-i18n="user_role_admin">الإدارة العامة (المالك)</p>
+                <p class="text-xs text-slate-400">admin@keymerv.com</p>
+            </div>
+            <a href="login.html" class="text-rose-400 hover:text-rose-300 text-xs font-semibold" data-i18n="logout">خروج</a>
+        </div>
+    </aside>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+        <header class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold" data-i18n="inventory_header">إدارة المخزون الرئيسي</h1>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleLanguage()" id="lang-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-sm font-medium transition">
+                    English
+                </button>
+            </div>
+        </header>
+
+        <div class="p-6 space-y-6">
+            
+            <!-- إحصائيات المخزون العلوية -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm" data-i18n="stat_total_items">إجمالي الأصناف</p>
+                        <h3 class="text-2xl font-extrabold mt-1 text-indigo-400">128</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-indigo-600/10 text-indigo-400 rounded-xl flex items-center justify-center font-bold text-lg">📦</div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm" data-i18n="stat_low_stock">أصناف وشيك نفاذها</p>
+                        <h3 class="text-2xl font-extrabold mt-1 text-amber-400">4</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-amber-600/10 text-amber-400 rounded-xl flex items-center justify-center font-bold text-lg">⚠️</div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm" data-i18n="stat_out_stock">أصناف منتهية</p>
+                        <h3 class="text-2xl font-extrabold mt-1 text-rose-400">1</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-rose-600/10 text-rose-400 rounded-xl flex items-center justify-center font-bold text-lg">❌</div>
+                </div>
+            </div>
+
+            <!-- شريط الأزرار والبحث -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+                <div class="w-full md:w-72">
+                    <input type="text" placeholder="ابحث عن صنف في المستودع..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-slate-200 text-sm focus:outline-none focus:border-indigo-500">
+                </div>
+                
+                <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition shadow-lg shadow-indigo-600/25" data-i18n="add_item_btn">
+                    + إضافة صنف جديد للمستودع
+                </button>
+            </div>
+
+            <!-- جدول المخزون الرئيسي -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 text-sm">
+                                <th class="py-3 px-4" data-i18n="th_item_name">اسم الصنف</th>
+                                <th class="py-3 px-4" data-i18n="th_category">التصنيف</th>
+                                <th class="py-3 px-4" data-i18n="th_quantity">الكمية الحالية</th>
+                                <th class="py-3 px-4" data-i18n="th_unit">الوحدة</th>
+                                <th class="py-3 px-4" data-i18n="th_status">الحالة</th>
+                                <th class="py-3 px-4 text-center" data-i18n="th_actions">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm divide-y divide-slate-800/50">
+                            <!-- صنف 1 -->
+                            <tr>
+                                <td class="py-3.5 px-4 font-bold text-slate-200">لحم برجر مجمد (أصلي)</td>
+                                <td class="py-3.5 px-4 text-slate-400">مستودع اللحوم والبراندات</td>
+                                <td class="py-3.5 px-4 font-bold text-indigo-400">1,450</td>
+                                <td class="py-3.5 px-4 text-slate-400">قطعة</td>
+                                <td class="py-3.5 px-4"><span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full text-xs" data-i18n="status_available">متوفر</span></td>
+                                <td class="py-3.5 px-4 text-center">
+                                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition" data-i18n="edit_btn">تعديل</button>
+                                </td>
+                            </tr>
+                            <!-- صنف 2 -->
+                            <tr>
+                                <td class="py-3.5 px-4 font-bold text-slate-200">خبز برجر بطاطس</td>
+                                <td class="py-3.5 px-4 text-slate-400">المخابز والمخازن الجافة</td>
+                                <td class="py-3.5 px-4 font-bold text-amber-400">85</td>
+                                <td class="py-3.5 px-4 text-slate-400">كيس</td>
+                                <td class="py-3.5 px-4"><span class="bg-amber-500/10 text-amber-400 px-2.5 py-1 rounded-full text-xs" data-i18n="status_low">قارب على النفاذ</span></td>
+                                <td class="py-3.5 px-4 text-center">
+                                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition" data-i18n="edit_btn">تعديل</button>
+                                </td>
+                            </tr>
+                            <!-- صنف 3 -->
+                            <tr>
+                                <td class="py-3.5 px-4 font-bold text-slate-200">صوص الصيل الخاص</td>
+                                <td class="py-3.5 px-4 text-slate-400">الصلصات والمواد السائلة</td>
+                                <td class="py-3.5 px-4 font-bold text-indigo-400">620</td>
+                                <td class="py-3.5 px-4 text-slate-400">عبوة</td>
+                                <td class="py-3.5 px-4"><span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full text-xs" data-i18n="status_available">متوفر</span></td>
+                                <td class="py-3.5 px-4 text-center">
+                                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition" data-i18n="edit_btn">تعديل</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- محرك الترجمة -->
+    <script>
+        const inventoryTranslations = {
+            ar: {
+                inventory_title: "إدارة المخزون - Keymerv Warehouse",
+                brand_name: "Keymerv Warehouse",
+                nav_overview: "الرئيسية",
+                nav_inventory: "إدارة المخزون",
+                nav_branches: "فروع المطاعم",
+                nav_orders: "طلبات التوريد",
+                nav_settings: "الإعدادات",
+                user_role_admin: "الإدارة العامة (المالك)",
+                logout: "خروج",
+                inventory_header: "إدارة المخزون الرئيسي",
+                stat_total_items: "إجمالي الأصناف",
+                stat_low_stock: "أصناف وشيك نفاذها",
+                stat_out_stock: "أصناف منتهية",
+                add_item_btn: "+ إضافة صنف جديد للمستودع",
+                th_item_name: "اسم الصنف",
+                th_category: "التصنيف",
+                th_quantity: "الكمية الحالية",
+                th_unit: "الوحدة",
+                th_status: "الحالة",
+                th_actions: "الإجراءات",
+                status_available: "متوفر",
+                status_low: "قارب على النفاذ",
+                edit_btn: "تعديل"
+            },
+            en: {
+                inventory_title: "Inventory Management - Keymerv Warehouse",
+                brand_name: "Keymerv Warehouse",
+                nav_overview: "Overview",
+                nav_inventory: "Inventory",
+                nav_branches: "Branches",
+                nav_orders: "Supply Orders",
+                nav_settings: "Settings",
+                user_role_admin: "General Admin (Owner)",
+                logout: "Logout",
+                inventory_header: "Main Inventory Management",
+                stat_total_items: "Total Items",
+                stat_low_stock: "Low Stock Items",
+                stat_out_stock: "Out of Stock",
+                add_item_btn: "+ Add New Item",
+                th_item_name: "Item Name",
+                th_category: "Category",
+                th_quantity: "Current Qty",
+                th_unit: "Unit",
+                th_status: "Status",
+                th_actions: "Actions",
+                status_available: "Available",
+                status_low: "Low Stock",
+                edit_btn: "Edit"
+            }
+        };
+
+        let currentLang = localStorage.getItem('lang') || 'ar';
+
+        function applyInventoryLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('lang', lang);
+            
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('lang', lang);
+            htmlRoot.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+
+            const langBtn = document.getElementById('lang-btn');
+            if (langBtn) {
+                langBtn.innerText = lang === 'ar' ? 'English' : 'العربية';
+            }
+
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (inventoryTranslations[lang] && inventoryTranslations[lang][key]) {
+                    element.innerText = inventoryTranslations[lang][key];
+                }
+            });
+        }
+
+        function toggleLanguage() {
+            const newLang = currentLang === 'ar' ? 'en' : 'ar';
+            applyInventoryLanguage(newLang);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            applyInventoryLanguage(currentLang);
+        });
+    </script>
+</body>
+</html>
