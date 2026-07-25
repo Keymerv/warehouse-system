@@ -81,21 +81,69 @@
                 </div>
             </div>
 
-            <!-- قسم إعدادات التنبيهات -->
+            <!-- قسم إعدادات الفريق الجديد -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-sm font-bold text-indigo-400" data-i18n="team_settings_title">إعدادات الفريق والصلاحيات</h3>
+                    <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition" data-i18n="add_team_member_btn">+ إضافة عضو جديد</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-xs">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400">
+                                <th class="py-3 px-2" data-i18n="table_member_name">اسم العضو</th>
+                                <th class="py-3 px-2" data-i18n="table_member_email">البريد الإلكتروني</th>
+                                <th class="py-3 px-2" data-i18n="table_member_role">الصلاحية</th>
+                                <th class="py-3 px-2 text-center" data-i18n="table_member_actions">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60 text-slate-200">
+                            <tr>
+                                <td class="py-3 px-2 font-medium">أحمد محمد</td>
+                                <td class="py-3 px-2 text-slate-400">ahmed@keymerv.com</td>
+                                <td class="py-3 px-2">
+                                    <span class="bg-indigo-500/10 text-indigo-400 px-2.5 py-1 rounded-lg text-[11px]" data-i18n="role_warehouse_manager">مدير مستودع</span>
+                                </td>
+                                <td class="py-3 px-2 text-center">
+                                    <button class="text-slate-400 hover:text-rose-400 transition text-[11px]" data-i18n="remove_btn">حذف</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-2 font-medium">خالد عبدالله</td>
+                                <td class="py-3 px-2 text-slate-400">khaled@keymerv.com</td>
+                                <td class="py-3 px-2">
+                                    <span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-lg text-[11px]" data-i18n="role_branch_supervisor">مشرف فروع</span>
+                                </td>
+                                <td class="py-3 px-2 text-center">
+                                    <button class="text-slate-400 hover:text-rose-400 transition text-[11px]" data-i18n="remove_btn">حذف</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- قسم إعدادات التنبيهات (مع أزرار تبديل تفاعلية Toggle Switches) -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <h3 class="text-sm font-bold text-indigo-400" data-i18n="inventory_config_title">إعدادات تنبيهات المخزون والطلبات</h3>
                 <div class="space-y-3.5 text-xs">
                     <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
                         <span class="text-slate-300" data-i18n="alert_low_stock">تنبيه تلقائي لوحة التحكم عند وصول الأصناف حد النفاذ</span>
-                        <input type="checkbox" checked class="w-4 h-4 accent-indigo-600 rounded">
+                        <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-indigo-600 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
+                            <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200 transform translate-x-5"></div>
+                        </button>
                     </div>
                     <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
                         <span class="text-slate-300" data-i18n="alert_branch_orders">إرسال إشعار فوري عند طلب فرع مطعم أصناف جديدة</span>
-                        <input type="checkbox" checked class="w-4 h-4 accent-indigo-600 rounded">
+                        <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-indigo-600 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
+                            <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200 transform translate-x-5"></div>
+                        </button>
                     </div>
                     <div class="flex items-center justify-between py-2">
                         <span class="text-slate-300" data-i18n="alert_weekly_report">تصدير تقرير أسبوعي لحركة المستودع تلقائياً</span>
-                        <input type="checkbox" class="w-4 h-4 accent-indigo-600 rounded">
+                        <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-slate-700 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
+                            <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200 transform translate-x-0"></div>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -123,6 +171,24 @@
     </main>
 
     <script>
+        function toggleSwitch(btn) {
+            const isRtl = document.documentElement.dir === 'rtl';
+            const knob = btn.querySelector('div');
+            const isActive = btn.classList.contains('bg-indigo-600');
+
+            if (isActive) {
+                btn.classList.remove('bg-indigo-600');
+                btn.classList.add('bg-slate-700');
+                knob.style.transform = isRtl ? 'translateX(0px)' : 'translateX(0px)';
+            } else {
+                btn.classList.remove('bg-slate-700');
+                btn.classList.add('bg-indigo-600');
+                // في حالة RTL تحتاج لاتجاه عكسي لحركة الإزاحة للزر
+                const translateValue = isRtl ? '-20px' : '20px';
+                knob.style.transform = `translateX(${translateValue})`;
+            }
+        }
+
         const settingsTranslations = {
             ar: {
                 settings_title: "الإعدادات - Keymerv Warehouse",
@@ -137,6 +203,15 @@
                 logout: "خروج",
                 settings_header: "إعدادات النظام العامة",
                 general_settings_title: "بيانات المنشأة الرئيسية",
+                team_settings_title: "إعدادات الفريق والصلاحيات",
+                add_team_member_btn: "+ إضافة عضو جديد",
+                table_member_name: "اسم العضو",
+                table_member_email: "البريد الإلكتروني",
+                table_member_role: "الصلاحية",
+                table_member_actions: "الإجراءات",
+                role_warehouse_manager: "مدير مستودع",
+                role_branch_supervisor: "مشرف فروع",
+                remove_btn: "حذف",
                 label_warehouse_name: "اسم المستودع / النظام",
                 label_admin_email: "البريد الإلكتروني للإدارة",
                 label_phone: "رقم هاتف الدعم",
@@ -163,6 +238,15 @@
                 logout: "Logout",
                 settings_header: "General System Settings",
                 general_settings_title: "Main Organization Details",
+                team_settings_title: "Team & Permissions Settings",
+                add_team_member_btn: "+ Add New Member",
+                table_member_name: "Member Name",
+                table_member_email: "Email",
+                table_member_role: "Role",
+                table_member_actions: "Actions",
+                role_warehouse_manager: "Warehouse Manager",
+                role_branch_supervisor: "Branch Supervisor",
+                remove_btn: "Remove",
                 label_warehouse_name: "Warehouse / System Name",
                 label_admin_email: "Admin Email",
                 label_phone: "Support Phone",
@@ -189,6 +273,17 @@
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (settingsTranslations[lang][key]) el.innerText = settingsTranslations[lang][key];
+            });
+
+            // ضبط اتجاه حركة أزرار التبديل بناءً على اللغة
+            document.querySelectorAll('button[onclick="toggleSwitch(this)"]').forEach(btn => {
+                const isActive = btn.classList.contains('bg-indigo-600');
+                const knob = btn.querySelector('div');
+                if (isActive) {
+                    knob.style.transform = lang === 'ar' ? 'translateX(-20px)' : 'translateX(20px)';
+                } else {
+                    knob.style.transform = 'translateX(0px)';
+                }
             });
         }
         function toggleLanguage() { applySettingsLanguage(currentLang === 'ar' ? 'en' : 'ar'); }
