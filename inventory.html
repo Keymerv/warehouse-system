@@ -6,6 +6,23 @@
     <title data-i18n="inventory_title">إدارة المخزون - Keymerv Warehouse</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        /* تخصيص شريط التمرير (Scrollbar) ليصبح داكناً وأنيقاً متوافقاً مع التصميم */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #020617; /* لون مطابق لـ bg-slate-950 */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b; /* لون مطابق لـ bg-slate-800 */
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155; /* لون عند التحويم مطابق لـ bg-slate-700 */
+        }
+    </style>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden">
 
@@ -76,14 +93,17 @@
             <!-- شريط الأدوات والفلترة وزر التحميل -->
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-slate-900 border border-slate-800 p-4 rounded-2xl">
                 
-                <!-- حقل البحث وأزرار التصفية السريعة -->
+                <!-- حقل البحث وقائمة الفلترة المنسدلة -->
                 <div class="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
-                    <input type="text" id="search-input" data-i18n-placeholder="search_placeholder" placeholder="ابحث عن صنف في المستودع..." class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 w-full sm:w-60">
+                    <input type="text" id="search-input" onkeyup="filterInventory()" data-i18n-placeholder="search_placeholder" placeholder="ابحث عن صنف في المستودع..." class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 w-full sm:w-60">
                     
-                    <button onclick="filterInventory('all')" id="filter-btn-all" class="bg-indigo-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition" data-i18n="filter_all">الكل</button>
-                    <button onclick="filterInventory('available')" id="filter-btn-available" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold transition" data-i18n="filter_available">المتوفرة</button>
-                    <button onclick="filterInventory('low')" id="filter-btn-low" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold transition" data-i18n="filter_low">قارب على النفاذ</button>
-                    <button onclick="filterInventory('out')" id="filter-btn-out" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold transition" data-i18n="filter_out">المنتهية</button>
+                    <!-- القائمة المنسدلة لفلترة الأصناف -->
+                    <select id="status-filter" onchange="filterInventory()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                        <option value="all" data-i18n="filter_all">جميع الأصناف</option>
+                        <option value="available" data-i18n="filter_available">الأصناف المتوفرة</option>
+                        <option value="low" data-i18n="filter_low">قاربت على النفاذ</option>
+                        <option value="out" data-i18n="filter_out">الأصناف المنتهية</option>
+                    </select>
                 </div>
 
                 <!-- أزرار الإجراءات (تنزيل وإضافة) -->
@@ -99,6 +119,24 @@
 
             <!-- جدول المخزون الرئيسي -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                
+                <!-- شريط إعدادات الصفحات والعدد في الأعلى -->
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pb-4 border-b border-slate-800 text-xs text-slate-400">
+                    <div class="flex items-center gap-2">
+                        <span data-i18n="pagination_show">عرض</span>
+                        <select id="items-per-page" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <option value="25">25</option>
+                            <option value="75">75</option>
+                            <option value="125">125</option>
+                            <option value="200">200</option>
+                        </select>
+                        <span data-i18n="pagination_per_page">صنف لكل صفحة</span>
+                    </div>
+                    <div>
+                        <span id="results-counter" class="font-bold text-indigo-400" data-i18n="pagination_info">عرض 4 من أصل 128 صنف</span>
+                    </div>
+                </div>
+
                 <div class="overflow-x-auto">
                     <table class="w-full text-right border-collapse">
                         <thead>
@@ -159,51 +197,42 @@
                         </tbody>
                     </table>
                 </div>
-
-                <!-- شريط تذييل الجدول: التحكم بعدد الصفحات والعرض -->
-                <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-slate-800 text-xs text-slate-400">
-                    <div class="flex items-center gap-2">
-                        <span data-i18n="pagination_show">عرض</span>
-                        <select id="items-per-page" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-slate-200 focus:outline-none focus:border-indigo-500">
-                            <option value="25">25</option>
-                            <option value="75">75</option>
-                            <option value="125">125</option>
-                            <option value="200">200</option>
-                        </select>
-                        <span data-i18n="pagination_per_page">صنف لكل صفحة</span>
-                    </div>
-                    <div>
-                        <span data-i18n="pagination_info">عرض 1 إلى 4 من أصل 128 صنف</span>
-                    </div>
-                </div>
             </div>
         </div>
     </main>
 
     <!-- محرك الترجمة والتصفية -->
     <script>
-        function filterInventory(status) {
-            // تحديث تصميم أزرار الفلتر
-            ['all', 'available', 'low', 'out'].forEach(s => {
-                const btn = document.getElementById('filter-btn-' + s);
-                if(btn) {
-                    btn.className = "bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold transition";
-                }
-            });
-            const activeBtn = document.getElementById('filter-btn-' + status);
-            if(activeBtn) {
-                activeBtn.className = "bg-indigo-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition";
-            }
-
-            // فلترة صفوف الجدول
+        function filterInventory() {
+            const statusFilter = document.getElementById('status-filter').value;
+            const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
             const rows = document.querySelectorAll('.inventory-row');
+            
+            let visibleCount = 0;
+
             rows.forEach(row => {
-                if (status === 'all' || row.getAttribute('data-status') === status) {
+                const rowStatus = row.getAttribute('data-status');
+                const rowName = row.innerText.toLowerCase();
+
+                const matchesStatus = (statusFilter === 'all' || rowStatus === statusFilter);
+                const matchesSearch = (rowName.includes(searchQuery));
+
+                if (matchesStatus && matchesSearch) {
                     row.style.display = '';
+                    visibleCount++;
                 } else {
                     row.style.display = 'none';
                 }
             });
+
+            const counterElement = document.getElementById('results-counter');
+            const lang = document.getElementById('html-root').getAttribute('lang') || 'ar';
+            
+            if (lang === 'ar') {
+                counterElement.innerText = `عرض ${visibleCount} من أصل 128 صنف`;
+            } else {
+                counterElement.innerText = `Showing ${visibleCount} of 128 items`;
+            }
         }
 
         const inventoryTranslations = {
@@ -222,10 +251,10 @@
                 stat_low_stock: "أصناف وشيك نفاذها",
                 stat_out_stock: "أصناف منتهية",
                 search_placeholder: "ابحث عن صنف في المستودع...",
-                filter_all: "الكل",
-                filter_available: "المتوفرة",
-                filter_low: "قارب على النفاذ",
-                filter_out: "المنتهية",
+                filter_all: "جميع الأصناف",
+                filter_available: "الأصناف المتوفرة",
+                filter_low: "قاربت على النفاذ",
+                filter_out: "الأصناف المنتهية",
                 download_all_btn: "📥 تنزيل جميع الأصناف",
                 add_item_btn: "+ إضافة صنف",
                 th_item_name: "اسم الصنف",
@@ -240,7 +269,7 @@
                 edit_btn: "تعديل",
                 pagination_show: "عرض",
                 pagination_per_page: "صنف لكل صفحة",
-                pagination_info: "عرض 1 إلى 4 من أصل 128 صنف"
+                pagination_info: "عرض 4 من أصل 128 صنف"
             },
             en: {
                 inventory_title: "Inventory Management - Keymerv Warehouse",
@@ -257,8 +286,8 @@
                 stat_low_stock: "Low Stock Items",
                 stat_out_stock: "Out of Stock",
                 search_placeholder: "Search item in warehouse...",
-                filter_all: "All",
-                filter_available: "Available",
+                filter_all: "All Items",
+                filter_available: "Available Items",
                 filter_low: "Low Stock",
                 filter_out: "Out of Stock",
                 download_all_btn: "📥 Download All Items",
@@ -275,7 +304,7 @@
                 edit_btn: "Edit",
                 pagination_show: "Show",
                 pagination_per_page: "items per page",
-                pagination_info: "Showing 1 to 4 of 128 items"
+                pagination_info: "Showing 4 of 128 items"
             }
         };
 
@@ -294,7 +323,6 @@
                 langBtn.innerText = lang === 'ar' ? 'English' : 'العربية';
             }
 
-            // ترجمة النصوص العادية
             document.querySelectorAll('[data-i18n]').forEach(element => {
                 const key = element.getAttribute('data-i18n');
                 if (inventoryTranslations[lang] && inventoryTranslations[lang][key]) {
@@ -302,13 +330,14 @@
                 }
             });
 
-            // ترجمة حقول البحث (Placeholder) لتتغير حسب اللغة
             document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
                 const key = element.getAttribute('data-i18n-placeholder');
                 if (inventoryTranslations[lang] && inventoryTranslations[lang][key]) {
                     element.setAttribute('placeholder', inventoryTranslations[lang][key]);
                 }
             });
+
+            filterInventory();
         }
 
         function toggleLanguage() {
