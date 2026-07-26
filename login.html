@@ -57,67 +57,7 @@
         <span data-i18n="footer_text">جميع الحقوق محفوظة © 2026 - Keymerv Warehouse (أحد مشاريع منصة Keymerv Platform)</span>
     </footer>
 
-    <!-- محرك الترجمة فقط -->
-    <script>
-        const loginTranslations = {
-            ar: {
-                login_title: "تسجيل الدخول - Keymerv Warehouse",
-                brand_name: "Keymerv Warehouse",
-                login_heading: "تسجيل دخول الفروع والمستودع",
-                system_description: "النظام الإداري الذكي لإدارة المخزون، تنظيم سلاسل التوريد، ومتابعة حركة التغذية للفروع بدقة وسرعة فائقة.",
-                login_subheading: "أدخل بيانات الاعتماد الخاصة بحسابك والمعتمدة من الإدارة العامة",
-                email_label: "البريد الإلكتروني",
-                password_label: "كلمة المرور",
-                login_btn_action: "دخول لوحة التحكم",
-                footer_text: "جميع الحقوق محفوظة © 2026 - Keymerv Warehouse (أحد مشاريع منصة Keymerv Platform)"
-            },
-            en: {
-                login_title: "Login - Keymerv Warehouse",
-                brand_name: "Keymerv Warehouse",
-                login_heading: "Branch & Warehouse Login",
-                system_description: "The smart administrative system for inventory management, supply chain coordination, and branch replenishment tracking.",
-                login_subheading: "Enter your account credentials provided by general administration",
-                email_label: "Email Address",
-                password_label: "Password",
-                login_btn_action: "Access Dashboard",
-                footer_text: "All Rights Reserved © 2026 - Keymerv Warehouse (A Keymerv Platform Project)"
-            }
-        };
-
-        let currentLang = localStorage.getItem('lang') || 'ar';
-
-        function applyLoginLanguage(lang) {
-            currentLang = lang;
-            localStorage.setItem('lang', lang);
-            
-            const htmlRoot = document.getElementById('html-root');
-            htmlRoot.setAttribute('lang', lang);
-            htmlRoot.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
-
-            const langBtn = document.getElementById('lang-btn');
-            if (langBtn) {
-                langBtn.innerText = lang === 'ar' ? 'English' : 'العربية';
-            }
-
-            document.querySelectorAll('[data-i18n]').forEach(element => {
-                const key = element.getAttribute('data-i18n');
-                if (loginTranslations[lang] && loginTranslations[lang][key]) {
-                    element.innerText = loginTranslations[lang][key];
-                }
-            });
-        }
-
-        function toggleLanguage() {
-            const newLang = currentLang === 'ar' ? 'en' : 'ar';
-            applyLoginLanguage(newLang);
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            applyLoginLanguage(currentLang);
-        });
-    </script>
-
-    <!-- استدعاء ملف المنطق البرمجي الخارجي بشكل احترافي -->
+    <!-- استدعاء ملف الـ JS الخارجي الوحيد الذي يدير كل شيء -->
     <script type="module" src="js/login.js"></script>
 </body>
 </html>
