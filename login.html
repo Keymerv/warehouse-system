@@ -22,21 +22,28 @@
 
     <!-- محتوى صفحة الدخول المباشر للفروع -->
     <main class="max-w-md mx-auto px-6 py-12 w-full flex-1 flex flex-col justify-center">
-        <div class="bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-xl">
-            <h1 class="text-2xl font-bold mb-2 text-center" data-i18n="login_heading">تسجيل دخول الفروع والمستودع</h1>
-            <p class="text-slate-400 text-sm text-center mb-8" data-i18n="login_subheading">أدخل بيانات الاعتماد الخاصة بفرعك والمعتمدة من الإدارة</p>
+        <div class="bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-xl space-y-4">
+            <div class="text-center space-y-2">
+                <h1 class="text-2xl font-bold" data-i18n="login_heading">تسجيل دخول الفروع والمستودع</h1>
+                <!-- النبذة الاحترافية المضافة -->
+                <p class="text-slate-400 text-xs leading-relaxed" data-i18n="system_description">
+                    النظام الإداري الذكي لإدارة المخزون، تنظيم سلاسل التوريد، ومتابعة حركة التغذية للبطاقات والفروع بدقة وسرعة فائقة.
+                </p>
+            </div>
+            
+            <p class="text-slate-500 text-xs text-center mb-6" data-i18n="login_subheading">أدخل بيانات الاعتماد الخاصة بحسابك والمعتمدة من الإدارة العامة</p>
 
             <!-- نموذج تسجيل الدخول المباشر -->
-            <form action="dashboard.html" class="space-y-5">
+            <form action="dashboard.html" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1" data-i18n="branch_code_label">كود الفرع أو اسم المستخدم</label>
-                    <input type="text" placeholder="e.g. branch-riyadh-01" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-indigo-500 text-sm">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1.5" data-i18n="email_label">البريد الإلكتروني</label>
+                    <input type="email" id="email" placeholder="name@keymerv.com" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-indigo-500 text-sm">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1" data-i18n="password_label">كلمة المرور</label>
-                    <input type="password" placeholder="••••••••" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-indigo-500 text-sm">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1.5" data-i18n="password_label">كلمة المرور</label>
+                    <input type="password" id="password" placeholder="••••••••" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-indigo-500 text-sm">
                 </div>
-                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 transition mt-2" data-i18n="login_btn_action">
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 transition mt-2 text-sm" data-i18n="login_btn_action">
                     دخول لوحة التحكم
                 </button>
             </form>
@@ -44,8 +51,8 @@
     </main>
 
     <!-- التذييل -->
-    <footer class="w-full text-center py-6 border-t border-slate-900 text-slate-500 text-sm">
-        <span data-i18n="footer_text">جميع الحقوق محفوظة © 2026 - Keymerv Warehouse (أحد مشاريع Keymerv Platform)</span>
+    <footer class="w-full text-center py-6 border-t border-slate-900 text-slate-500 text-xs">
+        <span data-i18n="footer_text">جميع الحقوق محفوظة © 2026 - Keymerv Warehouse (أحد مشاريع منصة Keymerv Platform)</span>
     </footer>
 
     <!-- محرك الترجمة -->
@@ -55,18 +62,20 @@
                 login_title: "تسجيل الدخول - Keymerv Warehouse",
                 brand_name: "Keymerv Warehouse",
                 login_heading: "تسجيل دخول الفروع والمستودع",
-                login_subheading: "أدخل بيانات الاعتماد الخاصة بفرعك والمعتمدة من الإدارة",
-                branch_code_label: "كود الفرع أو اسم المستخدم",
+                system_description: "النظام الإداري الذكي لإدارة المخزون، تنظيم سلاسل التوريد، ومتابعة حركة التغذية للفروع بدقة وسرعة فائقة.",
+                login_subheading: "أدخل بيانات الاعتماد الخاصة بحسابك والمعتمدة من الإدارة العامة",
+                email_label: "البريد الإلكتروني",
                 password_label: "كلمة المرور",
                 login_btn_action: "دخول لوحة التحكم",
-                footer_text: "جميع الحقوق محفوظة © 2026 - Keymerv Warehouse (أحد مشاريع Keymerv Platform)"
+                footer_text: "جميع الحقوق محفوظة © 2026 - Keymerv Warehouse (أحد مشاريع منصة Keymerv Platform)"
             },
             en: {
                 login_title: "Login - Keymerv Warehouse",
                 brand_name: "Keymerv Warehouse",
                 login_heading: "Branch & Warehouse Login",
-                login_subheading: "Enter your branch credentials provided by management",
-                branch_code_label: "Branch Code or Username",
+                system_description: "The smart administrative system for inventory management, supply chain coordination, and branch replenishment tracking.",
+                login_subheading: "Enter your account credentials provided by general administration",
+                email_label: "Email Address",
                 password_label: "Password",
                 login_btn_action: "Access Dashboard",
                 footer_text: "All Rights Reserved © 2026 - Keymerv Warehouse (A Keymerv Platform Project)"
