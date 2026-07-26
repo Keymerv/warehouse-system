@@ -26,7 +26,7 @@
                 <span class="font-bold text-xs tracking-tight text-slate-200" data-i18n="brand_name">Keymerv Warehouse</span>
             </div>
 
-            <!-- الروابط بالترتيب المطلوب مع تصحيح رابط التوريد -->
+            <!-- الروابط بالترتيب المطلوب -->
             <nav class="p-4 space-y-1.5">
                 <a href="dashboard.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition text-xs" data-i18n="nav_overview">الرئيسية</a>
                 <a href="orders.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition text-xs" data-i18n="nav_orders">طلبات التغذية</a>
@@ -57,7 +57,7 @@
         </header>
 
         <div class="p-6 space-y-6 max-w-5xl">
-            <!-- رسالة التنبيه العامة للتغييرات -->
+            <!-- رسالة التنبيه العامة -->
             <div id="settings-feedback" class="hidden px-4 py-3 rounded-xl text-xs text-center font-medium"></div>
 
             <!-- قسم بيانات المنشأة -->
@@ -86,34 +86,60 @@
                 </div>
             </div>
 
-            <!-- قسم إعدادات الفريق والصلاحيات المحدث والمتصل بقاعدة البيانات -->
+            <!-- قسم إعدادات الفريق والصلاحيات المنظم -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <div class="flex justify-between items-center">
                     <h3 class="text-sm font-bold text-indigo-400" data-i18n="team_settings_title">إعدادات الفريق والصلاحيات</h3>
                 </div>
 
-                <!-- نموذج إضافة عضو جديد متصل بـ Supabase Auth -->
-                <form id="create-user-form" class="bg-slate-950/60 border border-slate-800/80 p-4 rounded-xl space-y-3">
-                    <h4 class="text-xs font-semibold text-slate-300">إضافة مستخدم جديد للنظام (فرع أو مدير مستودع)</h4>
+                <!-- نموذج إضافة مستخدم جديد مرتب ومنسق -->
+                <form id="create-user-form" class="bg-slate-950/60 border border-slate-800/80 p-5 rounded-xl space-y-4">
+                    <h4 class="text-xs font-semibold text-slate-300">إضافة مستخدم جديد للنظام</h4>
                     <div id="user-feedback" class="hidden px-3 py-2 rounded-lg text-xs"></div>
+                    
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                        <input type="text" id="new-member-name" placeholder="اسم العضو (مثال: محمد علي)" required class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
-                        <input type="email" id="new-member-email" placeholder="البريد الإلكتروني" required class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
-                        <input type="password" id="new-member-pass" placeholder="كلمة المرور المؤقتة" required class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <div>
+                            <label class="block text-slate-400 mb-1">اسم العضو</label>
+                            <input type="text" id="new-member-name" placeholder="محمد علي" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">البريد الإلكتروني</label>
+                            <input type="email" id="new-member-email" placeholder="user@keymerv.com" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">كلمة المرور المؤقتة</label>
+                            <input type="password" id="new-member-pass" placeholder="••••••••" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                        </div>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                        <input type="text" id="new-member-branch" placeholder="الفرع (مثال: فرع التحلية)" required class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
-                        <select id="new-member-role" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
-                            <option value="warehouse_manager">مدير مستودع</option>
-                            <option value="branch_supervisor">مشرف فروع</option>
-                        </select>
-                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl font-semibold transition text-xs">
-                            + تنفيذ وإنشاء الحساب
-                        </button>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs items-end">
+                        <div>
+                            <label class="block text-slate-400 mb-1">الفرع المرتبط</label>
+                            <select id="new-member-branch" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                                <option value="" disabled selected>جاري تحميل الفروع...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">الصلاحية</label>
+                            <select id="new-member-role" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                                <option value="warehouse_manager">مدير مستودع</option>
+                                <option value="branch_manager">مدير فرع</option>
+                                <option value="accountant">محاسب</option>
+                                <option value="marketing">التسويق</option>
+                                <option value="customer_service">خدمة عملاء</option>
+                                <option value="branches_director">مدير الفروع</option>
+                            </select>
+                        </div>
+                        <div>
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-semibold transition text-xs shadow-md shadow-indigo-600/20">
+                                + تنفيذ وإنشاء الحساب
+                            </button>
+                        </div>
                     </div>
                 </form>
 
-                <div class="overflow-x-auto">
+                <!-- جدول عرض الأعضاء -->
+                <div class="overflow-x-auto pt-2">
                     <table class="w-full text-right text-xs">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400">
@@ -133,70 +159,62 @@
                 </div>
             </div>
 
-            <!-- قسم إعدادات تنبيهات المخزون والطلبات (مع أزرار التبديل الحافظة لخياراتك) -->
+            <!-- قسم تنبيهات المخزون والطلبات (8 تبديلات) -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <h3 class="text-sm font-bold text-indigo-400" data-i18n="inventory_config_title">إعدادات تنبيهات المخزون والطلبات</h3>
                 <div class="space-y-3 text-xs" id="toggles-container">
-                    <!-- 1 -->
                     <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
                         <span class="text-slate-300" data-i18n="alert_low_stock">تنبيه تلقائي لوحة التحكم عند وصول الأصناف حد النفاذ</span>
-                        <button type="button" onclick="toggleSwitch(this)" data-key="alert_low_stock" class="w-11 h-6 bg-indigo-600 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
+                        <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-indigo-600 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
                             <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
                         </button>
                     </div>
-                    <!-- 2 -->
                     <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
                         <span class="text-slate-300" data-i18n="alert_branch_orders">إرسال إشعار فوري عند طلب فرع مطعم أصناف جديدة</span>
-                        <button type="button" onclick="toggleSwitch(this)" data-key="alert_branch_orders" class="w-11 h-6 bg-indigo-600 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
+                        <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-indigo-600 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
                             <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
                         </button>
                     </div>
-                    <!-- 3 -->
                     <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
                         <span class="text-slate-300" data-i18n="alert_weekly_report">تصدير تقرير أسبوعي لحركة المستودع تلقائياً</span>
-                        <button type="button" onclick="toggleSwitch(this)" data-key="alert_weekly_report" class="w-11 h-6 bg-slate-700 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
+                        <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-slate-700 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
                             <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
                         </button>
                     </div>
-                    <!-- 4 -->
                     <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
                         <span class="text-slate-300" data-i18n="setting_auto_approval">قبول تلقائي لطلبات الفروع ضمن الحد المسموح به للمخزون</span>
-                        <button type="button" onclick="toggleSwitch(this)" data-key="setting_auto_approval" class="w-11 h-6 bg-slate-700 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
+                        <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-slate-700 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
                             <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
                         </button>
                     </div>
-                    <!-- 5 -->
                     <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
                         <span class="text-slate-300" data-i18n="setting_expiry_alerts">تفعيل تنبيهات انتهاء صلاحية المواد الغذائية قبل الموعد بـ 30 يوماً</span>
-                        <button type="button" onclick="toggleSwitch(this)" data-key="setting_expiry_alerts" class="w-11 h-6 bg-indigo-600 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
+                        <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-indigo-600 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
                             <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
                         </button>
                     </div>
-                    <!-- 6 -->
                     <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
                         <span class="text-slate-300" data-i18n="setting_sound_notifications">تشغيل المؤثرات الصوتية عند وصول طلب تغذية جديد من الفروع</span>
-                        <button type="button" onclick="toggleSwitch(this)" data-key="setting_sound_notifications" class="w-11 h-6 bg-indigo-600 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
+                        <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-indigo-600 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
                             <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
                         </button>
                     </div>
-                    <!-- 7 -->
                     <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
                         <span class="text-slate-300" data-i18n="setting_negative_inventory">منع اعتماد صرف المخزون في حال تجاوز الكمية المتاحة في المستودع</span>
-                        <button type="button" onclick="toggleSwitch(this)" data-key="setting_negative_inventory" class="w-11 h-6 bg-indigo-600 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
+                        <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-indigo-600 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
                             <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
                         </button>
                     </div>
-                    <!-- 8 -->
                     <div class="flex items-center justify-between py-2">
                         <span class="text-slate-300" data-i18n="setting_supplier_portal">إرسال طلبات التوريد للموردين تلقائياً عبر البريد عند وصول الحد الأدنى</span>
-                        <button type="button" onclick="toggleSwitch(this)" data-key="setting_supplier_portal" class="w-11 h-6 bg-slate-700 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
+                        <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-slate-700 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
                             <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- قسم أمان الحساب -->
+            <!-- أمان الحساب -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <h3 class="text-sm font-bold text-indigo-400" data-i18n="security_title">أمان الحساب وكلمة المرور</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
@@ -211,18 +229,17 @@
                 </div>
             </div>
 
-            <!-- زر الحفظ -->
             <div class="flex justify-end gap-3">
                 <button id="save-changes-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl text-xs font-semibold transition shadow-lg shadow-indigo-600/25" data-i18n="save_btn">حفظ التغييرات</button>
             </div>
         </div>
     </main>
 
-    <!-- الربط البرمجي مع Supabase عبر JavaScript المدمج للنظام -->
+    <!-- الربط البرمجي مع Supabase -->
     <script type="module">
         import { supabase } from './assets/js/supabase.js';
 
-        // تفعيل أزرار التبديل (Toggles) مع تصحيح اتجاه الحركة حسب اللغة
+        // تفعيل أزرار التبديل
         window.toggleSwitch = function(btn) {
             const isRtl = document.documentElement.dir === 'rtl';
             const knob = btn.querySelector('div');
@@ -240,7 +257,6 @@
             }
         };
 
-        // تهيئة حالة الأزرار عند التحميل
         function updateToggleKnobsPosition() {
             const isRtl = document.documentElement.dir === 'rtl';
             document.querySelectorAll('button[onclick="toggleSwitch(this)"]').forEach(btn => {
@@ -254,13 +270,45 @@
             });
         }
 
-        // جلب قائمة الحسابات من جدول profiles في Supabase
+        // تحويل أسماء الصلاحيات المكتوبة إلى نصوص واضحة للمستخدم
+        function getRoleLabel(role) {
+            const rolesMap = {
+                'warehouse_manager': 'مدير مستودع',
+                'branch_manager': 'مدير فرع',
+                'accountant': 'محاسب',
+                'marketing': 'التسويق',
+                'customer_service': 'خدمة عملاء',
+                'branches_director': 'مدير الفروع'
+            };
+            return rolesMap[role] || role;
+        }
+
+        // جلب الفروع المتاحة لتعبئة القائمة المنسدلة
+        async function loadBranchesDropdown() {
+            const branchSelect = document.getElementById('new-member-branch');
+            try {
+                // افترضنا جدول الفروع اسمه branches وحقل اسم الفرع اسمه name أو branch_name
+                const { data, error } = await supabase.from('branches').select('*');
+                
+                if (error || !data || data.length === 0) {
+                    branchSelect.innerHTML = `<option value="" disabled selected>لا توجد فروع مضافة (أنشئ فرعاً أولاً)</option>`;
+                    return;
+                }
+
+                branchSelect.innerHTML = `<option value="" disabled selected>اختر الفرع المرتبط</option>` + 
+                    data.map(b => `<option value="${b.name || b.branch_name || b.id}">${b.name || b.branch_name || 'فرع بدون اسم'}</option>`).join('');
+            } catch (err) {
+                branchSelect.innerHTML = `<option value="" disabled selected>خطأ في جلب الفروع</option>`;
+            }
+        }
+
+        // جلب قائمة الحسابات
         async function loadTeamMembers() {
             const tableBody = document.getElementById('users-table-body');
             try {
                 const { data, error } = await supabase.from('profiles').select('*');
                 if (error || !data || data.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-slate-500">لا توجد حسابات مضافة حديثاً (يمكنك إضافتها بالأعلى)</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-slate-500">لا توجد حسابات مضافة حالياً</td></tr>`;
                     return;
                 }
 
@@ -270,10 +318,10 @@
                         <td class="py-3 px-2 text-slate-400">${member.email}</td>
                         <td class="py-3 px-2">${member.branch || 'المستودع الرئيسي'}</td>
                         <td class="py-3 px-2">
-                            <span class="bg-indigo-500/10 text-indigo-400 px-2.5 py-1 rounded-lg text-[11px]">${member.role === 'warehouse_manager' ? 'مدير مستودع' : 'مشرف فروع'}</span>
+                            <span class="bg-indigo-500/10 text-indigo-400 px-2.5 py-1 rounded-lg text-[11px]">${getRoleLabel(member.role)}</span>
                         </td>
                         <td class="py-3 px-2 text-center">
-                            <span class="text-emerald-400 text-[11px] font-medium">نشط وآمن</span>
+                            <span class="text-emerald-400 text-[11px] font-medium">نشط</span>
                         </td>
                     </tr>
                 `).join('');
@@ -282,37 +330,44 @@
             }
         }
 
-        // إضافة مستخدم جديد عبر خوادم Supabase Auth وتخزين بياناته في جدول profiles
+        // إضافة مستخدم جديد مع التحقق من وجود فروع
         document.getElementById('create-user-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const branchSelect = document.getElementById('new-member-branch');
+            const feedback = document.getElementById('user-feedback');
+
+            // التحقق إذا لم يتم إنشاء فروع مسبقاً
+            if (!branchSelect.value || branchSelect.options.length === 0 || branchSelect.selectedOptions[0].disabled) {
+                feedback.className = 'px-3 py-2 rounded-lg text-xs bg-rose-500/10 text-rose-400 border border-rose-500/20';
+                feedback.innerText = 'تنبيه: يجب عليك إنشاء فرع أولاً من صفحة "الفروع" قبل إمكانية إضافة مستخدم جديد!';
+                feedback.classList.remove('hidden');
+                return;
+            }
+
             const name = document.getElementById('new-member-name').value.trim();
             const email = document.getElementById('new-member-email').value.trim();
             const password = document.getElementById('new-member-pass').value.trim();
-            const branch = document.getElementById('new-member-branch').value.trim();
+            const branch = branchSelect.value;
             const role = document.getElementById('new-member-role').value;
-            const feedback = document.getElementById('user-feedback');
 
             feedback.classList.remove('hidden', 'bg-emerald-500/10', 'text-emerald-400', 'bg-rose-500/10', 'text-rose-400');
-            feedback.innerText = 'جاري إنشاء الحساب وتسجيل الصلاحيات...';
+            feedback.innerText = 'جاري إنشاء الحساب...';
             feedback.classList.add('bg-indigo-500/10', 'text-indigo-400');
 
             try {
-                // 1. إنشاء الحساب في نظام المصادقة
                 const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
                 if (authError) throw authError;
 
-                // 2. حفظ تفاصيل العضو في جدول profiles
                 const { error: profileError } = await supabase.from('profiles').insert([
                     { id: authData.user?.id, full_name: name, email: email, branch: branch, role: role }
                 ]);
 
-                if (profileError) {
-                    console.warn("تم إنشاء حساب المصادقة، ولم يتم الحفظ في الجدول مباشرة:", profileError.message);
-                }
+                if (profileError) console.warn(profileError.message);
 
                 feedback.className = 'px-3 py-2 rounded-lg text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
                 feedback.innerText = 'تم إنشاء الحساب وصلاحياته بنجاح!';
                 document.getElementById('create-user-form').reset();
+                loadBranchesDropdown();
                 loadTeamMembers();
 
             } catch (err) {
@@ -321,7 +376,7 @@
             }
         });
 
-        // زر حفظ التغييرات العامة وكلمة المرور
+        // حفظ الإعدادات العامة
         document.getElementById('save-changes-btn').addEventListener('click', async () => {
             const feedback = document.getElementById('settings-feedback');
             const phone = document.getElementById('support-phone').value;
@@ -333,35 +388,32 @@
             feedback.classList.add('bg-indigo-500/10', 'text-indigo-400');
 
             try {
-                // إذا تم كتابة كلمة مرور جديدة يتم تحديثها في Supabase Auth
                 if (newPass) {
                     const { error: passError } = await supabase.auth.updateUser({ password: newPass });
                     if (passError) throw passError;
                 }
 
-                // حفظ الإعدادات في التخزين المحلي للمتصفح مؤقتاً
                 localStorage.setItem('support_phone', phone);
                 localStorage.setItem('default_currency', currency);
 
                 feedback.className = 'px-4 py-3 rounded-xl text-xs text-center font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
-                feedback.innerText = 'تم حفظ جميع إعدادات النظام وتحديث الأمان بنجاح!';
+                feedback.innerText = 'تم حفظ جميع إعدادات النظام بنجاح!';
                 document.getElementById('new-pass').value = '';
                 document.getElementById('current-pass').value = '';
 
             } catch (err) {
                 feedback.className = 'px-4 py-3 rounded-xl text-xs text-center font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20';
-                feedback.innerText = err.message || 'حدث خطأ أثناء حفظ التغييرات';
+                feedback.innerText = err.message || 'حدث خطأ أثناء الحفظ';
             }
         });
 
-        // زر تسجيل الخروج الآمن
         document.getElementById('logout-btn').addEventListener('click', async (e) => {
             e.preventDefault();
             await supabase.auth.signOut();
-            window.location.href = 'login.html';
+            window.location.href = 'index.html';
         });
 
-        // نظام الترجمة الواجهية (عربي / إنجليزي)
+        // نظام الترجمة الواجهية
         const settingsTranslations = {
             ar: {
                 settings_title: "الإعدادات - Keymerv Warehouse",
@@ -387,14 +439,6 @@
                 label_phone: "رقم هاتف الدعم",
                 label_currency: "العملة الافتراضية",
                 inventory_config_title: "إعدادات تنبيهات المخزون والطلبات",
-                alert_low_stock: "تنبيه تلقائي لوحة التحكم عند وصول الأصناف حد النفاذ",
-                alert_branch_orders: "إرسال إشعار فوري عند طلب فرع مطعم أصناف جديدة",
-                alert_weekly_report: "تصدير تقرير أسبوعي لحركة المستودع تلقائياً",
-                setting_auto_approval: "قبول تلقائي لطلبات الفروع ضمن الحد المسموح به للمخزون",
-                setting_expiry_alerts: "تفعيل تنبيهات انتهاء صلاحية المواد الغذائية قبل الموعد بـ 30 يوماً",
-                setting_sound_notifications: "تشغيل المؤثرات الصوتية عند وصول طلب تغذية جديد من الفروع",
-                setting_negative_inventory: "منع اعتماد صرف المخزون في حال تجاوز الكمية المتاحة في المستودع",
-                setting_supplier_portal: "إرسال طلبات التوريد للموردين تلقائياً عبر البريد عند وصول الحد الأدنى",
                 security_title: "أمان الحساب وكلمة المرور",
                 label_current_password: "كلمة المرور الحالية",
                 label_new_password: "كلمة المرور الجديدة",
@@ -424,14 +468,6 @@
                 label_phone: "Support Phone",
                 label_currency: "Default Currency",
                 inventory_config_title: "Inventory & Orders Alert Settings",
-                alert_low_stock: "Automatic dashboard alert when items reach low stock",
-                alert_branch_orders: "Instant notification when a branch requests items",
-                alert_weekly_report: "Auto-export weekly warehouse movement report",
-                setting_auto_approval: "Auto-approve branch orders within safe stock limits",
-                setting_expiry_alerts: "Enable food item expiration alerts 30 days prior",
-                setting_sound_notifications: "Enable sound effects on incoming branch replenishment orders",
-                setting_negative_inventory: "Prevent inventory dispatch if stock exceeds available balance",
-                setting_supplier_portal: "Auto-email purchase orders to suppliers when reaching minimum stock",
                 security_title: "Account Security & Password",
                 label_current_password: "Current Password",
                 label_new_password: "New Password",
@@ -463,6 +499,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             applySettingsLanguage(currentLang);
+            loadBranchesDropdown();
             loadTeamMembers();
         });
     </script>
