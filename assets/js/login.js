@@ -1,20 +1,23 @@
-import { supabase } from './js/supabase.js';
+import { supabase } from './supabase.js';
 
-// التقاط نموذج تسجيل الدخول عند الإرسال
-const loginForm = document.querySelector('form');
+const loginForm = document.getElementById('login-form');
 
 if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault(); // منع إعادة تحميل الصفحة التقليدي
+        e.preventDefault(); // منع إعادة تحميل الصفحة أو تحويلها تلقائياً
 
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value.trim();
-        
         const submitBtn = loginForm.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerText;
         
-        // تغيير نص الزر أثناء عملية التحقق
-        submitBtn.innerText = currentLang === 'ar' ? 'جاري التحقق...' : 'Verifying...';
+        // التحقق من أن الحقول ليست فارغة
+        if (!email || !password) {
+            alert('الرجاء إدخال البريد الإلكتروني وكلمة المرور');
+            return;
+        }
+
+        const originalText = submitBtn.innerText;
+        submitBtn.innerText = 'جاري التحقق...';
         submitBtn.disabled = true;
 
         try {
@@ -24,13 +27,16 @@ if (loginForm) {
                 password: password,
             });
 
-            if (error) throw error;
+            if (error) {
+                throw error; // رمي الخطأ في حال كانت البيانات غير صحيحة
+            }
 
-            // إذا تمت العملية بنجاح، توجيه المستخدم للوحة التحكم
+            // إذا تم التحقق بنجاح من قاعدة البيانات، يتم التوجيه للوحة التحكم
             window.location.href = 'dashboard.html';
 
         } catch (error) {
-            alert((currentLang === 'ar' ? 'خطأ في تسجيل الدخول: ' : 'Login Error: ') + error.message);
+            // إظهار رسالة الخطأ ومنع الدخول نهائياً
+            alert('خطأ في تسجيل الدخول: ' + (error.message || 'بيانات الاعتماد غير صحيحة'));
             submitBtn.innerText = originalText;
             submitBtn.disabled = false;
         }
