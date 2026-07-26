@@ -78,7 +78,7 @@
                 <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div>
                         <p class="text-slate-400 text-[11px]" data-i18n="stat_total_branches">إجمالي الفروع النشطة</p>
-                        <h3 class="text-lg font-extrabold mt-0.5 text-emerald-400">3</h3>
+                        <h3 id="total-branches-count" class="text-lg font-extrabold mt-0.5 text-emerald-400">0</h3>
                     </div>
                     <div class="w-9 h-9 bg-emerald-600/10 text-emerald-400 rounded-lg flex items-center justify-center font-bold text-sm">🏢</div>
                 </div>
@@ -93,65 +93,135 @@
                     <button onclick="filterBranches('brand-2')" id="btn-brand-2" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition" data-i18n="brand_two_name">براند مطاعم المشاوي</button>
                 </div>
                 
-                <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-md shadow-indigo-600/20" data-i18n="add_branch_btn">
+                <button onclick="openAddBranchModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-md shadow-indigo-600/20" data-i18n="add_branch_btn">
                     + إضافة فرع / براند جديد
                 </button>
             </div>
 
-            <!-- قائمة الفروع -->
+            <!-- قائمة الفروع (تُعبأ تلقائياً من Supabase) -->
             <div class="space-y-3" id="branches-container">
-                
-                <!-- فرع 1 -->
-                <div class="branch-card bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-3" data-brand="brand-1">
-                    <div class="flex items-start gap-3">
-                        <div class="w-9 h-9 bg-indigo-600/10 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-sm">🍔</div>
-                        <div>
-                            <span class="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded" data-i18n="brand_one_name">براند مطاعم البرجر</span>
-                            <h3 class="font-bold text-sm text-slate-100 mt-0.5">فرع التحلية</h3>
-                            <p class="text-[11px] text-slate-400 mt-0.5">كود الدخول: <span class="font-mono text-slate-200">b1-tahliya</span> | المدير: أحمد محمد</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2.5 w-full md:w-auto justify-between md:justify-end">
-                        <span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 rounded-full text-[11px] font-semibold" data-i18n="status_active">نشط</span>
-                        <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded-lg text-xs font-medium transition" data-i18n="edit_manager_btn">تعديل المدير</button>
-                    </div>
-                </div>
-
-                <!-- فرع 2 -->
-                <div class="branch-card bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-3" data-brand="brand-1">
-                    <div class="flex items-start gap-3">
-                        <div class="w-9 h-9 bg-indigo-600/10 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-sm">🍔</div>
-                        <div>
-                            <span class="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded" data-i18n="brand_one_name">براند مطاعم البرجر</span>
-                            <h3 class="font-bold text-sm text-slate-100 mt-0.5">فرع النخيل</h3>
-                            <p class="text-[11px] text-slate-400 mt-0.5">كود الدخول: <span class="font-mono text-slate-200">b1-nakheel</span> | المدير: خالد عبدالله</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2.5 w-full md:w-auto justify-between md:justify-end">
-                        <span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 rounded-full text-[11px] font-semibold" data-i18n="status_active">نشط</span>
-                        <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded-lg text-xs font-medium transition" data-i18n="edit_manager_btn">تعديل المدير</button>
-                    </div>
-                </div>
-
-                <!-- فرع 3 -->
-                <div class="branch-card bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-3" data-brand="brand-2">
-                    <div class="flex items-start gap-3">
-                        <div class="w-9 h-9 bg-amber-600/10 text-amber-400 rounded-lg flex items-center justify-center font-bold text-sm">🥩</div>
-                        <div>
-                            <span class="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded" data-i18n="brand_two_name">براند مطاعم المشاوي</span>
-                            <h3 class="font-bold text-sm text-slate-100 mt-0.5">فرع الوديعة</h3>
-                            <p class="text-[11px] text-slate-400 mt-0.5">كود الدخول: <span class="font-mono text-slate-200">b2-wadia</span> | المدير: طارق سعيد</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2.5 w-full md:w-auto justify-between md:justify-end">
-                        <span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 rounded-full text-[11px] font-semibold" data-i18n="status_active">نشط</span>
-                        <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded-lg text-xs font-medium transition" data-i18n="edit_manager_btn">تعديل المدير</button>
-                    </div>
-                </div>
-
+                <div class="text-center py-8 text-slate-500">جاري تحميل الفروع...</div>
             </div>
         </div>
     </main>
+
+    <!-- نافذة إضافة فرع جديد -->
+    <div id="add-branch-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 w-full max-w-md space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-sm text-slate-100">إضافة فرع جديد</h3>
+                <button onclick="closeAddBranchModal()" class="text-slate-400 hover:text-white">&times;</button>
+            </div>
+            <form id="add-branch-form" onsubmit="handleAddNewBranch(event)" class="space-y-3">
+                <div>
+                    <label class="block text-slate-400 text-[11px] mb-1">اسم الفرع</label>
+                    <input type="text" id="branch-name" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500" placeholder="مثال: فرع التحلية">
+                </div>
+                <div>
+                    <label class="block text-slate-400 text-[11px] mb-1">الموقع أو العنوان</label>
+                    <input type="text" id="branch-location" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500" placeholder="مثال: شارع التحلية، الرياض">
+                </div>
+                <div>
+                    <label class="block text-slate-400 text-[11px] mb-1">البراند التابع له</label>
+                    <select id="branch-brand" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <option value="brand-1">براند مطاعم البرجر</option>
+                        <option value="brand-2">براند مطاعم المشاوي</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeAddBranchModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg font-medium transition">إلغاء</button>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded-lg font-medium transition">حفظ الفرع</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- سكربت الاتصال بـ Supabase وعرض البيانات -->
+    <script type="module">
+        import { supabase } from './assets/js/supabase-client.js';
+
+        let allBranchesData = [];
+
+        async function fetchBranches() {
+            try {
+                const { data, error } = await supabase.from('branches').select('*').order('created_at', { ascending: false });
+                
+                if (error) throw error;
+
+                allBranchesData = data || [];
+                renderBranches(allBranchesData);
+                document.getElementById('total-branches-count').innerText = allBranchesData.length;
+            } catch (err) {
+                console.error('Error fetching branches:', err);
+                document.getElementById('branches-container').innerHTML = `<div class="text-center py-8 text-rose-400">فشل تحميل الفروع من قاعدة البيانات</div>`;
+            }
+        }
+
+        window.renderBranches = function(branches) {
+            const container = document.getElementById('branches-container');
+            if (branches.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-slate-500">لا توجد فروع مضافة حالياً. ابدأ بإضافة فرع جديد!</div>`;
+                return;
+            }
+
+            container.innerHTML = branches.map(b => {
+                const isBurger = !b.location || b.name.includes('التحلية') || b.name.includes('النخيل') || b.name.includes('برجر');
+                const brandClass = isBurger ? 'brand-1' : 'brand-2';
+                const brandName = isBurger ? 'براند مطاعم البرجر' : 'براند مطاعم المشاوي';
+                const icon = isBurger ? '🍔' : '🥩';
+                const iconBg = isBurger ? 'bg-indigo-600/10 text-indigo-400' : 'bg-amber-600/10 text-amber-400';
+                const badgeBg = isBurger ? 'text-indigo-400 bg-indigo-500/10' : 'text-amber-400 bg-amber-500/10';
+
+                return `
+                <div class="branch-card bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-3" data-brand="${brandClass}">
+                    <div class="flex items-start gap-3">
+                        <div class="w-9 h-9 ${iconBg} rounded-lg flex items-center justify-center font-bold text-sm">${icon}</div>
+                        <div>
+                            <span class="text-[10px] font-bold ${badgeBg} px-2 py-0.5 rounded">${brandName}</span>
+                            <h3 class="font-bold text-sm text-slate-100 mt-0.5">${b.name}</h3>
+                            <p class="text-[11px] text-slate-400 mt-0.5">الموقع: <span class="font-mono text-slate-200">${b.location || 'غير محدد'}</span> | الحالة: ${b.status || 'نشط'}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2.5 w-full md:w-auto justify-between md:justify-end">
+                        <span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 rounded-full text-[11px] font-semibold" data-i18n="status_active">${b.status || 'نشط'}</span>
+                        <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded-lg text-xs font-medium transition" data-i18n="edit_manager_btn">تعديل المدير</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        window.openAddBranchModal = function() {
+            document.getElementById('add-branch-modal').classList.remove('hidden');
+            document.getElementById('add-branch-modal').classList.add('flex');
+        }
+
+        window.closeAddBranchModal = function() {
+            document.getElementById('add-branch-modal').classList.remove('flex');
+            document.getElementById('add-branch-modal').classList.add('hidden');
+        }
+
+        window.handleAddNewBranch = async function(e) {
+            e.preventDefault();
+            const name = document.getElementById('branch-name').value;
+            const location = document.getElementById('branch-location').value;
+            const status = 'نشط';
+
+            try {
+                const { error } = await supabase.from('branches').insert([{ name, location, status }]);
+                if (error) throw error;
+
+                closeAddBranchModal();
+                document.getElementById('add-branch-form').reset();
+                fetchBranches();
+            } catch (err) {
+                alert('حدث خطأ أثناء إضافة الفرع: ' + err.message);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchBranches();
+        });
+    </script>
 
     <!-- محرك الترجمة والتصفية -->
     <script>
