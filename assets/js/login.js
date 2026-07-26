@@ -1,5 +1,5 @@
 import { supabase } from './supabase.js';
-
+console.log("Login JS loaded successfully!");
 const loginForm = document.getElementById('login-form');
 const errorMessageDiv = document.getElementById('error-message');
 const langBtn = document.getElementById('lang-btn');
