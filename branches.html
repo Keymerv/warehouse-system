@@ -103,7 +103,7 @@
         </div>
     </main>
 
-    <!-- نافذة إضافة فرع جديد (مع خيار صورة الشعار للبراند) -->
+    <!-- نافذة إضافة فرع جديد -->
     <div id="add-branch-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -112,8 +112,6 @@
             </div>
             
             <form id="add-branch-form" class="space-y-4">
-                
-                <!-- اختيار البراند -->
                 <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-2.5">
                     <label class="block text-indigo-400 text-[11px] font-bold" data-i18n="select_brand_type">اختيار البراند التابع له الفرع:</label>
                     <div class="flex items-center gap-4 text-xs">
@@ -127,14 +125,12 @@
                         </label>
                     </div>
 
-                    <!-- اختيار براند موجود -->
                     <div id="existing-brand-container" class="pt-1">
                         <select id="existing-brand-select" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs">
                             <option value="">-- اختر البراند --</option>
                         </select>
                     </div>
 
-                    <!-- إضافة براند جديد مع الصورة المصغرة -->
                     <div id="new-brand-container" class="space-y-3 hidden pt-1">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <div>
@@ -148,12 +144,11 @@
                         </div>
                         <div>
                             <label class="block text-slate-400 text-[11px] mb-1" data-i18n="label_brand_logo">رابط صورة الشعار (Logo URL) - اختياري</label>
-                            <input type="url" id="brand-logo-url" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs" placeholder="https://example.com/logo.png (سيطبق على كل فروع البراند)">
+                            <input type="url" id="brand-logo-url" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs" placeholder="https://example.com/logo.png">
                         </div>
                     </div>
                 </div>
 
-                <!-- أسماء الفرع -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-slate-400 text-[11px] mb-1" data-i18n="label_branch_ar">اسم الفرع (بالعربي)</label>
@@ -165,7 +160,6 @@
                     </div>
                 </div>
 
-                <!-- العنوان أو الموقع -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-slate-400 text-[11px] mb-1" data-i18n="label_location_ar">العنوان / الموقع (بالعربي)</label>
@@ -177,6 +171,17 @@
                     </div>
                 </div>
 
+                <!-- اختيار المدير المعين عند الإضافة -->
+                <div>
+                    <label class="block text-slate-400 text-[11px] mb-1" data-i18n="label_manager">المدير المعين</label>
+                    <select id="branch-manager-select" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs">
+                        <option value="">-- اختر المدير المعين --</option>
+                        <option value="أحمد محمد">أحمد محمد</option>
+                        <option value="خالد عبدالله">خالد عبدالله</option>
+                        <option value="سلطان العتيبي">سلطان العتيبي</option>
+                    </select>
+                </div>
+
                 <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
                     <button type="button" onclick="closeAddBranchModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg font-medium transition" data-i18n="btn_cancel">إلغاء</button>
                     <button type="submit" id="save-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded-lg font-medium transition" data-i18n="btn_save">حفظ الفرع</button>
@@ -185,11 +190,63 @@
         </div>
     </div>
 
-    <!-- السكربت 1: مستقل تماماً عن قواعد البيانات ومسؤول عن الأزرار والترجمة والفلترة -->
+    <!-- نافذة تعديل فرع موجود (مع اختيار المدير المعين) -->
+    <div id="edit-branch-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-sm text-slate-100" data-i18n="edit_modal_title">تعديل بيانات الفرع</h3>
+                <button onclick="closeEditBranchModal()" class="text-slate-400 hover:text-white text-base">&times;</button>
+            </div>
+            
+            <form id="edit-branch-form" class="space-y-4">
+                <input type="hidden" id="edit-branch-id">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-400 text-[11px] mb-1" data-i18n="label_branch_ar">اسم الفرع (بالعربي)</label>
+                        <input type="text" id="edit-branch-name-ar" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 text-[11px] mb-1" data-i18n="label_branch_en">اسم الفرع (بالإنجليزي)</label>
+                        <input type="text" id="edit-branch-name-en" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-400 text-[11px] mb-1" data-i18n="label_location_ar">العنوان / الموقع (بالعربي)</label>
+                        <input type="text" id="edit-branch-location-ar" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 text-[11px] mb-1" data-i18n="label_location_en">العنوان / الموقع (بالإنجليزي)</label>
+                        <input type="text" id="edit-branch-location-en" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs">
+                    </div>
+                </div>
+
+                <!-- اختيار المدير المعين من الإعدادات أو القائمة -->
+                <div>
+                    <label class="block text-slate-400 text-[11px] mb-1" data-i18n="label_manager">المدير المعين</label>
+                    <select id="edit-branch-manager-select" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs">
+                        <option value="">-- اختر المدير المعين --</option>
+                        <option value="أحمد محمد">أحمد محمد</option>
+                        <option value="خالد عبدالله">خالد عبدالله</option>
+                        <option value="سلطان العتيبي">سلطان العتيبي</option>
+                    </select>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+                    <button type="button" onclick="closeEditBranchModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg font-medium transition" data-i18n="btn_cancel">إلغاء</button>
+                    <button type="submit" id="update-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded-lg font-medium transition" data-i18n="btn_update">تحديث البيانات</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- السكربت الأول: واجهة المستخدم والترجمة وإدارة النوافذ والفلترة -->
     <script>
         let allBranchesData = [];
         let currentLang = localStorage.getItem('lang') || 'ar';
-        let currentFilter = 'all'; // لتثبيت الفلتر الحالي حتى عند التحديث أو تغيير اللغة
+        let currentFilter = 'all';
 
         const branchesTranslations = {
             ar: {
@@ -210,9 +267,10 @@
                 filter_all: "كل البراندات",
                 add_branch_btn: "+ إضافة فرع / براند جديد",
                 status_active: "نشط",
-                edit_manager_btn: "تعديل المدير",
+                edit_btn: "تعديل",
                 no_branches_msg: "لا توجد فروع أو براندات مضافة حالياً.",
                 modal_title: "إضافة فرع أو براند جديد",
+                edit_modal_title: "تعديل بيانات الفرع",
                 select_brand_type: "اختيار البراند التابع له الفرع:",
                 type_existing: "براند موجود مسبقاً",
                 type_new: "+ براند جديد",
@@ -223,10 +281,13 @@
                 label_brand_logo: "رابط صورة الشعار (Logo URL) - اختياري",
                 label_location_ar: "العنوان / الموقع (بالعربي)",
                 label_location_en: "العنوان / الموقع (بالإنجليزي)",
+                label_manager: "المدير المعين",
                 btn_cancel: "إلغاء",
                 btn_save: "حفظ الفرع",
+                btn_update: "تحديث البيانات",
                 location_text: "الموقع:",
                 status_text: "الحالة:",
+                manager_text: "المدير:",
                 select_brand_placeholder: "-- اختر البراند --"
             },
             en: {
@@ -247,9 +308,10 @@
                 filter_all: "All Brands",
                 add_branch_btn: "+ Add New Branch / Brand",
                 status_active: "Active",
-                edit_manager_btn: "Edit Manager",
+                edit_btn: "Edit",
                 no_branches_msg: "No branches or brands added yet.",
                 modal_title: "Add New Branch or Brand",
+                edit_modal_title: "Edit Branch Details",
                 select_brand_type: "Select Brand for this Branch:",
                 type_existing: "Existing Brand",
                 type_new: "+ New Brand",
@@ -260,15 +322,17 @@
                 label_brand_logo: "Brand Logo URL - Optional",
                 label_location_ar: "Address / Location (Arabic)",
                 label_location_en: "Address / Location (English)",
+                label_manager: "Assigned Manager",
                 btn_cancel: "Cancel",
                 btn_save: "Save Branch",
+                btn_update: "Update Details",
                 location_text: "Location:",
                 status_text: "Status:",
+                manager_text: "Manager:",
                 select_brand_placeholder: "-- Select Brand --"
             }
         };
 
-        // دوال فتح وإغلاق النافذة
         function openAddBranchModal() {
             const modal = document.getElementById('add-branch-modal');
             if (modal) {
@@ -280,6 +344,41 @@
 
         function closeAddBranchModal() {
             const modal = document.getElementById('add-branch-modal');
+            if (modal) {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
+        }
+
+        function openEditBranchModal(branchId) {
+            const branch = allBranchesData.find(b => b.id === branchId);
+            if (!branch) return;
+
+            document.getElementById('edit-branch-id').value = branch.id;
+
+            let names = (branch.name || '').split(' / ');
+            document.getElementById('edit-branch-name-ar').value = names[0] || '';
+            document.getElementById('edit-branch-name-en').value = names[1] || names[0] || '';
+
+            let rawLoc = branch.location || '';
+            let locClean = rawLoc.replace(/\[Brand:.*?\]/, '').replace(/\[Logo:.*?\]/, '').replace(/\[Manager:.*?\]/, '').trim();
+            let locParts = locClean.split(' / ');
+            document.getElementById('edit-branch-location-ar').value = locParts[0] || locClean;
+            document.getElementById('edit-branch-location-en').value = locParts[1] || locParts[0] || locClean;
+
+            let managerMatch = rawLoc.match(/\[Manager:\s*((.*?)?)\]/);
+            let currentManager = managerMatch ? managerMatch[1].trim() : '';
+            document.getElementById('edit-branch-manager-select').value = currentManager;
+
+            const modal = document.getElementById('edit-branch-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeEditBranchModal() {
+            const modal = document.getElementById('edit-branch-modal');
             if (modal) {
                 modal.classList.remove('flex');
                 modal.classList.add('hidden');
@@ -309,7 +408,6 @@
             }
         }
 
-        // الترجمة الفورية
         function applyBranchesLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('lang', lang);
@@ -341,10 +439,8 @@
             applyBranchesLanguage(newLang);
         }
 
-        // نظام الفلترة المحدث والمستقر
         function filterBranches(brandId) {
-            currentFilter = brandId; // حفظ الفلتر النشط حالياً
-
+            currentFilter = brandId;
             document.querySelectorAll('#filter-buttons-container button').forEach(btn => {
                 btn.className = "bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition";
             });
@@ -363,7 +459,6 @@
             });
         }
 
-        // رسم كروت الفروع مع الشعار وتطبيق الفلتر المحفوظ تلقائياً
         function renderBranches(branches) {
             const container = document.getElementById('branches-container');
             if (!container) return;
@@ -386,9 +481,12 @@
                 let logoMatch = (b.location || '').match(/\[Logo:\s*(.*?)\]/);
                 let logoUrl = logoMatch ? logoMatch[1].trim() : '';
 
-                let locWithoutBrand = (b.location || '').replace(/\[Brand:.*?\]/, '').replace(/\[Logo:.*?\]/, '').trim();
-                let locParts = locWithoutBrand.split(' / ');
-                let cleanLocation = currentLang === 'ar' ? (locParts[0] || locWithoutBrand) : (locParts[1] || locParts[0] || locWithoutBrand);
+                let managerMatch = (b.location || '').match(/\[Manager:\s*(.*?)\]/);
+                let managerName = managerMatch ? managerMatch[1].trim() : (currentLang === 'ar' ? 'غير مسند' : 'Unassigned');
+
+                let locWithoutMeta = (b.location || '').replace(/\[Brand:.*?\]/, '').replace(/\[Logo:.*?\]/, '').replace(/\[Manager:.*?\]/, '').trim();
+                let locParts = locWithoutMeta.split(' / ');
+                let cleanLocation = currentLang === 'ar' ? (locParts[0] || locWithoutMeta) : (locParts[1] || locParts[0] || locWithoutMeta);
 
                 let imageHtml = logoUrl ? 
                     `<img src="${logoUrl}" alt="${brandName}" onerror="this.outerHTML='<div class=\\\'w-9 h-9 bg-indigo-600/10 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-sm\\\'>🏢</div>'" class="w-9 h-9 rounded-lg object-cover border border-slate-700 shrink-0">` : 
@@ -401,21 +499,23 @@
                         <div>
                             <span class="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded">${brandName}</span>
                             <h3 class="font-bold text-sm text-slate-100 mt-1">${branchName}</h3>
-                            <p class="text-[11px] text-slate-400 mt-0.5">${branchesTranslations[currentLang].location_text} <span class="font-mono text-slate-200">${cleanLocation || 'غير محدد'}</span> | ${branchesTranslations[currentLang].status_text} ${b.status || 'نشط'}</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">
+                                ${branchesTranslations[currentLang].location_text} <span class="font-mono text-slate-200">${cleanLocation || 'غير محدد'}</span> | 
+                                ${branchesTranslations[currentLang].manager_text} <span class="text-indigo-300 font-semibold">${managerName}</span> | 
+                                ${branchesTranslations[currentLang].status_text} ${b.status || 'نشط'}
+                            </p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2.5 w-full md:w-auto justify-between md:justify-end">
                         <span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 rounded-full text-[11px] font-semibold">${b.status || branchesTranslations[currentLang].status_active}</span>
-                        <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded-lg text-xs font-medium transition">${branchesTranslations[currentLang].edit_manager_btn}</button>
+                        <button onclick="openEditBranchModal('${b.id}')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition">${branchesTranslations[currentLang].edit_btn}</button>
                     </div>
                 </div>`;
             }).join('');
 
-            // إعادة تطبيق الفلتر الحالي بعد إعادة الرسم لضمان استمراره
             filterBranches(currentFilter);
         }
 
-        // تحديث الإحصائيات وأزرار الفلترة مع الحفاظ على التحديد النشط
         function updateStatsAndFilters(branches) {
             const totalBranchesEl = document.getElementById('total-branches-count');
             if (totalBranchesEl) totalBranchesEl.innerText = branches.length;
@@ -448,7 +548,6 @@
             filterContainer.innerHTML = filterHtml;
         }
 
-        // تعبئة قائمة البراندات
         function populateExistingBrandsSelect() {
             const select = document.getElementById('existing-brand-select');
             const uniqueBrands = new Map();
@@ -490,7 +589,7 @@
         });
     </script>
 
-    <!-- السكربت 2: مسؤول فقط عن الاتصال بقاعدة البيانات Supabase والحفظ -->
+    <!-- السكربت الثاني: الاتصال بقاعدة البيانات Supabase والحفظ والتحديث -->
     <script type="module">
         import { supabase } from './assets/js/supabase.js';
 
@@ -507,6 +606,7 @@
             }
         }
 
+        // حفظ فرع جديد
         const addForm = document.getElementById('add-branch-form');
         if (addForm) {
             addForm.addEventListener('submit', async (e) => {
@@ -535,12 +635,12 @@
                 const branch_en = document.getElementById('branch-name-en').value.trim();
                 const loc_ar = document.getElementById('branch-location-ar').value.trim();
                 const loc_en = document.getElementById('branch-location-en').value.trim();
+                const manager = document.getElementById('branch-manager-select').value.trim();
 
                 const full_name = `${branch_ar} / ${branch_en}`;
                 let full_location = `${loc_ar} / ${loc_en} [Brand: ${brand_ar} - ${brand_en}]`;
-                if (logo_url) {
-                    full_location += ` [Logo: ${logo_url}]`;
-                }
+                if (logo_url) full_location += ` [Logo: ${logo_url}]`;
+                if (manager) full_location += ` [Manager: ${manager}]`;
                 
                 const saveBtn = document.getElementById('save-btn');
                 saveBtn.disabled = true;
@@ -567,7 +667,57 @@
             });
         }
 
-        // جلب البيانات فور تحميل الموديل
+        // تحديث فرع موجود
+        const editForm = document.getElementById('edit-branch-form');
+        if (editForm) {
+            editForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const branchId = document.getElementById('edit-branch-id').value;
+                const branch = allBranchesData.find(b => b.id === branchId);
+                if (!branch) return;
+
+                const branch_ar = document.getElementById('edit-branch-name-ar').value.trim();
+                const branch_en = document.getElementById('edit-branch-name-en').value.trim();
+                const loc_ar = document.getElementById('edit-branch-location-ar').value.trim();
+                const loc_en = document.getElementById('edit-branch-location-en').value.trim();
+                const manager = document.getElementById('edit-branch-manager-select').value.trim();
+
+                const full_name = `${branch_ar} / ${branch_en}`;
+
+                // استخراج البيانات القديمة (مثل البراند والشعار لتثبيتها وعدم فقدانها)
+                let rawLoc = branch.location || '';
+                let brandMatch = rawLoc.match(/\[Brand:\s*(.*?)\]/);
+                let logoMatch = rawLoc.match(/\[Logo:\s*(.*?)\]/);
+
+                let full_location = `${loc_ar} / ${loc_en}`;
+                if (brandMatch) full_location += ` [Brand: ${brandMatch[1]}]`;
+                if (logoMatch) full_location += ` [Logo: ${logoMatch[1]}]`;
+                if (manager) full_location += ` [Manager: ${manager}]`;
+
+                const updateBtn = document.getElementById('update-btn');
+                updateBtn.disabled = true;
+                updateBtn.innerText = currentLang === 'ar' ? 'جاري التحديث...' : 'Updating...';
+
+                try {
+                    const { error } = await supabase.from('branches').update({
+                        name: full_name,
+                        location: full_location
+                    }).eq('id', branchId);
+
+                    if (error) throw error;
+
+                    closeEditBranchModal();
+                    await fetchBranches();
+                } catch (err) {
+                    alert('حدث خطأ أثناء التحديث: ' + err.message);
+                } finally {
+                    updateBtn.disabled = false;
+                    updateBtn.innerText = branchesTranslations[currentLang].btn_update;
+                }
+            });
+        }
+
         fetchBranches();
     </script>
 </body>
