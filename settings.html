@@ -86,57 +86,14 @@
                 </div>
             </div>
 
-            <!-- قسم إعدادات الفريق والصلاحيات المنظم -->
+            <!-- قسم إعدادات الفريق والصلاحيات -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <div class="flex justify-between items-center">
                     <h3 class="text-sm font-bold text-indigo-400" data-i18n="team_settings_title">إعدادات الفريق والصلاحيات</h3>
+                    <button onclick="openAddUserModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-md shadow-indigo-600/20">
+                        <span>+ إضافة مستخدم جديد</span>
+                    </button>
                 </div>
-
-                <!-- نموذج إضافة مستخدم جديد مرتب ومنسق -->
-                <form id="create-user-form" class="bg-slate-950/60 border border-slate-800/80 p-5 rounded-xl space-y-4">
-                    <h4 class="text-xs font-semibold text-slate-300">إضافة مستخدم جديد للنظام</h4>
-                    <div id="user-feedback" class="hidden px-3 py-2 rounded-lg text-xs"></div>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                        <div>
-                            <label class="block text-slate-400 mb-1">اسم العضو</label>
-                            <input type="text" id="new-member-name" placeholder="محمد علي" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
-                        </div>
-                        <div>
-                            <label class="block text-slate-400 mb-1">البريد الإلكتروني</label>
-                            <input type="email" id="new-member-email" placeholder="user@keymerv.com" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
-                        </div>
-                        <div>
-                            <label class="block text-slate-400 mb-1">كلمة المرور المؤقتة</label>
-                            <input type="password" id="new-member-pass" placeholder="••••••••" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs items-end">
-                        <div>
-                            <label class="block text-slate-400 mb-1">الفرع المرتبط</label>
-                            <select id="new-member-branch" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
-                                <option value="" disabled selected>جاري تحميل الفروع...</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-slate-400 mb-1">الصلاحية</label>
-                            <select id="new-member-role" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
-                                <option value="warehouse_manager">مدير مستودع</option>
-                                <option value="branch_manager">مدير فرع</option>
-                                <option value="accountant">محاسب</option>
-                                <option value="marketing">التسويق</option>
-                                <option value="customer_service">خدمة عملاء</option>
-                                <option value="branches_director">مدير الفروع</option>
-                            </select>
-                        </div>
-                        <div>
-                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-semibold transition text-xs shadow-md shadow-indigo-600/20">
-                                + تنفيذ وإنشاء الحساب
-                            </button>
-                        </div>
-                    </div>
-                </form>
 
                 <!-- جدول عرض الأعضاء -->
                 <div class="overflow-x-auto pt-2">
@@ -145,21 +102,22 @@
                             <tr class="border-b border-slate-800 text-slate-400">
                                 <th class="py-3 px-2" data-i18n="table_member_name">اسم العضو</th>
                                 <th class="py-3 px-2" data-i18n="table_member_email">البريد الإلكتروني</th>
-                                <th class="py-3 px-2" data-i18n="table_member_branch">الفرع</th>
+                                <th class="py-3 px-2">البراندات والفروع</th>
                                 <th class="py-3 px-2" data-i18n="table_member_role">الصلاحية</th>
+                                <th class="py-3 px-2">تاريخ الإنشاء</th>
                                 <th class="py-3 px-2 text-center" data-i18n="table_member_actions">الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody id="users-table-body" class="divide-y divide-slate-800/60 text-slate-200">
                             <tr>
-                                <td colspan="5" class="text-center py-4 text-slate-500">جاري تحميل الحسابات...</td>
+                                <td colspan="6" class="text-center py-4 text-slate-500">جاري تحميل الحسابات...</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- قسم تنبيهات المخزون والطلبات (8 تبديلات) -->
+            <!-- قسم تنبيهات المخزون والطلبات -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <h3 class="text-sm font-bold text-indigo-400" data-i18n="inventory_config_title">إعدادات تنبيهات المخزون والطلبات</h3>
                 <div class="space-y-3 text-xs" id="toggles-container">
@@ -235,9 +193,94 @@
         </div>
     </main>
 
+    <!-- نافذة إضافة مستخدم منبثقة (Modal) -->
+    <div id="addUserModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-xl p-6 space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-indigo-400">إضافة مستخدم جديد للنظام</h3>
+                <button onclick="closeAddUserModal()" class="text-slate-400 hover:text-slate-200 text-sm font-bold">&times;</button>
+            </div>
+
+            <div id="user-feedback" class="hidden px-3 py-2 rounded-lg text-xs"></div>
+
+            <form id="create-user-form" class="space-y-4 text-xs">
+                <div>
+                    <label class="block text-slate-400 mb-1">اسم العضو (حروف إنجليزية فقط)</label>
+                    <input type="text" id="new-member-name" placeholder="John Doe" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    <p id="name-error" class="text-[10px] text-rose-400 mt-1 hidden">يسمح فقط بالحروف الإنجليزية (بدون أرقام أو رموز أو حروف عربية).</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-400 mb-1">البريد الإلكتروني</label>
+                        <input type="email" id="new-member-email" placeholder="user@keymerv.com" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">رمز المرور المؤقت</label>
+                        <input type="password" id="new-member-pass" placeholder="••••••••" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-400 mb-1">الصلاحية</label>
+                        <select id="new-member-role" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <option value="warehouse_manager">مدير مستودع</option>
+                            <option value="branch_manager">مدير فرع</option>
+                            <option value="accountant">قسم المحاسبة</option>
+                            <option value="marketing">قسم التسويق</option>
+                            <option value="customer_service">قسم خدمة العملاء</option>
+                            <option value="branches_director">مدير الفروع</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- البراندات والفروع مع خيار الكل ومتعدد التحديد -->
+                <div class="space-y-3 pt-2 border-t border-slate-800">
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-slate-400 font-semibold">البراندات المرتبطة</label>
+                            <label class="cursor-pointer text-indigo-400 text-[11px]"><input type="checkbox" id="select-all-brands" class="ml-1"> كل البراندات</label>
+                        </div>
+                        <div id="brands-checkboxes-container" class="bg-slate-950 border border-slate-800 rounded-xl p-3 max-h-32 overflow-y-auto space-y-2 text-[11px]">
+                            <span class="text-slate-500">جاري تحميل البراندات...</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-slate-400 font-semibold">الفروع المرتبطة</label>
+                            <label class="cursor-pointer text-indigo-400 text-[11px]"><input type="checkbox" id="select-all-branches" class="ml-1"> كل الفروع</label>
+                        </div>
+                        <div id="branches-checkboxes-container" class="bg-slate-950 border border-slate-800 rounded-xl p-3 max-h-32 overflow-y-auto space-y-2 text-[11px]">
+                            <span class="text-slate-500">جاري تحميل الفروع...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closeAddUserModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2.5 rounded-xl font-semibold transition text-xs">إلغاء</button>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-semibold transition text-xs shadow-md shadow-indigo-600/20">تنفيذ وإنشاء الحساب</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- الربط البرمجي مع Supabase -->
     <script type="module">
         import { supabase } from './assets/js/supabase.js';
+
+        // نافذة منبثقة التحكم
+        window.openAddUserModal = function() {
+            document.getElementById('addUserModal').classList.remove('hidden');
+            loadBrandsAndBranchesSelection();
+        }
+
+        window.closeAddUserModal = function() {
+            document.getElementById('addUserModal').classList.add('hidden');
+            document.getElementById('create-user-form').reset();
+            document.getElementById('user-feedback').classList.add('hidden');
+        }
 
         // تفعيل أزرار التبديل
         window.toggleSwitch = function(btn) {
@@ -275,30 +318,77 @@
             const rolesMap = {
                 'warehouse_manager': 'مدير مستودع',
                 'branch_manager': 'مدير فرع',
-                'accountant': 'محاسب',
-                'marketing': 'التسويق',
-                'customer_service': 'خدمة عملاء',
+                'accountant': 'قسم المحاسبة',
+                'marketing': 'قسم التسويق',
+                'customer_service': 'قسم خدمة العملاء',
                 'branches_director': 'مدير الفروع'
             };
             return rolesMap[role] || role;
         }
 
-        // جلب الفروع المتاحة لتعبئة القائمة المنسدلة
-        async function loadBranchesDropdown() {
-            const branchSelect = document.getElementById('new-member-branch');
+        // التحقق من أن اسم العضو يحتوي على حروف إنجليزية فقط
+        const nameInput = document.getElementById('new-member-name');
+        const nameError = document.getElementById('name-error');
+        nameInput.addEventListener('input', (e) => {
+            const val = e.target.value;
+            // السماح بالحروف الإنجليزية والمسافات فقط
+            const filtered = val.replace(/[^A-Za-z\s]/g, '');
+            if (val !== filtered) {
+                nameError.classList.remove('hidden');
+            } else {
+                nameError.classList.add('hidden');
+            }
+            e.target.value = filtered;
+        });
+
+        // جلب البراندات والفروع من الدेटा بيز من جدول الفروع
+        async function loadBrandsAndBranchesSelection() {
+            const brandsContainer = document.getElementById('brands-checkboxes-container');
+            const branchesContainer = document.getElementById('branches-checkboxes-container');
+
             try {
-                // افترضنا جدول الفروع اسمه branches وحقل اسم الفرع اسمه name أو branch_name
                 const { data, error } = await supabase.from('branches').select('*');
-                
                 if (error || !data || data.length === 0) {
-                    branchSelect.innerHTML = `<option value="" disabled selected>لا توجد فروع مضافة (أنشئ فرعاً أولاً)</option>`;
+                    brandsContainer.innerHTML = `<span class="text-slate-500">لا توجد براندات مسجلة</span>`;
+                    branchesContainer.innerHTML = `<span class="text-slate-500">لا توجد فروع مسجلة (أنشئ فروعاً من صفحة الفروع أولاً)</span>`;
                     return;
                 }
 
-                branchSelect.innerHTML = `<option value="" disabled selected>اختر الفرع المرتبط</option>` + 
-                    data.map(b => `<option value="${b.name || b.branch_name || b.id}">${b.name || b.branch_name || 'فرع بدون اسم'}</option>`).join('');
+                // استخراج البراندات الفريدة والفروع
+                const brandsSet = new Set();
+                data.forEach(item => {
+                    if (item.brand || item.brand_name) brandsSet.add(item.brand || item.brand_name);
+                });
+
+                if (brandsSet.size === 0) {
+                    brandsContainer.innerHTML = `<span class="text-slate-500">لا توجد براندات متاحة</span>`;
+                } else {
+                    brandsContainer.innerHTML = Array.from(brandsSet).map(brand => `
+                        <label class="flex items-center gap-2 cursor-pointer text-slate-300">
+                            <input type="checkbox" name="selected_brands" value="${brand}" class="brand-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
+                            <span>${brand}</span>
+                        </label>
+                    `).join('');
+                }
+
+                branchesContainer.innerHTML = data.map(b => `
+                    <label class="flex items-center gap-2 cursor-pointer text-slate-300">
+                        <input type="checkbox" name="selected_branches" value="${b.name || b.branch_name || b.id}" class="branch-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
+                        <span>${b.name || b.branch_name || 'فرع بدون اسم'}</span>
+                    </label>
+                `).join('');
+
+                // تففعيل خيار الكل
+                document.getElementById('select-all-brands').addEventListener('change', (e) => {
+                    document.querySelectorAll('.brand-checkbox').forEach(cb => cb.checked = e.target.checked);
+                });
+                document.getElementById('select-all-branches').addEventListener('change', (e) => {
+                    document.querySelectorAll('.branch-checkbox').forEach(cb => cb.checked = e.target.checked);
+                });
+
             } catch (err) {
-                branchSelect.innerHTML = `<option value="" disabled selected>خطأ في جلب الفروع</option>`;
+                brandsContainer.innerHTML = `<span class="text-rose-400">خطأ في جلب البيانات</span>`;
+                branchesContainer.innerHTML = `<span class="text-rose-400">خطأ في جلب البيانات</span>`;
             }
         }
 
@@ -308,47 +398,54 @@
             try {
                 const { data, error } = await supabase.from('profiles').select('*');
                 if (error || !data || data.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-slate-500">لا توجد حسابات مضافة حالياً</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">لا توجد حسابات مضافة حالياً</td></tr>`;
                     return;
                 }
 
-                tableBody.innerHTML = data.map(member => `
-                    <tr class="border-b border-slate-800/60">
-                        <td class="py-3 px-2 font-medium">${member.full_name || 'مستخدم نظام'}</td>
-                        <td class="py-3 px-2 text-slate-400">${member.email}</td>
-                        <td class="py-3 px-2">${member.branch || 'المستودع الرئيسي'}</td>
-                        <td class="py-3 px-2">
-                            <span class="bg-indigo-500/10 text-indigo-400 px-2.5 py-1 rounded-lg text-[11px]">${getRoleLabel(member.role)}</span>
-                        </td>
-                        <td class="py-3 px-2 text-center">
-                            <span class="text-emerald-400 text-[11px] font-medium">نشط</span>
-                        </td>
-                    </tr>
-                `).join('');
+                tableBody.innerHTML = data.map(member => {
+                    let assignedLocations = member.branch || member.branches || member.brand || 'المستودع الرئيسي';
+                    if (Array.isArray(assignedLocations)) {
+                        assignedLocations = assignedLocations.join(', ');
+                    }
+                    const createdDate = member.created_at ? new Date(member.created_at).toLocaleDateString('en-GB') : '-';
+
+                    return `
+                        <tr class="border-b border-slate-800/60">
+                            <td class="py-3 px-2 font-medium">${member.full_name || 'مستخدم نظام'}</td>
+                            <td class="py-3 px-2 text-slate-400">${member.email}</td>
+                            <td class="py-3 px-2 text-slate-300">${assignedLocations}</td>
+                            <td class="py-3 px-2">
+                                <span class="bg-indigo-500/10 text-indigo-400 px-2.5 py-1 rounded-lg text-[11px]">${getRoleLabel(member.role)}</span>
+                            </td>
+                            <td class="py-3 px-2 text-slate-400">${createdDate}</td>
+                            <td class="py-3 px-2 text-center">
+                                <span class="text-emerald-400 text-[11px] font-medium">نشط</span>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
             } catch (err) {
-                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-rose-400">تعذر الاتصال بقاعدة بيانات المستخدمين</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-rose-400">تعذر الاتصال بقاعدة بيانات المستخدمين</td></tr>`;
             }
         }
 
-        // إضافة مستخدم جديد مع التحقق من وجود فروع
+        // تنفيذ إضافة مستخدم جديد
         document.getElementById('create-user-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const branchSelect = document.getElementById('new-member-branch');
             const feedback = document.getElementById('user-feedback');
-
-            // التحقق إذا لم يتم إنشاء فروع مسبقاً
-            if (!branchSelect.value || branchSelect.options.length === 0 || branchSelect.selectedOptions[0].disabled) {
-                feedback.className = 'px-3 py-2 rounded-lg text-xs bg-rose-500/10 text-rose-400 border border-rose-500/20';
-                feedback.innerText = 'تنبيه: يجب عليك إنشاء فرع أولاً من صفحة "الفروع" قبل إمكانية إضافة مستخدم جديد!';
-                feedback.classList.remove('hidden');
-                return;
-            }
 
             const name = document.getElementById('new-member-name').value.trim();
             const email = document.getElementById('new-member-email').value.trim();
             const password = document.getElementById('new-member-pass').value.trim();
-            const branch = branchSelect.value;
             const role = document.getElementById('new-member-role').value;
+
+            const selectedBrands = Array.from(document.querySelectorAll('.brand-checkbox:checked')).map(cb => cb.value);
+            const selectedBranches = Array.from(document.querySelectorAll('.branch-checkbox:checked')).map(cb => cb.value);
+            const allBrandsChecked = document.getElementById('select-all-brands').checked;
+            const allBranchesChecked = document.getElementById('select-all-branches').checked;
+
+            const brandValue = allBrandsChecked ? 'كل البراندات' : (selectedBrands.length > 0 ? selectedBrands.join(', ') : 'بدون براند');
+            const branchValue = allBranchesChecked ? 'كل الفروع' : (selectedBranches.length > 0 ? selectedBranches.join(', ') : 'المستودع الرئيسي');
 
             feedback.classList.remove('hidden', 'bg-emerald-500/10', 'text-emerald-400', 'bg-rose-500/10', 'text-rose-400');
             feedback.innerText = 'جاري إنشاء الحساب...';
@@ -359,16 +456,25 @@
                 if (authError) throw authError;
 
                 const { error: profileError } = await supabase.from('profiles').insert([
-                    { id: authData.user?.id, full_name: name, email: email, branch: branch, role: role }
+                    { 
+                        id: authData.user?.id, 
+                        full_name: name, 
+                        email: email, 
+                        branch: branchValue, 
+                        brand: brandValue,
+                        role: role,
+                        created_at: new Date().toISOString()
+                    }
                 ]);
 
                 if (profileError) console.warn(profileError.message);
 
                 feedback.className = 'px-3 py-2 rounded-lg text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
                 feedback.innerText = 'تم إنشاء الحساب وصلاحياته بنجاح!';
-                document.getElementById('create-user-form').reset();
-                loadBranchesDropdown();
-                loadTeamMembers();
+                setTimeout(() => {
+                    closeAddUserModal();
+                    loadTeamMembers();
+                }, 1200);
 
             } catch (err) {
                 feedback.className = 'px-3 py-2 rounded-lg text-xs bg-rose-500/10 text-rose-400 border border-rose-500/20';
@@ -412,6 +518,9 @@
             await supabase.auth.signOut();
             window.location.href = 'index.html';
         });
+
+        // تحميل الأعضاء عند بدء التشغيل
+        loadTeamMembers();
 
         // نظام الترجمة الواجهية
         const settingsTranslations = {
@@ -496,12 +605,6 @@
         window.toggleLanguage = function() {
             applySettingsLanguage(currentLang === 'ar' ? 'en' : 'ar');
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            applySettingsLanguage(currentLang);
-            loadBranchesDropdown();
-            loadTeamMembers();
-        });
     </script>
 </body>
 </html>
