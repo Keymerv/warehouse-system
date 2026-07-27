@@ -58,7 +58,7 @@
         <header class="bg-slate-900 border-b border-slate-800 px-5 py-3 flex justify-between items-center">
             <h1 class="text-sm font-bold" data-i18n="branches_header">إدارة البراندات والفروع</h1>
             <div class="flex items-center gap-3">
-                <button onclick="toggleLanguage()" id="lang-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-md text-xs font-medium transition">
+                <button onclick="window.toggleLanguage()" id="lang-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-md text-xs font-medium transition">
                     English
                 </button>
             </div>
@@ -88,10 +88,10 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-slate-900 border border-slate-800 p-3 rounded-xl">
                 <div class="flex flex-wrap items-center gap-2" id="filter-buttons-container">
                     <span class="text-slate-400 text-[11px] font-semibold ml-2" data-i18n="filter_label">تصفية حسب:</span>
-                    <button onclick="filterBranches('all')" id="btn-all" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" data-i18n="filter_all">كل البراندات</button>
+                    <button onclick="window.filterBranches('all')" id="btn-all" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" data-i18n="filter_all">كل البراندات</button>
                 </div>
                 
-                <button onclick="openAddBranchModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-md shadow-indigo-600/20" data-i18n="add_branch_btn">
+                <button onclick="window.openAddBranchModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-md shadow-indigo-600/20" data-i18n="add_branch_btn">
                     + إضافة فرع / براند جديد
                 </button>
             </div>
@@ -108,9 +108,9 @@
         <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h3 class="font-bold text-sm text-slate-100" data-i18n="modal_title">إضافة فرع أو براند جديد</h3>
-                <button onclick="closeAddBranchModal()" class="text-slate-400 hover:text-white text-base">&times;</button>
+                <button onclick="window.closeAddBranchModal()" class="text-slate-400 hover:text-white text-base">&times;</button>
             </div>
-            <form id="add-branch-form" onsubmit="handleAddNewBranch(event)" class="space-y-3">
+            <form id="add-branch-form" onsubmit="window.handleAddNewBranch(event)" class="space-y-3">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-slate-400 text-[11px] mb-1" data-i18n="label_branch_ar">اسم الفرع (بالعربي)</label>
@@ -139,14 +139,14 @@
                 </div>
 
                 <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
-                    <button type="button" onclick="closeAddBranchModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg font-medium transition" data-i18n="btn_cancel">إلغاء</button>
+                    <button type="button" onclick="window.closeAddBranchModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg font-medium transition" data-i18n="btn_cancel">إلغاء</button>
                     <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded-lg font-medium transition" data-i18n="btn_save">حفظ الفرع</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- سكربت الاتصال بـ Supabase وعرض البيانات والترجمة -->
+    <!-- سكربتات التطبيق والربط المتكاملة -->
     <script type="module">
         import { supabase } from './assets/js/supabase-client.js';
 
@@ -221,7 +221,6 @@
         async function fetchBranches() {
             try {
                 const { data, error } = await supabase.from('branches').select('*').order('created_at', { ascending: false });
-                
                 if (error) throw error;
 
                 allBranchesData = data || [];
@@ -236,15 +235,22 @@
         window.renderBranches = function(branches) {
             const container = document.getElementById('branches-container');
             if (branches.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-slate-500" data-i18n="no_branches_msg">${branchesTranslations[currentLang].no_branches_msg}</div>`;
+                container.innerHTML = `<div class="text-center py-8 text-slate-500">${branchesTranslations[currentLang].no_branches_msg}</div>`;
                 return;
             }
 
             container.innerHTML = branches.map(b => {
-                // استخراج الاسماء حسب اللغة الحالية (إذا كانت مخزنة كـ JSON في حقل location أو حقول منفصلة، أو نعتمد الحقول النصية الجديدة)
-                let branchName = currentLang === 'ar' ? (b.name_ar || b.name) : (b.name_en || b.name);
-                let brandName = currentLang === 'ar' ? (b.brand_ar || 'براند عام') : (b.brand_en || 'General Brand');
-                let brandClass = b.brand_en ? b.brand_en.replace(/\s+/g, '-').toLowerCase() : 'general-brand';
+                // استخراج البيانات المخزنة بشكل يدعم اللغتين
+                let namesArr = (b.name || '').split(' / ');
+                let branchName = currentLang === 'ar' ? (namesArr[0] || b.name) : (namesArr[1] || namesArr[0] || b.name);
+                
+                let brandMatch = (b.location || '').match(/\[Brand:\s*(.*?)\s*-\s*(.*?)\]/);
+                let brandAr = brandMatch ? brandMatch[1] : 'براند عام';
+                let brandEn = brandMatch ? brandMatch[2] : 'General Brand';
+                let brandName = currentLang === 'ar' ? brandAr : brandEn;
+                let brandClass = brandEn.replace(/\s+/g, '-').toLowerCase();
+
+                let cleanLocation = (b.location || '').replace(/\[Brand:.*?\]/, '').trim();
 
                 return `
                 <div class="branch-card bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-3" data-brand="${brandClass}">
@@ -253,7 +259,7 @@
                         <div>
                             <span class="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded">${brandName}</span>
                             <h3 class="font-bold text-sm text-slate-100 mt-0.5">${branchName}</h3>
-                            <p class="text-[11px] text-slate-400 mt-0.5">${branchesTranslations[currentLang].location_text} <span class="font-mono text-slate-200">${b.location || 'غير محدد'}</span> | ${branchesTranslations[currentLang].status_text} ${b.status || 'نشط'}</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">${branchesTranslations[currentLang].location_text} <span class="font-mono text-slate-200">${cleanLocation || 'غير محدد'}</span> | ${branchesTranslations[currentLang].status_text} ${b.status || 'نشط'}</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2.5 w-full md:w-auto justify-between md:justify-end">
@@ -265,27 +271,31 @@
         }
 
         function updateStatsAndFilters(branches) {
-            // إجمالي الفروع
             document.getElementById('total-branches-count').innerText = branches.length;
 
-            // إجمالي البراندات الفريدة
-            const uniqueBrands = new Set(branches.map(b => b.brand_ar || b.brand_en || 'general')).size;
+            const uniqueBrands = new Set(branches.map(b => {
+                let m = (b.location || '').match(/\[Brand:\s*(.*?)\s*-\s*(.*?)\]/);
+                return m ? m[2] : 'general';
+            })).size;
+            
             document.getElementById('total-brands-count').innerText = branches.length === 0 ? 0 : uniqueBrands;
 
-            // تحديث أزرار التلفرة بناء على البراندات الموجودة
             const filterContainer = document.getElementById('filter-buttons-container');
             let filterHtml = `<span class="text-slate-400 text-[11px] font-semibold ml-2" data-i18n="filter_label">${branchesTranslations[currentLang].filter_label}</span>
-                              <button onclick="filterBranches('all')" id="btn-all" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" data-i18n="filter_all">${branchesTranslations[currentLang].filter_all}</button>`;
+                              <button onclick="window.filterBranches('all')" id="btn-all" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" data-i18n="filter_all">${branchesTranslations[currentLang].filter_all}</button>`;
 
             const brandsMap = new Map();
             branches.forEach(b => {
-                const key = b.brand_en ? b.brand_en.replace(/\s+/g, '-').toLowerCase() : 'general';
-                const name = currentLang === 'ar' ? (b.brand_ar || 'براند عام') : (b.brand_en || 'General Brand');
+                let m = (b.location || '').match(/\[Brand:\s*(.*?)\s*-\s*(.*?)\]/);
+                let bAr = m ? m[1] : 'براند عام';
+                let bEn = m ? m[2] : 'General Brand';
+                let key = bEn.replace(/\s+/g, '-').toLowerCase();
+                let name = currentLang === 'ar' ? bAr : bEn;
                 brandsMap.set(key, name);
             });
 
             brandsMap.forEach((name, key) => {
-                filterHtml += `<button onclick="filterBranches('${key}')" id="btn-${key}" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition">${name}</button>`;
+                filterHtml += `<button onclick="window.filterBranches('${key}')" id="btn-${key}" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition">${name}</button>`;
             });
 
             filterContainer.innerHTML = filterHtml;
@@ -293,14 +303,18 @@
 
         window.openAddBranchModal = function() {
             const modal = document.getElementById('add-branch-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            if(modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
         }
 
         window.closeAddBranchModal = function() {
             const modal = document.getElementById('add-branch-modal');
-            modal.classList.remove('flex');
-            modal.classList.add('hidden');
+            if(modal) {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
         }
 
         window.handleAddNewBranch = async function(e) {
@@ -311,32 +325,16 @@
             const brand_en = document.getElementById('brand-name-en').value;
             const location = document.getElementById('branch-location').value;
             
-            // نخزن الاسم الرئيسي بالعربي والإنجليزي في الأعمدة المتاحة
-            const name = name_ar; 
-            const status = 'نشط';
-
             try {
-                const { error } = await supabase.from('branches').insert([{ 
-                    name, 
-                    location, 
-                    status,
-                    // إذا أردت حفظ الحقول الإضافية، تأكد أن قاعدة البيانات تقبلها أو يتم حفظها ضمن النصوص
-                }]);
-                
-                // حفظ الأسماء باللغتين بشكل مؤقت في الذاكرة أو الأعمدة إن وجدت
-                // لضمان التوافق مع الجدول الحالي، سنقوم بحفظ البيانات وإضافة الخصائص:
-                const newEntry = { name_ar, name_en, brand_ar, brand_en, location, status };
-                
-                // إرسال البيانات لقاعدة البيانات
-                const dbRes = await supabase.from('branches').insert([{
+                const { error } = await supabase.from('branches').insert([{
                     name: `${name_ar} / ${name_en}`,
                     location: `${location} [Brand: ${brand_ar} - ${brand_en}]`,
                     status: 'نشط'
                 }]);
 
-                if (dbRes.error) throw dbRes.error;
+                if (error) throw error;
 
-                closeAddBranchModal();
+                window.closeAddBranchModal();
                 document.getElementById('add-branch-form').reset();
                 fetchBranches();
             } catch (err) {
