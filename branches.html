@@ -69,31 +69,31 @@
             <!-- إحصائيات علوية سريعة -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
-                    <div>
+                    <div class="w-9 h-9 bg-indigo-600/10 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-sm">🍔</div>
+                    <div class="text-left md:text-right">
                         <p class="text-slate-400 text-[11px]" data-i18n="stat_total_brands">إجمالي البراندات</p>
                         <h3 id="total-brands-count" class="text-lg font-extrabold mt-0.5 text-indigo-400">0</h3>
                     </div>
-                    <div class="w-9 h-9 bg-indigo-600/10 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-sm">🍔</div>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
-                    <div>
+                    <div class="w-9 h-9 bg-emerald-600/10 text-emerald-400 rounded-lg flex items-center justify-center font-bold text-sm">🏢</div>
+                    <div class="text-left md:text-right">
                         <p class="text-slate-400 text-[11px]" data-i18n="stat_total_branches">إجمالي الفروع النشطة</p>
                         <h3 id="total-branches-count" class="text-lg font-extrabold mt-0.5 text-emerald-400">0</h3>
                     </div>
-                    <div class="w-9 h-9 bg-emerald-600/10 text-emerald-400 rounded-lg flex items-center justify-center font-bold text-sm">🏢</div>
                 </div>
             </div>
 
             <!-- شريط الفلترة والأزرار -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-slate-900 border border-slate-800 p-3 rounded-xl">
-                <div class="flex flex-wrap items-center gap-2" id="filter-buttons-container">
-                    <span class="text-slate-400 text-[11px] font-semibold ml-2" data-i18n="filter_label">تصفية حسب:</span>
-                    <button onclick="window.filterBranches('all')" id="btn-all" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" data-i18n="filter_all">كل البراندات</button>
-                </div>
-                
                 <button onclick="window.openAddBranchModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-md shadow-indigo-600/20" data-i18n="add_branch_btn">
                     + إضافة فرع / براند جديد
                 </button>
+
+                <div class="flex flex-wrap items-center gap-2" id="filter-buttons-container">
+                    <button onclick="window.filterBranches('all')" id="btn-all" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" data-i18n="filter_all">كل البراندات</button>
+                    <span class="text-slate-400 text-[11px] font-semibold mr-2" data-i18n="filter_label">تصفية حسب:</span>
+                </div>
             </div>
 
             <!-- قائمة الفروع -->
@@ -103,7 +103,7 @@
         </div>
     </main>
 
-    <!-- نافذة إضافة فرع جديد (مع دعم اللغتين) -->
+    <!-- نافذة إضافة فرع جديد -->
     <div id="add-branch-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -146,7 +146,7 @@
         </div>
     </div>
 
-    <!-- سكربتات التطبيق والربط المتكاملة -->
+    <!-- سكربتات التطبيق والربط العام للنافذة والترجمة -->
     <script type="module">
         import { supabase } from './assets/js/supabase-client.js';
 
@@ -232,7 +232,7 @@
             }
         }
 
-        window.renderBranches = function(branches) {
+        function renderBranches(branches) {
             const container = document.getElementById('branches-container');
             if (branches.length === 0) {
                 container.innerHTML = `<div class="text-center py-8 text-slate-500">${branchesTranslations[currentLang].no_branches_msg}</div>`;
@@ -240,7 +240,6 @@
             }
 
             container.innerHTML = branches.map(b => {
-                // استخراج البيانات المخزنة بشكل يدعم اللغتين
                 let namesArr = (b.name || '').split(' / ');
                 let branchName = currentLang === 'ar' ? (namesArr[0] || b.name) : (namesArr[1] || namesArr[0] || b.name);
                 
@@ -281,8 +280,8 @@
             document.getElementById('total-brands-count').innerText = branches.length === 0 ? 0 : uniqueBrands;
 
             const filterContainer = document.getElementById('filter-buttons-container');
-            let filterHtml = `<span class="text-slate-400 text-[11px] font-semibold ml-2" data-i18n="filter_label">${branchesTranslations[currentLang].filter_label}</span>
-                              <button onclick="window.filterBranches('all')" id="btn-all" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" data-i18n="filter_all">${branchesTranslations[currentLang].filter_all}</button>`;
+            let filterHtml = `<button onclick="window.filterBranches('all')" id="btn-all" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" data-i18n="filter_all">${branchesTranslations[currentLang].filter_all}</button>
+                              <span class="text-slate-400 text-[11px] font-semibold mr-2" data-i18n="filter_label">${branchesTranslations[currentLang].filter_label}</span>`;
 
             const brandsMap = new Map();
             branches.forEach(b => {
@@ -301,6 +300,7 @@
             filterContainer.innerHTML = filterHtml;
         }
 
+        // ربط الدوال صراحة بنطاق window لضمان عمل الأزرار 100%
         window.openAddBranchModal = function() {
             const modal = document.getElementById('add-branch-modal');
             if(modal) {
