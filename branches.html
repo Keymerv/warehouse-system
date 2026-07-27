@@ -84,15 +84,15 @@
                 </div>
             </div>
 
-            <!-- شريط الفلترة والأزرار -->
+            <!-- شريط الفلترة والأزرار (تم ضبط الترتيب: زر الإضافة يمين، والفلترة يسار) -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-slate-900 border border-slate-800 p-3 rounded-xl">
-                <button onclick="window.openAddBranchModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-md shadow-indigo-600/20" data-i18n="add_branch_btn">
+                <button onclick="window.openAddBranchModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-md shadow-indigo-600/20 order-1 md:order-1" data-i18n="add_branch_btn">
                     + إضافة فرع / براند جديد
                 </button>
 
-                <div class="flex flex-wrap items-center gap-2" id="filter-buttons-container">
+                <div class="flex flex-wrap items-center gap-2 order-2 md:order-2" id="filter-buttons-container">
+                    <span class="text-slate-400 text-[11px] font-semibold ml-2" data-i18n="filter_label">تصفية حسب:</span>
                     <button onclick="window.filterBranches('all')" id="btn-all" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" data-i18n="filter_all">كل البراندات</button>
-                    <span class="text-slate-400 text-[11px] font-semibold mr-2" data-i18n="filter_label">تصفية حسب:</span>
                 </div>
             </div>
 
@@ -280,8 +280,8 @@
             document.getElementById('total-brands-count').innerText = branches.length === 0 ? 0 : uniqueBrands;
 
             const filterContainer = document.getElementById('filter-buttons-container');
-            let filterHtml = `<button onclick="window.filterBranches('all')" id="btn-all" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" data-i18n="filter_all">${branchesTranslations[currentLang].filter_all}</button>
-                              <span class="text-slate-400 text-[11px] font-semibold mr-2" data-i18n="filter_label">${branchesTranslations[currentLang].filter_label}</span>`;
+            let filterHtml = `<span class="text-slate-400 text-[11px] font-semibold ml-2" data-i18n="filter_label">${branchesTranslations[currentLang].filter_label}</span>
+                              <button onclick="window.filterBranches('all')" id="btn-all" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" data-i18n="filter_all">${branchesTranslations[currentLang].filter_all}</button>`;
 
             const brandsMap = new Map();
             branches.forEach(b => {
