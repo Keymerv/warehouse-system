@@ -185,10 +185,11 @@
         </div>
     </div>
 
-    <!-- السكربت 1: مستقل تماماً عن قواعد البيانات ومسؤول عن الأزرار والترجمة والفلترة ليعمل 100% فوراً -->
+    <!-- السكربت 1: مستقل تماماً عن قواعد البيانات ومسؤول عن الأزرار والترجمة والفلترة -->
     <script>
         let allBranchesData = [];
         let currentLang = localStorage.getItem('lang') || 'ar';
+        let currentFilter = 'all'; // لتثبيت الفلتر الحالي حتى عند التحديث أو تغيير اللغة
 
         const branchesTranslations = {
             ar: {
@@ -267,7 +268,7 @@
             }
         };
 
-        // دوال فتح وإغلاق النافذة (تعمل فوراً دون شروط)
+        // دوال فتح وإغلاق النافذة
         function openAddBranchModal() {
             const modal = document.getElementById('add-branch-modal');
             if (modal) {
@@ -331,8 +332,8 @@
                 }
             });
 
-            renderBranches(allBranchesData);
             updateStatsAndFilters(allBranchesData);
+            renderBranches(allBranchesData);
         }
 
         function toggleLanguage() {
@@ -340,13 +341,17 @@
             applyBranchesLanguage(newLang);
         }
 
-        // الفلترة
+        // نظام الفلترة المحدث والمستقر
         function filterBranches(brandId) {
+            currentFilter = brandId; // حفظ الفلتر النشط حالياً
+
             document.querySelectorAll('#filter-buttons-container button').forEach(btn => {
                 btn.className = "bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition";
             });
             const activeBtn = document.getElementById('btn-' + brandId);
-            if (activeBtn) activeBtn.className = "bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition";
+            if (activeBtn) {
+                activeBtn.className = "bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition";
+            }
 
             const cards = document.querySelectorAll('.branch-card');
             cards.forEach(card => {
@@ -358,7 +363,7 @@
             });
         }
 
-        // رسم كروت الفروع مع الشعار (الصورة المصغرة)
+        // رسم كروت الفروع مع الشعار وتطبيق الفلتر المحفوظ تلقائياً
         function renderBranches(branches) {
             const container = document.getElementById('branches-container');
             if (!container) return;
@@ -405,9 +410,12 @@
                     </div>
                 </div>`;
             }).join('');
+
+            // إعادة تطبيق الفلتر الحالي بعد إعادة الرسم لضمان استمراره
+            filterBranches(currentFilter);
         }
 
-        // تحديث الإحصائيات وأزرار الفلترة
+        // تحديث الإحصائيات وأزرار الفلترة مع الحفاظ على التحديد النشط
         function updateStatsAndFilters(branches) {
             const totalBranchesEl = document.getElementById('total-branches-count');
             if (totalBranchesEl) totalBranchesEl.innerText = branches.length;
@@ -428,17 +436,19 @@
             if (!filterContainer) return;
 
             let filterHtml = `<span class="text-slate-400 text-[11px] font-semibold ml-2" data-i18n="filter_label">${branchesTranslations[currentLang].filter_label}</span>
-                              <button onclick="filterBranches('all')" id="btn-all" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" data-i18n="filter_all">${branchesTranslations[currentLang].filter_all}</button>`;
+                              <button onclick="filterBranches('all')" id="btn-all" class="${currentFilter === 'all' ? 'bg-indigo-600 text-white' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'} px-3 py-1.5 rounded-lg text-xs font-semibold transition" data-i18n="filter_all">${branchesTranslations[currentLang].filter_all}</button>`;
 
             uniqueBrandsMap.forEach((val, key) => {
                 let name = currentLang === 'ar' ? val.ar : val.en;
-                filterHtml += `<button onclick="filterBranches('${key}')" id="btn-${key}" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition">${name}</button>`;
+                let isActive = currentFilter === key;
+                let btnClass = isActive ? 'bg-indigo-600 text-white' : 'bg-slate-800 hover:bg-slate-700 text-slate-300';
+                filterHtml += `<button onclick="filterBranches('${key}')" id="btn-${key}" class="${btnClass} px-3 py-1.5 rounded-lg text-xs font-semibold transition">${name}</button>`;
             });
 
             filterContainer.innerHTML = filterHtml;
         }
 
-        // تعبئة قائمة البراندات مع سحب رابط الصورة التابع للبراند
+        // تعبئة قائمة البراندات
         function populateExistingBrandsSelect() {
             const select = document.getElementById('existing-brand-select');
             const uniqueBrands = new Map();
@@ -475,7 +485,6 @@
             }
         }
 
-        // تشغيل الترجمة فور التحميل دون انتظار قاعدة البيانات
         window.addEventListener('DOMContentLoaded', () => {
             applyBranchesLanguage(currentLang);
         });
@@ -491,8 +500,8 @@
                 if (error) throw error;
 
                 allBranchesData = data || [];
-                renderBranches(allBranchesData);
                 updateStatsAndFilters(allBranchesData);
+                renderBranches(allBranchesData);
             } catch (err) {
                 console.error('Error fetching branches:', err);
             }
