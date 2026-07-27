@@ -203,21 +203,21 @@
 
             <div id="user-feedback" class="hidden px-3 py-2 rounded-lg text-xs"></div>
 
-            <form id="create-user-form" class="space-y-4 text-xs">
+            <form id="create-user-form" autocomplete="off" class="space-y-4 text-xs">
                 <div>
                     <label class="block text-slate-400 mb-1" data-i18n="modal_label_name">اسم العضو (حروف إنجليزية فقط)</label>
-                    <input type="text" id="new-member-name" placeholder="John Doe" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    <input type="text" id="new-member-name" autocomplete="off" placeholder="John Doe" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
                     <p id="name-error" class="text-[10px] text-rose-400 mt-1 hidden" data-i18n="modal_error_name">يسمح فقط بالحروف الإنجليزية (بدون أرقام أو رموز أو حروف عربية).</p>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-slate-400 mb-1" data-i18n="modal_label_email">البريد الإلكتروني</label>
-                        <input type="email" id="new-member-email" placeholder="user@keymerv.com" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <input type="email" id="new-member-email" autocomplete="off" placeholder="user@keymerv.com" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
                     </div>
                     <div>
                         <label class="block text-slate-400 mb-1" data-i18n="modal_label_pass">رمز المرور المؤقت</label>
-                        <input type="password" id="new-member-pass" placeholder="••••••••" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <input type="password" id="new-member-pass" autocomplete="new-password" placeholder="••••••••" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
                     </div>
                 </div>
 
@@ -459,19 +459,31 @@
 
         // نافذة منبثقة التحكم
         window.openAddUserModal = function() {
-            document.getElementById('addUserModal').classList.remove('hidden');
+            const modal = document.getElementById('addUserModal');
+            modal.classList.remove('hidden');
+            
+            // تفريغ خانات الإدخال تماماً لمنع ظهور البيانات المحفوظة مسبقاً
+            document.getElementById('create-user-form').reset();
+            document.getElementById('new-member-name').value = '';
+            document.getElementById('new-member-email').value = '';
+            document.getElementById('new-member-pass').value = '';
+            document.getElementById('user-feedback').classList.add('hidden');
+            document.getElementById('modal-bottom-feedback').classList.add('hidden');
+            document.getElementById('name-error').classList.add('hidden');
+            
+            const submitBtn = document.getElementById('submit-user-btn');
+            submitBtn.disabled = false;
+            submitBtn.innerText = currentLang === 'ar' ? 'تنفيذ وإنشاء الحساب' : 'Execute & Create Account';
+
             loadBrandsAndBranchesSelection();
         }
 
         window.closeAddUserModal = function() {
             document.getElementById('addUserModal').classList.add('hidden');
             document.getElementById('create-user-form').reset();
-            document.getElementById('user-feedback').classList.add('hidden');
-            const bottomFeedback = document.getElementById('modal-bottom-feedback');
-            bottomFeedback.classList.add('hidden');
-            const submitBtn = document.getElementById('submit-user-btn');
-            submitBtn.disabled = false;
-            submitBtn.innerText = currentLang === 'ar' ? 'تنفيذ وإنشاء الحساب' : 'Execute & Create Account';
+            document.getElementById('new-member-name').value = '';
+            document.getElementById('new-member-email').value = '';
+            document.getElementById('new-member-pass').value = '';
         }
 
         // تفعيل أزرار التبديل (Toggles)
@@ -522,15 +534,18 @@
             const branchesContainer = document.getElementById('branches-checkboxes-container');
 
             try {
+                // جلب الفروع والبراندات من قاعدة البيانات مع ضمان الدمج الصحيح
                 const { data: branchesData, error: branchesError } = await supabase.from('branches').select('*');
-                
-                let brandsList = [];
                 const { data: brandsTableData, error: brandsError } = await supabase.from('brands').select('*');
                 
+                let brandsList = [];
                 if (!brandsError && brandsTableData && brandsTableData.length > 0) {
                     brandsList = brandsTableData.map(b => b.name || b.brand_name);
-                } else if (branchesData) {
-                    const brandsSet = new Set();
+                }
+                
+                // استخراج البراندات تلقائياً من الفروع أيضاً لضمان عدم حدوث فراغ
+                if (branchesData) {
+                    const brandsSet = new Set(brandsList);
                     branchesData.forEach(item => {
                         if (item.brand || item.brand_name) brandsSet.add(item.brand || item.brand_name);
                     });
@@ -542,7 +557,7 @@
                 } else {
                     brandsContainer.innerHTML = brandsList.map(brand => `
                         <label class="flex items-center gap-2 cursor-pointer text-slate-300">
-                            <input type="checkbox" name="selected_brands" value="${brand}" class="brand-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
+                            <input type="checkbox" name="selected_brands" value="${brand}" data-brand="${brand}" class="brand-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
                             <span>${brand}</span>
                         </label>
                     `).join('');
@@ -551,20 +566,55 @@
                 if (branchesError || !branchesData || branchesData.length === 0) {
                     branchesContainer.innerHTML = `<span class="text-slate-500">${currentLang === 'ar' ? 'لا توجد فروع مسجلة' : 'No registered branches'}</span>`;
                 } else {
-                    branchesContainer.innerHTML = branchesData.map(b => `
-                        <label class="flex items-center gap-2 cursor-pointer text-slate-300">
-                            <input type="checkbox" name="selected_branches" value="${b.name || b.branch_name || b.id}" class="branch-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
-                            <span>${b.name || b.branch_name || 'Unnamed Branch'}</span>
-                        </label>
-                    `).join('');
+                    branchesContainer.innerHTML = branchesData.map(b => {
+                        const branchName = b.name || b.branch_name || 'Unnamed Branch';
+                        const branchBrand = b.brand || b.brand_name || '';
+                        return `
+                            <label class="flex items-center gap-2 cursor-pointer text-slate-300">
+                                <input type="checkbox" name="selected_branches" value="${branchName}" data-brand="${branchBrand}" class="branch-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
+                                <span>${branchName} ${branchBrand ? '(' + branchBrand + ')' : ''}</span>
+                            </label>
+                        `;
+                    }).join('');
                 }
 
+                // ربط الأحداث التفاعلية بين البراندات وفروعها
+                document.querySelectorAll('.brand-checkbox').forEach(brandCb => {
+                    brandCb.addEventListener('change', (e) => {
+                        const brandName = e.target.getAttribute('data-brand');
+                        const isChecked = e.target.checked;
+                        document.querySelectorAll(`.branch-checkbox[data-brand="${CSS.escape(brandName)}"]`).forEach(branchCb => {
+                            branchCb.checked = isChecked;
+                        });
+                    });
+                });
+
+                document.querySelectorAll('.branch-checkbox').forEach(branchCb => {
+                    branchCb.addEventListener('change', (e) => {
+                        const brandName = e.target.getAttribute('data-brand');
+                        if (!brandName) return;
+                        const brandCb = document.querySelector(`.brand-checkbox[data-brand="${CSS.escape(brandName)}"]`);
+                        if (!brandCb) return;
+
+                        // التحقق هل يوجد فرع واحد على الأقل محدد لنفس البراند
+                        const siblingBranches = document.querySelectorAll(`.branch-checkbox[data-brand="${CSS.escape(brandName)}"]`);
+                        const anyChecked = Array.from(siblingBranches).some(cb => cb.checked);
+                        brandCb.checked = anyChecked; // يتم تحديد البراند إذا وجد فرع واحد على الأقل، ويُلغى إذا أُلغيت كل الفروع
+                    });
+                });
+
                 document.getElementById('select-all-brands').addEventListener('change', (e) => {
-                    document.querySelectorAll('.brand-checkbox').forEach(cb => cb.checked = e.target.checked);
+                    const isChecked = e.target.checked;
+                    document.querySelectorAll('.brand-checkbox').forEach(cb => cb.checked = isChecked);
+                    document.querySelectorAll('.branch-checkbox').forEach(cb => cb.checked = isChecked);
                 });
+
                 document.getElementById('select-all-branches').addEventListener('change', (e) => {
-                    document.querySelectorAll('.branch-checkbox').forEach(cb => cb.checked = e.target.checked);
+                    const isChecked = e.target.checked;
+                    document.querySelectorAll('.branch-checkbox').forEach(cb => cb.checked = isChecked);
+                    document.querySelectorAll('.brand-checkbox').forEach(cb => cb.checked = isChecked);
                 });
+
                 document.getElementById('select-all-pages').addEventListener('change', (e) => {
                     document.querySelectorAll('.page-checkbox').forEach(cb => cb.checked = e.target.checked);
                 });
