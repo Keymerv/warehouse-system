@@ -84,7 +84,7 @@
                 </div>
             </div>
 
-            <!-- شريط الفلترة والأزرار (تم إعادة الترتيب الصحيح: الفلتر يمين، وزر الإضافة يسار كما في صورتك الأولى) -->
+            <!-- شريط الفلترة والأزرار -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-slate-900 border border-slate-800 p-3 rounded-xl">
                 <!-- قسم الفلترة في اليمين -->
                 <div class="flex flex-wrap items-center gap-2" id="filter-buttons-container">
@@ -105,51 +105,86 @@
         </div>
     </main>
 
-    <!-- نافذة إضافة فرع جديد -->
+    <!-- نافذة إضافة فرع جديد (محدثة بالكامل مع خيارات البراند والعنوان المزدوج) -->
     <div id="add-branch-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h3 class="font-bold text-sm text-slate-100" data-i18n="modal_title">إضافة فرع أو براند جديد</h3>
                 <button onclick="closeAddBranchModal()" class="text-slate-400 hover:text-white text-base">&times;</button>
             </div>
-            <form id="add-branch-form" class="space-y-3">
+            
+            <form id="add-branch-form" class="space-y-4">
+                
+                <!-- 1. تحديد نوع البراند (موجود مسبقاً أم جديد) -->
+                <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-2.5">
+                    <label class="block text-indigo-400 text-[11px] font-bold" data-i18n="select_brand_type">اختيار البراند التابع له الفرع:</label>
+                    <div class="flex items-center gap-4 text-xs">
+                        <label class="flex items-center gap-2 cursor-pointer text-slate-300">
+                            <input type="radio" name="brand_type" id="type-existing-brand" value="existing" checked onclick="toggleBrandInputType()" class="text-indigo-600 focus:ring-0 bg-slate-900 border-slate-700">
+                            <span data-i18n="type_existing">براند موجود مسبقاً</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer text-slate-300">
+                            <input type="radio" name="brand_type" id="type-new-brand" value="new" onclick="toggleBrandInputType()" class="text-indigo-600 focus:ring-0 bg-slate-900 border-slate-700">
+                            <span data-i18n="type_new">+ براند جديد</span>
+                        </label>
+                    </div>
+
+                    <!-- قائمة اختيار براند موجود -->
+                    <div id="existing-brand-container" class="pt-1">
+                        <select id="existing-brand-select" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs">
+                            <option value="">-- اختر البراند --</option>
+                        </select>
+                    </div>
+
+                    <!-- إدخال براند جديد (مخفي افتراضياً) -->
+                    <div id="new-brand-container" class="grid grid-cols-1 md:grid-cols-2 gap-3 hidden pt-1">
+                        <div>
+                            <label class="block text-slate-400 text-[11px] mb-1" data-i18n="label_brand_ar">اسم البراند (بالعربي)</label>
+                            <input type="text" id="brand-name-ar" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs" placeholder="مثال: براند مطاعم البرجر">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 text-[11px] mb-1" data-i18n="label_brand_en">اسم البراند (بالإنجليزي)</label>
+                            <input type="text" id="brand-name-en" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs" placeholder="e.g. Burger Restaurant Brand">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. أسماء الفرع -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-slate-400 text-[11px] mb-1" data-i18n="label_branch_ar">اسم الفرع (بالعربي)</label>
-                        <input type="text" id="branch-name-ar" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500" placeholder="مثال: فرع التحلية">
+                        <input type="text" id="branch-name-ar" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs" placeholder="مثال: فرع التحلية">
                     </div>
                     <div>
                         <label class="block text-slate-400 text-[11px] mb-1" data-i18n="label_branch_en">اسم الفرع (بالإنجليزي)</label>
-                        <input type="text" id="branch-name-en" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500" placeholder="e.g. Tahlia Branch">
+                        <input type="text" id="branch-name-en" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs" placeholder="e.g. Tahlia Branch">
                     </div>
                 </div>
 
+                <!-- 3. العنوان أو الموقع (بالعربي والإنجليزي) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-slate-400 text-[11px] mb-1" data-i18n="label_brand_ar">اسم البراند (بالعربي)</label>
-                        <input type="text" id="brand-name-ar" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500" placeholder="مثال: براند مطاعم البرجر">
+                        <label class="block text-slate-400 text-[11px] mb-1" data-i18n="label_location_ar">العنوان / الموقع (بالعربي)</label>
+                        <input type="text" id="branch-location-ar" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs" placeholder="مثال: شارع التحلية، الرياض">
                     </div>
                     <div>
-                        <label class="block text-slate-400 text-[11px] mb-1" data-i18n="label_brand_en">اسم البراند (بالإنجليزي)</label>
-                        <input type="text" id="brand-name-en" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500" placeholder="e.g. Burger Restaurant Brand">
+                        <label class="block text-slate-400 text-[11px] mb-1" data-i18n="label_location_en">العنوان / الموقع (بالإنجليزي)</label>
+                        <input type="text" id="branch-location-en" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs" placeholder="e.g. Tahlia Street, Riyadh">
                     </div>
-                </div>
-
-                <div>
-                    <label class="block text-slate-400 text-[11px] mb-1" data-i18n="label_location">الموقع أو العنوان</label>
-                    <input type="text" id="branch-location" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500" placeholder="مثال: شارع التحلية، الرياض">
                 </div>
 
                 <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
                     <button type="button" onclick="closeAddBranchModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg font-medium transition" data-i18n="btn_cancel">إلغاء</button>
-                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded-lg font-medium transition" data-i18n="btn_save">حفظ الفرع</button>
+                    <button type="submit" id="save-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded-lg font-medium transition" data-i18n="btn_save">حفظ الفرع</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- السكربت الأول: واجهة المستخدم والترجمة والأزرار (مستقل ويعمل 100% فوراً دون أي اعتماد على أخطاء الاتصال) -->
-    <script>
+    <!-- سكربت موحد ومتكامل لضمان الاتصال والترجمة والفلترة 100% -->
+    <script type="module">
+        import { supabase } from './assets/js/supabase-client.js';
+
         let allBranchesData = [];
         let currentLang = localStorage.getItem('lang') || 'ar';
 
@@ -175,15 +210,20 @@
                 edit_manager_btn: "تعديل المدير",
                 no_branches_msg: "لا توجد فروع أو براندات مضافة حالياً.",
                 modal_title: "إضافة فرع أو براند جديد",
+                select_brand_type: "اختيار البراند التابع له الفرع:",
+                type_existing: "براند موجود مسبقاً",
+                type_new: "+ براند جديد",
                 label_branch_ar: "اسم الفرع (بالعربي)",
                 label_branch_en: "اسم الفرع (بالإنجليزي)",
                 label_brand_ar: "اسم البراند (بالعربي)",
                 label_brand_en: "اسم البراند (بالإنجليزي)",
-                label_location: "الموقع أو العنوان",
+                label_location_ar: "العنوان / الموقع (بالعربي)",
+                label_location_en: "العنوان / الموقع (بالإنجليزي)",
                 btn_cancel: "إلغاء",
                 btn_save: "حفظ الفرع",
                 location_text: "الموقع:",
-                status_text: "الحالة:"
+                status_text: "الحالة:",
+                select_brand_placeholder: "-- اختر البراند --"
             },
             en: {
                 branches_title: "Branches & Brands - Keymerv Warehouse",
@@ -206,36 +246,208 @@
                 edit_manager_btn: "Edit Manager",
                 no_branches_msg: "No branches or brands added yet.",
                 modal_title: "Add New Branch or Brand",
+                select_brand_type: "Select Brand for this Branch:",
+                type_existing: "Existing Brand",
+                type_new: "+ New Brand",
                 label_branch_ar: "Branch Name (Arabic)",
                 label_branch_en: "Branch Name (English)",
                 label_brand_ar: "Brand Name (Arabic)",
                 label_brand_en: "Brand Name (English)",
-                label_location: "Location / Address",
+                label_location_ar: "Address / Location (Arabic)",
+                label_location_en: "Address / Location (English)",
                 btn_cancel: "Cancel",
                 btn_save: "Save Branch",
                 location_text: "Location:",
-                status_text: "Status:"
+                status_text: "Status:",
+                select_brand_placeholder: "-- Select Brand --"
             }
         };
 
-        // دوال النوافذ (تفتح وتغلق مباشرة دون شروط)
-        function openAddBranchModal() {
-            const modal = document.getElementById('add-branch-modal');
-            if (modal) {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
+        // جلب البيانات من Supabase
+        async function fetchBranches() {
+            try {
+                const { data, error } = await supabase.from('branches').select('*').order('created_at', { ascending: false });
+                if (error) throw error;
+
+                allBranchesData = data || [];
+                renderBranches(allBranchesData);
+                updateStatsAndFilters(allBranchesData);
+            } catch (err) {
+                console.error('Error fetching branches:', err);
+                const container = document.getElementById('branches-container');
+                if (container) {
+                    container.innerHTML = `<div class="text-center py-8 text-rose-400 font-bold">فشل جلب البيانات: ${err.message}<br><span class="text-xs text-slate-500">تأكد من تفعيل سياسات القراءة (RLS) في Supabase</span></div>`;
+                }
             }
         }
 
-        function closeAddBranchModal() {
+        // رسم كروت الفروع
+        function renderBranches(branches) {
+            const container = document.getElementById('branches-container');
+            if (!container) return;
+
+            if (branches.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-slate-500">${branchesTranslations[currentLang].no_branches_msg}</div>`;
+                return;
+            }
+
+            container.innerHTML = branches.map(b => {
+                let namesArr = (b.name || '').split(' / ');
+                let branchName = currentLang === 'ar' ? (namesArr[0] || b.name) : (namesArr[1] || namesArr[0] || b.name);
+                
+                let brandMatch = (b.location || '').match(/\[Brand:\s*(.*?)\s*-\s*(.*?)\]/);
+                let brandAr = brandMatch ? brandMatch[1] : 'براند عام';
+                let brandEn = brandMatch ? brandMatch[2] : 'General Brand';
+                let brandName = currentLang === 'ar' ? brandAr : brandEn;
+                let brandClass = brandEn.trim().replace(/\s+/g, '-').toLowerCase();
+
+                let locWithoutBrand = (b.location || '').replace(/\[Brand:.*?\]/, '').trim();
+                let locParts = locWithoutBrand.split(' / ');
+                let cleanLocation = currentLang === 'ar' ? (locParts[0] || locWithoutBrand) : (locParts[1] || locParts[0] || locWithoutBrand);
+
+                return `
+                <div class="branch-card bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-3" data-brand="${brandClass}">
+                    <div class="flex items-start gap-3">
+                        <div class="w-9 h-9 bg-indigo-600/10 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-sm">🏢</div>
+                        <div>
+                            <span class="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded">${brandName}</span>
+                            <h3 class="font-bold text-sm text-slate-100 mt-0.5">${branchName}</h3>
+                            <p class="text-[11px] text-slate-400 mt-0.5">${branchesTranslations[currentLang].location_text} <span class="font-mono text-slate-200">${cleanLocation || 'غير محدد'}</span> | ${branchesTranslations[currentLang].status_text} ${b.status || 'نشط'}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2.5 w-full md:w-auto justify-between md:justify-end">
+                        <span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 rounded-full text-[11px] font-semibold">${b.status || branchesTranslations[currentLang].status_active}</span>
+                        <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded-lg text-xs font-medium transition">${branchesTranslations[currentLang].edit_manager_btn}</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // تحديث الإحصائيات وأزرار الفلترة
+        function updateStatsAndFilters(branches) {
+            const totalBranchesEl = document.getElementById('total-branches-count');
+            if (totalBranchesEl) totalBranchesEl.innerText = branches.length;
+
+            const uniqueBrandsMap = new Map();
+            branches.forEach(b => {
+                let m = (b.location || '').match(/\[Brand:\s*(.*?)\s*-\s*(.*?)\]/);
+                let bAr = m ? m[1].trim() : 'براند عام';
+                let bEn = m ? m[2].trim() : 'General Brand';
+                let key = bEn.replace(/\s+/g, '-').toLowerCase();
+                uniqueBrandsMap.set(key, { ar: bAr, en: bEn });
+            });
+            
+            const totalBrandsEl = document.getElementById('total-brands-count');
+            if (totalBrandsEl) totalBrandsEl.innerText = branches.length === 0 ? 0 : uniqueBrandsMap.size;
+
+            const filterContainer = document.getElementById('filter-buttons-container');
+            if (!filterContainer) return;
+
+            let filterHtml = `<span class="text-slate-400 text-[11px] font-semibold ml-2" data-i18n="filter_label">${branchesTranslations[currentLang].filter_label}</span>
+                              <button onclick="filterBranches('all')" id="btn-all" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" data-i18n="filter_all">${branchesTranslations[currentLang].filter_all}</button>`;
+
+            uniqueBrandsMap.forEach((val, key) => {
+                let name = currentLang === 'ar' ? val.ar : val.en;
+                filterHtml += `<button onclick="filterBranches('${key}')" id="btn-${key}" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition">${name}</button>`;
+            });
+
+            filterContainer.innerHTML = filterHtml;
+        }
+
+        // تعبئة قائمة البراندات المسبقة في نافذة الإضافة
+        function populateExistingBrandsSelect() {
+            const select = document.getElementById('existing-brand-select');
+            const uniqueBrands = new Map();
+            allBranchesData.forEach(b => {
+                let m = (b.location || '').match(/\[Brand:\s*(.*?)\s*-\s*(.*?)\]/);
+                if (m) {
+                    let key = `${m[1].trim()}|${m[2].trim()}`;
+                    uniqueBrands.set(key, { ar: m[1].trim(), en: m[2].trim() });
+                }
+            });
+
+            const existingRadio = document.getElementById('type-existing-brand');
+            const newRadio = document.getElementById('type-new-brand');
+
+            if (uniqueBrands.size === 0) {
+                newRadio.checked = true;
+                if(existingRadio) existingRadio.disabled = true;
+                window.toggleBrandInputType();
+            } else {
+                if(existingRadio) {
+                    existingRadio.disabled = false;
+                    existingRadio.checked = true;
+                }
+                window.toggleBrandInputType();
+                
+                let optionsHtml = `<option value="">${branchesTranslations[currentLang].select_brand_placeholder}</option>`;
+                uniqueBrands.forEach((val, key) => {
+                    optionsHtml += `<option value="${key}">${currentLang === 'ar' ? val.ar : val.en} (${val.ar} / ${val.en})</option>`;
+                });
+                select.innerHTML = optionsHtml;
+            }
+        }
+
+        // ربط الدوال بنافذة الـ Window لتستجيب لـ onclick فوراً
+        window.openAddBranchModal = function() {
+            const modal = document.getElementById('add-branch-modal');
+            if (modal) {
+                populateExistingBrandsSelect();
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        };
+
+        window.closeAddBranchModal = function() {
             const modal = document.getElementById('add-branch-modal');
             if (modal) {
                 modal.classList.remove('flex');
                 modal.classList.add('hidden');
             }
-        }
+        };
 
-        // الترجمة الفورية
+        window.toggleBrandInputType = function() {
+            const isNew = document.getElementById('type-new-brand').checked;
+            const existingContainer = document.getElementById('existing-brand-container');
+            const newContainer = document.getElementById('new-brand-container');
+            const brandArInput = document.getElementById('brand-name-ar');
+            const brandEnInput = document.getElementById('brand-name-en');
+            const existingSelect = document.getElementById('existing-brand-select');
+
+            if (isNew) {
+                existingContainer.classList.add('hidden');
+                newContainer.classList.remove('hidden');
+                newContainer.classList.add('grid');
+                brandArInput.required = true;
+                brandEnInput.required = true;
+                existingSelect.required = false;
+            } else {
+                existingContainer.classList.remove('hidden');
+                newContainer.classList.add('hidden');
+                newContainer.classList.remove('grid');
+                brandArInput.required = false;
+                brandEnInput.required = false;
+                existingSelect.required = true;
+            }
+        };
+
+        window.filterBranches = function(brandId) {
+            document.querySelectorAll('#filter-buttons-container button').forEach(btn => {
+                btn.className = "bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition";
+            });
+            const activeBtn = document.getElementById('btn-' + brandId);
+            if (activeBtn) activeBtn.className = "bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition";
+
+            const cards = document.querySelectorAll('.branch-card');
+            cards.forEach(card => {
+                if (brandId === 'all' || card.getAttribute('data-brand') === brandId) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        };
+
         function applyBranchesLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('lang', lang);
@@ -262,157 +474,73 @@
             updateStatsAndFilters(allBranchesData);
         }
 
-        function toggleLanguage() {
+        window.toggleLanguage = function() {
             const newLang = currentLang === 'ar' ? 'en' : 'ar';
             applyBranchesLanguage(newLang);
-        }
+        };
 
-        // الفلترة
-        function filterBranches(brandId) {
-            document.querySelectorAll('#filter-buttons-container button').forEach(btn => {
-                btn.className = "bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition";
-            });
-            const activeBtn = document.getElementById('btn-' + brandId);
-            if (activeBtn) activeBtn.className = "bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition";
-
-            const cards = document.querySelectorAll('.branch-card');
-            cards.forEach(card => {
-                if (brandId === 'all' || card.getAttribute('data-brand') === brandId) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
-
-        // رسم الفروع في الصفحة
-        function renderBranches(branches) {
-            const container = document.getElementById('branches-container');
-            if (!container) return;
-
-            if (branches.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-slate-500">${branchesTranslations[currentLang].no_branches_msg}</div>`;
-                return;
-            }
-
-            container.innerHTML = branches.map(b => {
-                let namesArr = (b.name || '').split(' / ');
-                let branchName = currentLang === 'ar' ? (namesArr[0] || b.name) : (namesArr[1] || namesArr[0] || b.name);
-                
-                let brandMatch = (b.location || '').match(/\[Brand:\s*(.*?)\s*-\s*(.*?)\]/);
-                let brandAr = brandMatch ? brandMatch[1] : 'براند عام';
-                let brandEn = brandMatch ? brandMatch[2] : 'General Brand';
-                let brandName = currentLang === 'ar' ? brandAr : brandEn;
-                let brandClass = brandEn.replace(/\s+/g, '-').toLowerCase();
-
-                let cleanLocation = (b.location || '').replace(/\[Brand:.*?\]/, '').trim();
-
-                return `
-                <div class="branch-card bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-3" data-brand="${brandClass}">
-                    <div class="flex items-start gap-3">
-                        <div class="w-9 h-9 bg-indigo-600/10 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-sm">🏢</div>
-                        <div>
-                            <span class="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded">${brandName}</span>
-                            <h3 class="font-bold text-sm text-slate-100 mt-0.5">${branchName}</h3>
-                            <p class="text-[11px] text-slate-400 mt-0.5">${branchesTranslations[currentLang].location_text} <span class="font-mono text-slate-200">${cleanLocation || 'غير محدد'}</span> | ${branchesTranslations[currentLang].status_text} ${b.status || 'نشط'}</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2.5 w-full md:w-auto justify-between md:justify-end">
-                        <span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 rounded-full text-[11px] font-semibold">${b.status || branchesTranslations[currentLang].status_active}</span>
-                        <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded-lg text-xs font-medium transition">${branchesTranslations[currentLang].edit_manager_btn}</button>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        // تحديث إحصائيات الفلتر والأرقام
-        function updateStatsAndFilters(branches) {
-            const totalBranchesEl = document.getElementById('total-branches-count');
-            if (totalBranchesEl) totalBranchesEl.innerText = branches.length;
-
-            const uniqueBrands = new Set(branches.map(b => {
-                let m = (b.location || '').match(/\[Brand:\s*(.*?)\s*-\s*(.*?)\]/);
-                return m ? m[2] : 'general';
-            })).size;
-            
-            const totalBrandsEl = document.getElementById('total-brands-count');
-            if (totalBrandsEl) totalBrandsEl.innerText = branches.length === 0 ? 0 : uniqueBrands;
-
-            const filterContainer = document.getElementById('filter-buttons-container');
-            if (!filterContainer) return;
-
-            let filterHtml = `<span class="text-slate-400 text-[11px] font-semibold ml-2" data-i18n="filter_label">${branchesTranslations[currentLang].filter_label}</span>
-                              <button onclick="filterBranches('all')" id="btn-all" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition" data-i18n="filter_all">${branchesTranslations[currentLang].filter_all}</button>`;
-
-            const brandsMap = new Map();
-            branches.forEach(b => {
-                let m = (b.location || '').match(/\[Brand:\s*(.*?)\s*-\s*(.*?)\]/);
-                let bAr = m ? m[1] : 'براند عام';
-                let bEn = m ? m[2] : 'General Brand';
-                let key = bEn.replace(/\s+/g, '-').toLowerCase();
-                let name = currentLang === 'ar' ? bAr : bEn;
-                brandsMap.set(key, name);
-            });
-
-            brandsMap.forEach((name, key) => {
-                filterHtml += `<button onclick="filterBranches('${key}')" id="btn-${key}" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition">${name}</button>`;
-            });
-
-            filterContainer.innerHTML = filterHtml;
-        }
-
-        // تشغيل اللغة فوراً عند التحميل
-        window.addEventListener('DOMContentLoaded', () => {
-            applyBranchesLanguage(currentLang);
-        });
-    </script>
-
-    <!-- السكربت الثاني: خاص بقاعدة البيانات فقط (Supabase) -->
-    <script type="module">
-        import { supabase } from './assets/js/supabase-client.js';
-
-        async function fetchBranches() {
-            try {
-                const { data, error } = await supabase.from('branches').select('*').order('created_at', { ascending: false });
-                if (error) throw error;
-
-                allBranchesData = data || [];
-                renderBranches(allBranchesData);
-                updateStatsAndFilters(allBranchesData);
-            } catch (err) {
-                console.error('Error fetching branches:', err);
-            }
-        }
-
+        // إرسال النموذج وحفظ الفرع في Supabase
         const addForm = document.getElementById('add-branch-form');
         if (addForm) {
             addForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const name_ar = document.getElementById('branch-name-ar').value;
-                const name_en = document.getElementById('branch-name-en').value;
-                const brand_ar = document.getElementById('brand-name-ar').value;
-                const brand_en = document.getElementById('brand-name-en').value;
-                const location = document.getElementById('branch-location').value;
                 
+                const isNewBrand = document.getElementById('type-new-brand').checked;
+                let brand_ar = '', brand_en = '';
+
+                if (isNewBrand) {
+                    brand_ar = document.getElementById('brand-name-ar').value.trim();
+                    brand_en = document.getElementById('brand-name-en').value.trim();
+                } else {
+                    const selectVal = document.getElementById('existing-brand-select').value;
+                    if (!selectVal) {
+                        alert(currentLang === 'ar' ? 'الرجاء اختيار براند من القائمة' : 'Please select a brand');
+                        return;
+                    }
+                    const parts = selectVal.split('|');
+                    brand_ar = parts[0];
+                    brand_en = parts[1];
+                }
+
+                const branch_ar = document.getElementById('branch-name-ar').value.trim();
+                const branch_en = document.getElementById('branch-name-en').value.trim();
+                const loc_ar = document.getElementById('branch-location-ar').value.trim();
+                const loc_en = document.getElementById('branch-location-en').value.trim();
+
+                const full_name = `${branch_ar} / ${branch_en}`;
+                const full_location = `${loc_ar} / ${loc_en} [Brand: ${brand_ar} - ${brand_en}]`;
+                
+                const saveBtn = document.getElementById('save-btn');
+                saveBtn.disabled = true;
+                saveBtn.innerText = currentLang === 'ar' ? 'جاري الحفظ...' : 'Saving...';
+
                 try {
-                    const { error } = await supabase.from('branches').insert([{
-                        name: `${name_ar} / ${name_en}`,
-                        location: `${location} [Brand: ${brand_ar} - ${brand_en}]`,
+                    const { data, error } = await supabase.from('branches').insert([{
+                        name: full_name,
+                        location: full_location,
                         status: 'نشط'
-                    }]);
+                    }]).select();
 
                     if (error) throw error;
 
-                    closeAddBranchModal();
+                    window.closeAddBranchModal();
                     addForm.reset();
-                    fetchBranches();
+                    await fetchBranches();
                 } catch (err) {
-                    alert('حدث خطأ أثناء حفظ الفرع في قاعدة البيانات: ' + err.message);
+                    alert('حدث خطأ أثناء حفظ الفرع في قاعدة البيانات: \n' + err.message + '\n\nتنبيه: تأكد أن سياسات RLS في Supabase تسمح بـ INSERT');
+                    console.error('Insert error:', err);
+                } finally {
+                    saveBtn.disabled = false;
+                    saveBtn.innerText = branchesTranslations[currentLang].btn_save;
                 }
             });
         }
 
-        fetchBranches();
+        // التشغيل المبدئي عند التحميل
+        document.addEventListener('DOMContentLoaded', () => {
+            applyBranchesLanguage(currentLang);
+            fetchBranches();
+        });
     </script>
 </body>
 </html>
