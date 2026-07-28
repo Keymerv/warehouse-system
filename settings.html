@@ -60,7 +60,7 @@
             <!-- رسالة التنبيه العامة -->
             <div id="settings-feedback" class="hidden px-4 py-3 rounded-xl text-xs text-center font-medium"></div>
 
-            <!-- 1. قسم بيانات المنشأة (يظهر للجميع: الأدمن والموظفين) -->
+            <!-- 1. قسم بيانات المنشأة (يظهر للجميع) -->
             <div id="general-settings-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <h3 class="text-sm font-bold text-indigo-400" data-i18n="general_settings_title">بيانات المنشأة الرئيسية</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
@@ -141,7 +141,7 @@
                 </div>
             </div>
 
-            <!-- 4. أمان الحساب (يظهر للجميع: الأدمن والموظفين) -->
+            <!-- 4. أمان الحساب (يظهر للجميع) -->
             <div id="security-settings-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <h3 class="text-sm font-bold text-indigo-400" data-i18n="security_title">أمان الحساب وكلمة المرور</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
@@ -205,7 +205,10 @@
                 <div class="space-y-3 pt-3 border-t border-slate-800">
                     <div class="flex justify-between items-center mb-1">
                         <label class="text-slate-400 font-semibold" data-i18n="modal_label_pages">صلاحيات الوصول للصفحات (تحديد ما يمكنه زيارته)</label>
-                        <label class="cursor-pointer text-indigo-400 text-[11px]"><input type="checkbox" id="select-all-pages" checked class="ml-1"> <span data-i18n="select_all_pages">السماح بكل الصفحات</span></label>
+                        <label class="cursor-pointer text-indigo-400 text-[11px] flex items-center gap-1">
+                            <input type="checkbox" id="select-all-pages" checked class="rounded bg-slate-900 border-slate-700 text-indigo-600"> 
+                            <span data-i18n="select_all_pages">السماح بكل الصفحات</span>
+                        </label>
                     </div>
                     <div id="pages-checkboxes-container" class="bg-slate-950 border border-slate-800 rounded-xl p-3 max-h-36 overflow-y-auto grid grid-cols-2 gap-2 text-[11px]">
                         <label class="flex items-center gap-2 cursor-pointer text-slate-300">
@@ -250,7 +253,6 @@
     <script type="module">
         import { supabase } from './assets/js/supabase.js';
 
-        // 1. قاموس الترجمات المحدث
         const translations = {
             ar: {
                 settings_title: "الإعدادات - Keymerv Warehouse",
@@ -370,7 +372,6 @@
         let currentAdminUserId = null;
         let isSuperAdmin = false;
 
-        // 2. تطبيق اللغة
         window.toggleLanguage = function() {
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
             localStorage.setItem('keymerv_lang', currentLang);
@@ -397,14 +398,12 @@
             });
         }
 
-        // 3. التحقق من صلاحيات الحساب وإخفاء الأقسام للموظفين
         async function verifyUserPermissions() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (session && session.user) {
                     currentAdminUserId = session.user.id;
                     
-                    // محاولة جلب بيانات مستخدم السشن الحالية
                     let profileRes = await supabase.from('users').select('*').eq('id', session.user.id).single();
                     if (profileRes.error) {
                         profileRes = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
@@ -413,16 +412,13 @@
                     const profile = profileRes.data;
                     document.getElementById('sidebar-user-email').innerText = session.user.email || 'admin@keymerv.com';
 
-                    // إذا كان الحساب هو الأدمن المباشر (ليس له created_by أو رتبته admin/owner)
                     if (!profile || !profile.created_by || profile.role === 'admin' || profile.role === 'owner') {
                         isSuperAdmin = true;
                         document.getElementById('sidebar-user-role').innerText = translations[currentLang]['user_role_admin'];
-                        // إظهار الأقسام الكاملة للأدمن
                         document.getElementById('team-settings-card')?.classList.remove('hidden');
                         document.getElementById('inventory-config-card')?.classList.remove('hidden');
                         loadUsers();
                     } else {
-                        // الموظف المضاف عبر الأدمن: تخفى عنه أقسام إدارة الفريق والتنبيهات
                         isSuperAdmin = false;
                         const roleName = (translations[currentLang] && translations[currentLang][`role_${profile.role}`]) || profile.role;
                         document.getElementById('sidebar-user-role').innerText = roleName;
@@ -431,20 +427,17 @@
                         document.getElementById('inventory-config-card')?.classList.add('hidden');
                     }
                 } else {
-                    // في حال عدم وجود جلسة مباشرة، نعتبره الأدمن افتراضياً للتطوير
                     isSuperAdmin = true;
                     document.getElementById('sidebar-user-role').innerText = translations[currentLang]['user_role_admin'];
                     loadUsers();
                 }
             } catch (err) {
                 console.error("Permission check error:", err);
-                // الافتراضي في حال عدم الربط بعد
                 isSuperAdmin = true;
                 loadUsers();
             }
         }
 
-        // 4. أزرار التبديل (Toggles)
         window.toggleSwitch = function(btn) {
             const isChecked = btn.classList.contains('bg-indigo-600');
             const thumb = btn.querySelector('div');
@@ -461,7 +454,6 @@
             }
         };
 
-        // 5. فتح وإغلاق النافذة المنبثقة
         window.openAddUserModal = function() {
             document.getElementById('addUserModal').classList.remove('hidden');
             document.getElementById('modal-bottom-feedback').classList.add('hidden');
@@ -472,9 +464,10 @@
             document.getElementById('create-user-form').reset();
             document.getElementById('name-error').classList.add('hidden');
             document.getElementById('modal-bottom-feedback').classList.add('hidden');
+            if (selectAllPagesCheckbox) selectAllPagesCheckbox.checked = true;
+            pageCheckboxes.forEach(cb => cb.checked = true);
         };
 
-        // 6. جلب قائمة المستخدمين
         async function loadUsers() {
             if (!isSuperAdmin) return;
             const tableBody = document.getElementById('users-table-body');
@@ -523,7 +516,6 @@
             }
         }
 
-        // 7. حذف مستخدم
         window.deleteUser = async function(userId) {
             if (!confirm('هل أنت تأكد من رغبتك في حذف هذا المستخدم نهائياً؟')) return;
             try {
@@ -538,32 +530,52 @@
             }
         };
 
-        // 8. التحقق من اسم العضو بالإنجليزي
+        // 1. المنع الفوري لأي إدخال غير الحروف الإنجليزية والمسافات
         const nameInput = document.getElementById('new-member-name');
         const nameError = document.getElementById('name-error');
 
-        nameInput.addEventListener('input', () => {
-            const englishRegex = /^[A-Za-z\s]*$/;
-            if (!englishRegex.test(nameInput.value)) {
+        nameInput.addEventListener('input', (e) => {
+            const originalValue = e.target.value;
+            // مسح أي حرف غير إنجليزي أو رموز أو أرقام فوراً أثناء الكتابة
+            const sanitizedValue = originalValue.replace(/[^A-Za-z\s]/g, '');
+
+            if (originalValue !== sanitizedValue) {
+                e.target.value = sanitizedValue;
                 nameError.classList.remove('hidden');
             } else {
                 nameError.classList.add('hidden');
             }
         });
 
-        document.getElementById('select-all-pages')?.addEventListener('change', (e) => {
-            document.querySelectorAll('.page-checkbox').forEach(cb => cb.checked = e.target.checked);
+        // 2. المزامنة التلقائية لمربعات اختيار الصلاحيات مع زر "السماح بكل الصفحات"
+        const selectAllPagesCheckbox = document.getElementById('select-all-pages');
+        const pageCheckboxes = document.querySelectorAll('.page-checkbox');
+
+        selectAllPagesCheckbox?.addEventListener('change', (e) => {
+            pageCheckboxes.forEach(cb => cb.checked = e.target.checked);
         });
 
-        // 9. إضافة مستخدم جديد وربطه بالأدمن
+        pageCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                const total = pageCheckboxes.length;
+                const checkedCount = document.querySelectorAll('.page-checkbox:checked').length;
+
+                if (selectAllPagesCheckbox) {
+                    // يتحدد تلقائياً فقط إذا جرى تحديد كافة الصفحات، ويتلغى تلقائياً بمجرد إزالة واحدة أو أكثر
+                    selectAllPagesCheckbox.checked = (total === checkedCount && total > 0);
+                }
+            });
+        });
+
+        // 3. إضافة مستخدم جديد للنظام
         document.getElementById('create-user-form').addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const feedback = document.getElementById('modal-bottom-feedback');
             const submitBtn = document.getElementById('submit-user-btn');
 
-            const englishRegex = /^[A-Za-z\s]+$/;
             const nameVal = nameInput.value.trim();
+            const englishRegex = /^[A-Za-z\s]+$/;
 
             if (!englishRegex.test(nameVal)) {
                 nameError.classList.remove('hidden');
@@ -587,7 +599,7 @@
                     email: email,
                     role: role,
                     allowed_pages: allowedPages,
-                    created_by: currentAdminUserId || null, // ربط المستخدم المضاف بيوزر الأدمن
+                    created_by: currentAdminUserId || null,
                     created_at: new Date().toISOString()
                 };
 
@@ -608,14 +620,18 @@
             } catch (err) {
                 console.error("Error creating user:", err);
                 feedback.className = "px-3 py-2 rounded-xl text-xs text-center font-medium bg-rose-950 border border-rose-800 text-rose-300 block";
-                feedback.innerText = 'فشل إنشاء الحساب: ' + (err.message || 'خطأ غير معروف');
+                
+                if (err.message && err.message.includes('allowed_pages')) {
+                    feedback.innerText = 'تنبيه: يجب إضافة عمود allowed_pages في SQL Editor لقاعدة البيانات أولاً.';
+                } else {
+                    feedback.innerText = 'فشل إنشاء الحساب: ' + (err.message || 'خطأ غير معروف');
+                }
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerText = translations[currentLang]['btn_submit_user'];
             }
         });
 
-        // 10. حفظ الإعدادات
         document.getElementById('save-changes-btn').addEventListener('click', () => {
             const feedback = document.getElementById('settings-feedback');
             feedback.className = "px-4 py-3 rounded-xl text-xs text-center font-medium bg-emerald-950 border border-emerald-800 text-emerald-300 block";
@@ -626,7 +642,6 @@
             }, 3000);
         });
 
-        // التشغيل الأولي
         applyLanguage(currentLang);
         verifyUserPermissions();
     </script>
