@@ -44,7 +44,7 @@
             </nav>
         </div>
 
-        <!-- معلومات المستخدم والوظيفة والبريد -->
+        <!-- معلومات المستخدم والوظيفة والبريد الإلكتروني -->
         <div class="p-3 border-t border-slate-800 flex items-center justify-between">
             <div>
                 <p class="font-bold text-slate-200 text-xs" id="user-name" data-i18n="user_name">أحمد الغامدي</p>
@@ -108,7 +108,6 @@
                 </div>
 
                 <div class="flex items-center gap-2 w-full lg:w-auto justify-end">
-                    <!-- زر الحذف المجمع (يظهر فقط عند التحديد) -->
                     <button id="bulk-delete-btn" onclick="deleteSelected()" class="hidden bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-600/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5" data-i18n="delete_selected_btn">
                         🗑️ حذف المحدد (<span id="selected-count">0</span>)
                     </button>
@@ -159,13 +158,13 @@
                             </tr>
                         </thead>
                         <tbody class="text-xs divide-y divide-slate-800/40" id="inventory-table-body">
-                            <tr class="inventory-row" data-status="available">
+                            <tr class="inventory-row" data-status="available" data-name-ar="لحم برجر مجمد (أصلي)" data-name-en="Frozen Beef Burger (Original)" data-cat-ar="مستودع اللحوم" data-cat-en="Meat Warehouse">
                                 <td class="py-3 px-3 text-center">
                                     <input type="checkbox" onchange="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0 cursor-pointer">
                                 </td>
                                 <td class="py-3 px-3 font-mono text-indigo-300 row-sku">SKU-BRG-001</td>
                                 <td class="py-3 px-3 font-bold text-slate-200 row-name">لحم برجر مجمد (أصلي)</td>
-                                <td class="py-3 px-3 text-slate-400 row-category">مستودع اللحوم والبراندات</td>
+                                <td class="py-3 px-3 text-slate-400 row-category">مستودع اللحوم</td>
                                 <td class="py-3 px-3 font-bold text-indigo-400 row-qty">1,450</td>
                                 <td class="py-3 px-3 font-semibold text-slate-400 row-min">200</td>
                                 <td class="py-3 px-3 text-slate-400 row-unit">قطعة</td>
@@ -174,7 +173,7 @@
                                     <button onclick="openModal('edit', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded text-[11px] font-medium transition" data-i18n="edit_btn">تعديل</button>
                                 </td>
                             </tr>
-                            <tr class="inventory-row" data-status="low">
+                            <tr class="inventory-row" data-status="low" data-name-ar="خبز برجر بطاطس" data-name-en="Potato Burger Bun" data-cat-ar="المخابز والمخازن الجافة" data-cat-en="Bakery & Dry Storage">
                                 <td class="py-3 px-3 text-center">
                                     <input type="checkbox" onchange="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0 cursor-pointer">
                                 </td>
@@ -189,36 +188,6 @@
                                     <button onclick="openModal('edit', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded text-[11px] font-medium transition" data-i18n="edit_btn">تعديل</button>
                                 </td>
                             </tr>
-                            <tr class="inventory-row" data-status="available">
-                                <td class="py-3 px-3 text-center">
-                                    <input type="checkbox" onchange="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0 cursor-pointer">
-                                </td>
-                                <td class="py-3 px-3 font-mono text-indigo-300 row-sku">SKU-SRC-105</td>
-                                <td class="py-3 px-3 font-bold text-slate-200 row-name">صوص الصيل الخاص</td>
-                                <td class="py-3 px-3 text-slate-400 row-category">الصلصات والمواد السائلة</td>
-                                <td class="py-3 px-3 font-bold text-indigo-400 row-qty">620</td>
-                                <td class="py-3 px-3 font-semibold text-slate-400 row-min">150</td>
-                                <td class="py-3 px-3 text-slate-400 row-unit">عبوة</td>
-                                <td class="py-3 px-3"><span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full text-[11px] status-badge" data-i18n="status_available">متوفر</span></td>
-                                <td class="py-3 px-3 text-center">
-                                    <button onclick="openModal('edit', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded text-[11px] font-medium transition" data-i18n="edit_btn">تعديل</button>
-                                </td>
-                            </tr>
-                            <tr class="inventory-row" data-status="out">
-                                <td class="py-3 px-3 text-center">
-                                    <input type="checkbox" onchange="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0 cursor-pointer">
-                                </td>
-                                <td class="py-3 px-3 font-mono text-indigo-300 row-sku">SKU-PKG-019</td>
-                                <td class="py-3 px-3 font-bold text-slate-200 row-name">أكياس تعبئة ورق 1 كجم</td>
-                                <td class="py-3 px-3 text-slate-400 row-category">مستودع التغليف</td>
-                                <td class="py-3 px-3 font-bold text-rose-400 row-qty">0</td>
-                                <td class="py-3 px-3 font-semibold text-slate-400 row-min">50</td>
-                                <td class="py-3 px-3 text-slate-400 row-unit">شدة</td>
-                                <td class="py-3 px-3"><span class="bg-rose-500/10 text-rose-400 px-2 py-0.5 rounded-full text-[11px] status-badge" data-i18n="status_out">منتهي</span></td>
-                                <td class="py-3 px-3 text-center">
-                                    <button onclick="openModal('edit', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded text-[11px] font-medium transition" data-i18n="edit_btn">تعديل</button>
-                                </td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -226,43 +195,77 @@
         </div>
     </main>
 
-    <!-- Modal النافذة المنبثقة للإضافة/التعديل المحدثة -->
+    <!-- Modal النافذة المنبثقة للنموذج والتحقق الذكي -->
     <div id="item-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-md p-5 space-y-4 shadow-xl">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-lg p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h3 id="modal-title" class="font-bold text-slate-200 text-sm">إضافة صنف جديد</h3>
                 <button onclick="closeModal()" class="text-slate-400 hover:text-white text-lg font-bold">&times;</button>
             </div>
             
-            <form id="item-form" onsubmit="handleFormSubmit(event)" class="space-y-3">
-                <div>
-                    <label class="block text-[11px] text-slate-400 mb-1">كود SKU</label>
-                    <input type="text" id="modal-sku" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+            <form id="item-form" onsubmit="handleFormSubmit(event)" novalidate class="space-y-3">
+                
+                <!-- كود SKU -->
+                <div class="field-container">
+                    <label class="block text-[11px] text-slate-400 mb-1">كود SKU <span class="text-rose-500">*</span></label>
+                    <input type="text" id="modal-sku" class="form-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                    <span class="error-msg hidden text-rose-500 text-[10px] mt-1 block"></span>
                 </div>
-                <div>
-                    <label class="block text-[11px] text-slate-400 mb-1">اسم الصنف</label>
-                    <input type="text" id="modal-name" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-[11px] text-slate-400 mb-1">التصنيف</label>
-                    <input type="text" id="modal-category" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-[11px] text-slate-400 mb-1">الكمية الحالية</label>
-                        <input type="number" id="modal-qty" min="0" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+
+                <!-- اسم الصنف بالعربي والانجليزي -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="field-container">
+                        <label class="block text-[11px] text-slate-400 mb-1">اسم الصنف (بالعربي) <span class="text-rose-500">*</span></label>
+                        <input type="text" id="modal-name-ar" class="form-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                        <span class="error-msg hidden text-rose-500 text-[10px] mt-1 block"></span>
                     </div>
-                    <div>
-                        <label class="block text-[11px] text-amber-400 mb-1">الحد الأدنى للتنبيه ⚠️</label>
-                        <input type="number" id="modal-min" min="1" required placeholder="مثال: 50" class="w-full bg-slate-950 border border-amber-500/30 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-amber-500">
+
+                    <div class="field-container">
+                        <label class="block text-[11px] text-slate-400 mb-1">Item Name (English) <span class="text-rose-500">*</span></label>
+                        <input type="text" id="modal-name-en" dir="ltr" class="form-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                        <span class="error-msg hidden text-rose-500 text-[10px] mt-1 block"></span>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-[11px] text-slate-400 mb-1">الوحدة</label>
-                        <input type="text" id="modal-unit" placeholder="قطعة, كيس..." required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+
+                <!-- التصنيف بالعربي والانجليزي -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="field-container">
+                        <label class="block text-[11px] text-slate-400 mb-1">التصنيف (بالعربي) <span class="text-rose-500">*</span></label>
+                        <input type="text" id="modal-cat-ar" class="form-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                        <span class="error-msg hidden text-rose-500 text-[10px] mt-1 block"></span>
                     </div>
-                    <div>
+
+                    <div class="field-container">
+                        <label class="block text-[11px] text-slate-400 mb-1">Category (English) <span class="text-rose-500">*</span></label>
+                        <input type="text" id="modal-cat-en" dir="ltr" class="form-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                        <span class="error-msg hidden text-rose-500 text-[10px] mt-1 block"></span>
+                    </div>
+                </div>
+
+                <!-- الكمية والحد الأدنى -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="field-container">
+                        <label class="block text-[11px] text-slate-400 mb-1">الكمية الحالية <span class="text-rose-500">*</span></label>
+                        <input type="number" id="modal-qty" min="0" class="form-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                        <span class="error-msg hidden text-rose-500 text-[10px] mt-1 block"></span>
+                    </div>
+
+                    <div class="field-container">
+                        <label class="block text-[11px] text-amber-400 mb-1">الحد الأدنى للتنبيه ⚠️ <span class="text-rose-500">*</span></label>
+                        <input type="number" id="modal-min" min="1" placeholder="مثال: 50" class="form-input w-full bg-slate-950 border border-amber-500/30 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-amber-500">
+                        <span class="error-msg hidden text-rose-500 text-[10px] mt-1 block"></span>
+                    </div>
+                </div>
+
+                <!-- الوحدة والحالة -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="field-container">
+                        <label class="block text-[11px] text-slate-400 mb-1">الوحدة <span class="text-rose-500">*</span></label>
+                        <input type="text" id="modal-unit" placeholder="قطعة, كيس..." class="form-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                        <span class="error-msg hidden text-rose-500 text-[10px] mt-1 block"></span>
+                    </div>
+
+                    <div class="field-container">
                         <label class="block text-[11px] text-slate-400 mb-1">الحالة</label>
                         <select id="modal-status" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
                             <option value="available">متوفر</option>
@@ -280,11 +283,71 @@
         </div>
     </div>
 
-    <!-- محرك البرمجة والترجمة والتحديد -->
+    <!-- JavaScript المحدث بالكامل -->
     <script>
         let editingRow = null;
+        let currentLang = localStorage.getItem('lang') || 'ar';
 
-        // وظائف تحديد العناصر والحذف الجملة
+        // إزالة أخطاء المدخلات ذكياً عند الكتابة
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputs = document.querySelectorAll('.form-input');
+            inputs.forEach(input => {
+                input.addEventListener('input', () => clearFieldError(input));
+            });
+            applyInventoryLanguage(currentLang);
+        });
+
+        function clearFieldError(input) {
+            const container = input.closest('.field-container');
+            if (!container) return;
+
+            const errorSpan = container.querySelector('.error-msg');
+            input.classList.remove('border-rose-500');
+            if (errorSpan) {
+                errorSpan.classList.add('hidden');
+                errorSpan.innerText = '';
+            }
+        }
+
+        function showFieldError(input, message) {
+            const container = input.closest('.field-container');
+            if (!container) return;
+
+            const errorSpan = container.querySelector('.error-msg');
+            input.classList.add('border-rose-500');
+            if (errorSpan) {
+                errorSpan.innerText = message;
+                errorSpan.classList.remove('hidden');
+            }
+        }
+
+        function validateModalForm() {
+            let isValid = true;
+            const requiredFields = [
+                { id: 'modal-sku', msgAr: 'كود SKU مطلوب', msgEn: 'SKU code is required' },
+                { id: 'modal-name-ar', msgAr: 'اسم الصنف بالعربي مطلوب', msgEn: 'Arabic name is required' },
+                { id: 'modal-name-en', msgAr: 'اسم الصنف بالانجليزي مطلوب', msgEn: 'English name is required' },
+                { id: 'modal-cat-ar', msgAr: 'التصنيف بالعربي مطلوب', msgEn: 'Arabic category is required' },
+                { id: 'modal-cat-en', msgAr: 'التصنيف بالانجليزي مطلوب', msgEn: 'English category is required' },
+                { id: 'modal-qty', msgAr: 'الكمية الحالية مطلوبة', msgEn: 'Current quantity is required' },
+                { id: 'modal-min', msgAr: 'الحد الأدنى مطلوب', msgEn: 'Minimum limit is required' },
+                { id: 'modal-unit', msgAr: 'الوحدة مطلوبة', msgEn: 'Unit is required' }
+            ];
+
+            requiredFields.forEach(field => {
+                const input = document.getElementById(field.id);
+                if (!input || !input.value.trim()) {
+                    const msg = currentLang === 'ar' ? field.msgAr : field.msgEn;
+                    showFieldError(input, msg);
+                    isValid = false;
+                } else {
+                    clearFieldError(input);
+                }
+            });
+
+            return isValid;
+        }
+
         function toggleSelectAll(masterCheckbox) {
             const checkboxes = document.querySelectorAll('.row-checkbox');
             checkboxes.forEach(cb => {
@@ -318,9 +381,7 @@
                 : `Are you sure you want to delete ${selectedCheckboxes.length} item(s)?`;
 
             if (confirm(confirmMessage)) {
-                selectedCheckboxes.forEach(cb => {
-                    cb.closest('tr').remove();
-                });
+                selectedCheckboxes.forEach(cb => cb.closest('tr').remove());
                 document.getElementById('select-all').checked = false;
                 updateSelection();
                 filterInventory();
@@ -381,6 +442,9 @@
             const modal = document.getElementById('item-modal');
             const title = document.getElementById('modal-title');
             
+            // تنظيف كل الأخطاء عند الفتح
+            document.querySelectorAll('.form-input').forEach(input => clearFieldError(input));
+
             if (mode === 'add') {
                 editingRow = null;
                 title.innerText = currentLang === 'ar' ? 'إضافة صنف جديد' : 'Add New Item';
@@ -390,8 +454,10 @@
                 title.innerText = currentLang === 'ar' ? 'تعديل صنف' : 'Edit Item';
 
                 document.getElementById('modal-sku').value = editingRow.querySelector('.row-sku').innerText;
-                document.getElementById('modal-name').value = editingRow.querySelector('.row-name').innerText;
-                document.getElementById('modal-category').value = editingRow.querySelector('.row-category').innerText;
+                document.getElementById('modal-name-ar').value = editingRow.getAttribute('data-name-ar') || editingRow.querySelector('.row-name').innerText;
+                document.getElementById('modal-name-en').value = editingRow.getAttribute('data-name-en') || '';
+                document.getElementById('modal-cat-ar').value = editingRow.getAttribute('data-cat-ar') || editingRow.querySelector('.row-category').innerText;
+                document.getElementById('modal-cat-en').value = editingRow.getAttribute('data-cat-en') || '';
                 document.getElementById('modal-qty').value = editingRow.querySelector('.row-qty').innerText.replace(/,/g, '');
                 document.getElementById('modal-min').value = editingRow.querySelector('.row-min').innerText.replace(/,/g, '');
                 document.getElementById('modal-unit').value = editingRow.querySelector('.row-unit').innerText;
@@ -410,17 +476,21 @@
 
         function handleFormSubmit(event) {
             event.preventDefault();
+
+            if (!validateModalForm()) return;
             
             const sku = document.getElementById('modal-sku').value;
-            const name = document.getElementById('modal-name').value;
-            const category = document.getElementById('modal-category').value;
+            const nameAr = document.getElementById('modal-name-ar').value;
+            const nameEn = document.getElementById('modal-name-en').value;
+            const catAr = document.getElementById('modal-cat-ar').value;
+            const catEn = document.getElementById('modal-cat-en').value;
+            
             const rawQty = parseInt(document.getElementById('modal-qty').value);
             const rawMin = parseInt(document.getElementById('modal-min').value);
             const qty = rawQty.toLocaleString();
             const min = rawMin.toLocaleString();
             const unit = document.getElementById('modal-unit').value;
             
-            // تحديد حالة المنتج تلقائياً بناءً على الحد الأدنى لو أراد المستخدم
             let status = document.getElementById('modal-status').value;
             if (rawQty === 0) status = 'out';
             else if (rawQty <= rawMin) status = 'low';
@@ -429,11 +499,19 @@
             let statusColor = status === 'available' ? 'bg-emerald-500/10 text-emerald-400' : (status === 'low' ? 'bg-amber-500/10 text-amber-400' : 'bg-rose-500/10 text-rose-400');
             let qtyColor = status === 'available' ? 'text-indigo-400' : (status === 'low' ? 'text-amber-400' : 'text-rose-400');
 
+            const displayName = currentLang === 'ar' ? nameAr : nameEn;
+            const displayCat = currentLang === 'ar' ? catAr : catEn;
+
             if (editingRow) {
                 editingRow.setAttribute('data-status', status);
+                editingRow.setAttribute('data-name-ar', nameAr);
+                editingRow.setAttribute('data-name-en', nameEn);
+                editingRow.setAttribute('data-cat-ar', catAr);
+                editingRow.setAttribute('data-cat-en', catEn);
+
                 editingRow.querySelector('.row-sku').innerText = sku;
-                editingRow.querySelector('.row-name').innerText = name;
-                editingRow.querySelector('.row-category').innerText = category;
+                editingRow.querySelector('.row-name').innerText = displayName;
+                editingRow.querySelector('.row-category').innerText = displayCat;
                 editingRow.querySelector('.row-qty').innerText = qty;
                 editingRow.querySelector('.row-qty').className = `py-3 px-3 font-bold ${qtyColor} row-qty`;
                 editingRow.querySelector('.row-min').innerText = min;
@@ -448,13 +526,18 @@
                 const newRow = document.createElement('tr');
                 newRow.className = 'inventory-row';
                 newRow.setAttribute('data-status', status);
+                newRow.setAttribute('data-name-ar', nameAr);
+                newRow.setAttribute('data-name-en', nameEn);
+                newRow.setAttribute('data-cat-ar', catAr);
+                newRow.setAttribute('data-cat-en', catEn);
+
                 newRow.innerHTML = `
                     <td class="py-3 px-3 text-center">
                         <input type="checkbox" onchange="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0 cursor-pointer">
                     </td>
                     <td class="py-3 px-3 font-mono text-indigo-300 row-sku">${sku}</td>
-                    <td class="py-3 px-3 font-bold text-slate-200 row-name">${name}</td>
-                    <td class="py-3 px-3 text-slate-400 row-category">${category}</td>
+                    <td class="py-3 px-3 font-bold text-slate-200 row-name">${displayName}</td>
+                    <td class="py-3 px-3 text-slate-400 row-category">${displayCat}</td>
                     <td class="py-3 px-3 font-bold ${qtyColor} row-qty">${qty}</td>
                     <td class="py-3 px-3 font-semibold text-slate-400 row-min">${min}</td>
                     <td class="py-3 px-3 text-slate-400 row-unit">${unit}</td>
@@ -472,20 +555,22 @@
 
         function downloadCSV() {
             let csv = '\uFEFF'; 
-            csv += 'كود SKU,اسم الصنف,التصنيف,الكمية الحالية,الحد الأدنى,الوحدة,الحالة\n';
+            csv += 'كود SKU,اسم الصنف بالعربي,Item Name (EN),التصنيف بالعربي,Category (EN),الكمية الحالية,الحد الأدنى,الوحدة,الحالة\n';
 
             const rows = document.querySelectorAll('.inventory-row');
             rows.forEach(row => {
                 if (row.style.display !== 'none') {
                     const sku = row.querySelector('.row-sku').innerText;
-                    const name = `"${row.querySelector('.row-name').innerText}"`;
-                    const cat = `"${row.querySelector('.row-category').innerText}"`;
+                    const nameAr = `"${row.getAttribute('data-name-ar') || ''}"`;
+                    const nameEn = `"${row.getAttribute('data-name-en') || ''}"`;
+                    const catAr = `"${row.getAttribute('data-cat-ar') || ''}"`;
+                    const catEn = `"${row.getAttribute('data-cat-en') || ''}"`;
                     const qty = row.querySelector('.row-qty').innerText.replace(/,/g, '');
                     const min = row.querySelector('.row-min').innerText.replace(/,/g, '');
                     const unit = row.querySelector('.row-unit').innerText;
                     const status = row.querySelector('.status-badge').innerText;
 
-                    csv += `${sku},${name},${cat},${qty},${min},${unit},${status}\n`;
+                    csv += `${sku},${nameAr},${nameEn},${catAr},${catEn},${qty},${min},${unit},${status}\n`;
                 }
             });
 
@@ -579,8 +664,6 @@
             }
         };
 
-        let currentLang = localStorage.getItem('lang') || 'ar';
-
         function applyInventoryLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('lang', lang);
@@ -608,6 +691,17 @@
                 }
             });
 
+            // تحديث طريقة عرض الأسماء والاقسام بحسب اللغة المخزنة
+            document.querySelectorAll('.inventory-row').forEach(row => {
+                const nameAr = row.getAttribute('data-name-ar');
+                const nameEn = row.getAttribute('data-name-en');
+                const catAr = row.getAttribute('data-cat-ar');
+                const catEn = row.getAttribute('data-cat-en');
+
+                if (nameAr && nameEn) row.querySelector('.row-name').innerText = lang === 'ar' ? nameAr : nameEn;
+                if (catAr && catEn) row.querySelector('.row-category').innerText = lang === 'ar' ? catAr : catEn;
+            });
+
             filterInventory();
         }
 
@@ -615,10 +709,6 @@
             const newLang = currentLang === 'ar' ? 'en' : 'ar';
             applyInventoryLanguage(newLang);
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            applyInventoryLanguage(currentLang);
-        });
     </script>
 </body>
 </html>
