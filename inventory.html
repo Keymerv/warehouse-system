@@ -73,7 +73,7 @@
                 <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div>
                         <p class="text-slate-400 text-[11px]" data-i18n="stat_total_items">إجمالي الأصناف</p>
-                        <h3 id="stat-total" class="text-lg font-extrabold mt-0.5 text-indigo-400">4</h3>
+                        <h3 id="stat-total" class="text-lg font-extrabold mt-0.5 text-indigo-400">2</h3>
                     </div>
                     <div class="w-9 h-9 bg-indigo-600/10 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-sm">📦</div>
                 </div>
@@ -87,13 +87,13 @@
                 <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div>
                         <p class="text-slate-400 text-[11px]" data-i18n="stat_out_stock">أصناف منتهية</p>
-                        <h3 id="stat-out" class="text-lg font-extrabold mt-0.5 text-rose-400">1</h3>
+                        <h3 id="stat-out" class="text-lg font-extrabold mt-0.5 text-rose-400">0</h3>
                     </div>
                     <div class="w-9 h-9 bg-rose-600/10 text-rose-400 rounded-lg flex items-center justify-center font-bold text-sm">❌</div>
                 </div>
             </div>
 
-            <!-- شريط الأدوات والفلترة وزر التحميل والحذف الجملة -->
+            <!-- شريط الأدوات والفلترة واستيراد الإكسيل -->
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 bg-slate-900 border border-slate-800 p-3 rounded-xl">
                 
                 <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
@@ -107,14 +107,27 @@
                     </select>
                 </div>
 
-                <div class="flex items-center gap-2 w-full lg:w-auto justify-end">
+                <!-- أزرار الإكسيل والإضافة -->
+                <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end">
                     <button id="bulk-delete-btn" onclick="deleteSelected()" class="hidden bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-600/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5" data-i18n="delete_selected_btn">
                         🗑️ حذف المحدد (<span id="selected-count">0</span>)
                     </button>
 
-                    <button onclick="downloadCSV()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 border border-slate-700" data-i18n="download_all_btn">
-                        📥 تنزيل جميع الأصناف
+                    <!-- تنزيل نموذج الإكسيل -->
+                    <button onclick="downloadExcelTemplate()" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5" data-i18n="download_template_btn">
+                        📄 تنزيل نموذج الإكسيل
                     </button>
+
+                    <!-- رفع ملف إكسيل -->
+                    <label class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-md shadow-emerald-600/20 cursor-pointer flex items-center gap-1.5">
+                        <span>📊 رفع شيت الإكسيل</span>
+                        <input type="file" id="excel-file-input" accept=".csv" onchange="importExcelFile(event)" class="hidden">
+                    </label>
+
+                    <button onclick="downloadCSV()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 border border-slate-700" data-i18n="download_all_btn">
+                        📥 تصدير الأصناف
+                    </button>
+
                     <button onclick="openModal('add')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-md shadow-indigo-600/20" data-i18n="add_item_btn">
                         + إضافة صنف
                     </button>
@@ -136,7 +149,7 @@
                         <span data-i18n="pagination_per_page">صنف لكل صفحة</span>
                     </div>
                     <div>
-                        <span id="results-counter" class="font-bold text-indigo-400" data-i18n="pagination_info">عرض 4 من أصل 4 صنف</span>
+                        <span id="results-counter" class="font-bold text-indigo-400" data-i18n="pagination_info">عرض 2 من أصل 2 صنف</span>
                     </div>
                 </div>
 
@@ -158,7 +171,7 @@
                             </tr>
                         </thead>
                         <tbody class="text-xs divide-y divide-slate-800/40" id="inventory-table-body">
-                            <tr class="inventory-row" data-status="available" data-name-ar="لحم برجر مجمد (أصلي)" data-name-en="Frozen Beef Burger (Original)" data-cat-ar="مستودع اللحوم" data-cat-en="Meat Warehouse">
+                            <tr class="inventory-row" data-status="available" data-name-ar="لحم برجر مجمد (أصلي)" data-name-en="Frozen Beef Burger (Original)" data-cat-ar="مستودع اللحوم" data-cat-en="Meat Warehouse" data-unit-val="piece">
                                 <td class="py-3 px-3 text-center">
                                     <input type="checkbox" onchange="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0 cursor-pointer">
                                 </td>
@@ -167,13 +180,13 @@
                                 <td class="py-3 px-3 text-slate-400 row-category">مستودع اللحوم</td>
                                 <td class="py-3 px-3 font-bold text-indigo-400 row-qty">1,450</td>
                                 <td class="py-3 px-3 font-semibold text-slate-400 row-min">200</td>
-                                <td class="py-3 px-3 text-slate-400 row-unit">قطعة</td>
+                                <td class="py-3 px-3 text-slate-400 row-unit" data-i18n="unit_piece">قطعة</td>
                                 <td class="py-3 px-3"><span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full text-[11px] status-badge" data-i18n="status_available">متوفر</span></td>
                                 <td class="py-3 px-3 text-center">
                                     <button onclick="openModal('edit', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded text-[11px] font-medium transition" data-i18n="edit_btn">تعديل</button>
                                 </td>
                             </tr>
-                            <tr class="inventory-row" data-status="low" data-name-ar="خبز برجر بطاطس" data-name-en="Potato Burger Bun" data-cat-ar="المخابز والمخازن الجافة" data-cat-en="Bakery & Dry Storage">
+                            <tr class="inventory-row" data-status="low" data-name-ar="خبز برجر بطاطس" data-name-en="Potato Burger Bun" data-cat-ar="المخابز والمخازن الجافة" data-cat-en="Bakery & Dry Storage" data-unit-val="bag">
                                 <td class="py-3 px-3 text-center">
                                     <input type="checkbox" onchange="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0 cursor-pointer">
                                 </td>
@@ -182,7 +195,7 @@
                                 <td class="py-3 px-3 text-slate-400 row-category">المخابز والمخازن الجافة</td>
                                 <td class="py-3 px-3 font-bold text-amber-400 row-qty">85</td>
                                 <td class="py-3 px-3 font-semibold text-slate-400 row-min">100</td>
-                                <td class="py-3 px-3 text-slate-400 row-unit">كيس</td>
+                                <td class="py-3 px-3 text-slate-400 row-unit" data-i18n="unit_bag">كيس</td>
                                 <td class="py-3 px-3"><span class="bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-full text-[11px] status-badge" data-i18n="status_low">قارب على النفاذ</span></td>
                                 <td class="py-3 px-3 text-center">
                                     <button onclick="openModal('edit', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded text-[11px] font-medium transition" data-i18n="edit_btn">تعديل</button>
@@ -195,7 +208,7 @@
         </div>
     </main>
 
-    <!-- Modal النافذة المنبثقة للنموذج والتحقق الذكي -->
+    <!-- Modal النافذة المنبثقة -->
     <div id="item-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-lg p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -257,11 +270,17 @@
                     </div>
                 </div>
 
-                <!-- الوحدة والحالة -->
+                <!-- الوحدة (قائمة منسدلة) والحالة -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="field-container">
                         <label class="block text-[11px] text-slate-400 mb-1">الوحدة <span class="text-rose-500">*</span></label>
-                        <input type="text" id="modal-unit" placeholder="قطعة, كيس..." class="form-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                        <select id="modal-unit" class="form-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                            <option value="" disabled selected>اختر الوحدة...</option>
+                            <option value="piece" data-i18n="unit_piece">قطعة</option>
+                            <option value="bag" data-i18n="unit_bag">كيس</option>
+                            <option value="carton" data-i18n="unit_carton">كرتون</option>
+                            <option value="gram" data-i18n="unit_gram">بالغرام</option>
+                        </select>
                         <span class="error-msg hidden text-rose-500 text-[10px] mt-1 block"></span>
                     </div>
 
@@ -283,16 +302,16 @@
         </div>
     </div>
 
-    <!-- JavaScript المحدث بالكامل -->
+    <!-- JavaScript المحدث -->
     <script>
         let editingRow = null;
         let currentLang = localStorage.getItem('lang') || 'ar';
 
-        // إزالة أخطاء المدخلات ذكياً عند الكتابة
         document.addEventListener('DOMContentLoaded', () => {
             const inputs = document.querySelectorAll('.form-input');
             inputs.forEach(input => {
                 input.addEventListener('input', () => clearFieldError(input));
+                input.addEventListener('change', () => clearFieldError(input));
             });
             applyInventoryLanguage(currentLang);
         });
@@ -331,12 +350,12 @@
                 { id: 'modal-cat-en', msgAr: 'التصنيف بالانجليزي مطلوب', msgEn: 'English category is required' },
                 { id: 'modal-qty', msgAr: 'الكمية الحالية مطلوبة', msgEn: 'Current quantity is required' },
                 { id: 'modal-min', msgAr: 'الحد الأدنى مطلوب', msgEn: 'Minimum limit is required' },
-                { id: 'modal-unit', msgAr: 'الوحدة مطلوبة', msgEn: 'Unit is required' }
+                { id: 'modal-unit', msgAr: 'يرجى اختيار الوحدة', msgEn: 'Please select a unit' }
             ];
 
             requiredFields.forEach(field => {
                 const input = document.getElementById(field.id);
-                if (!input || !input.value.trim()) {
+                if (!input || !input.value || !input.value.trim()) {
                     const msg = currentLang === 'ar' ? field.msgAr : field.msgEn;
                     showFieldError(input, msg);
                     isValid = false;
@@ -346,6 +365,126 @@
             });
 
             return isValid;
+        }
+
+        // تنزيل شيت الإكسيل النموذج للمحاسب
+        function downloadExcelTemplate() {
+            let csv = '\uFEFF'; 
+            csv += 'SKU,Item Name (AR),Item Name (EN),Category (AR),Category (EN),Quantity,Min Limit,Unit (piece/bag/carton/gram)\n';
+            csv += 'SKU-EX-101,جبن شيدر شرائح,Cheddar Cheese Slices,الألبان والاجبان,Dairy,500,50,piece\n';
+            csv += 'SKU-EX-102,بطاطس مقلية,French Fries,المجمدات,Frozen Foods,120,30,carton\n';
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `inventory_import_template.csv`;
+            link.click();
+        }
+
+        // استيراد وقراءة شيت الإكسيل المرفوع
+        function importExcelFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const lines = content.split('\n');
+                
+                let addedCount = 0;
+                const tbody = document.getElementById('inventory-table-body');
+
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+
+                    const cols = line.split(',').map(col => col.replace(/^"(.*)"$/, '$1').trim());
+                    if (cols.length >= 8) {
+                        const [sku, nameAr, nameEn, catAr, catEn, rawQty, rawMin, unitKey] = cols;
+                        
+                        const qtyNum = parseInt(rawQty) || 0;
+                        const minNum = parseInt(rawMin) || 0;
+                        
+                        let status = 'available';
+                        if (qtyNum === 0) status = 'out';
+                        else if (qtyNum <= minNum) status = 'low';
+
+                        let validUnit = ['piece', 'bag', 'carton', 'gram'].includes(unitKey.toLowerCase()) ? unitKey.toLowerCase() : 'piece';
+
+                        createOrUpdateRow(null, sku, nameAr, nameEn, catAr, catEn, qtyNum, minNum, validUnit, status);
+                        addedCount++;
+                    }
+                }
+
+                alert(currentLang === 'ar' ? `تم استيراد ${addedCount} صنف بنجاح!` : `Successfully imported ${addedCount} items!`);
+                filterInventory();
+                event.target.value = '';
+            };
+
+            reader.readAsText(file);
+        }
+
+        function createOrUpdateRow(targetRow, sku, nameAr, nameEn, catAr, catEn, rawQty, rawMin, unitKey, status) {
+            const qty = rawQty.toLocaleString();
+            const min = rawMin.toLocaleString();
+
+            let statusText = inventoryTranslations[currentLang][`status_${status}`];
+            let statusColor = status === 'available' ? 'bg-emerald-500/10 text-emerald-400' : (status === 'low' ? 'bg-amber-500/10 text-amber-400' : 'bg-rose-500/10 text-rose-400');
+            let qtyColor = status === 'available' ? 'text-indigo-400' : (status === 'low' ? 'text-amber-400' : 'text-rose-400');
+
+            const displayName = currentLang === 'ar' ? nameAr : nameEn;
+            const displayCat = currentLang === 'ar' ? catAr : catEn;
+            const displayUnit = inventoryTranslations[currentLang][`unit_${unitKey}`] || unitKey;
+
+            if (targetRow) {
+                targetRow.setAttribute('data-status', status);
+                targetRow.setAttribute('data-name-ar', nameAr);
+                targetRow.setAttribute('data-name-en', nameEn);
+                targetRow.setAttribute('data-cat-ar', catAr);
+                targetRow.setAttribute('data-cat-en', catEn);
+                targetRow.setAttribute('data-unit-val', unitKey);
+
+                targetRow.querySelector('.row-sku').innerText = sku;
+                targetRow.querySelector('.row-name').innerText = displayName;
+                targetRow.querySelector('.row-category').innerText = displayCat;
+                targetRow.querySelector('.row-qty').innerText = qty;
+                targetRow.querySelector('.row-qty').className = `py-3 px-3 font-bold ${qtyColor} row-qty`;
+                targetRow.querySelector('.row-min').innerText = min;
+                targetRow.querySelector('.row-unit').innerText = displayUnit;
+                targetRow.querySelector('.row-unit').setAttribute('data-i18n', `unit_${unitKey}`);
+                
+                const badge = targetRow.querySelector('.status-badge');
+                badge.className = `${statusColor} px-2 py-0.5 rounded-full text-[11px] status-badge`;
+                badge.innerText = statusText;
+                badge.setAttribute('data-i18n', `status_${status}`);
+            } else {
+                const tbody = document.getElementById('inventory-table-body');
+                const newRow = document.createElement('tr');
+                newRow.className = 'inventory-row';
+                newRow.setAttribute('data-status', status);
+                newRow.setAttribute('data-name-ar', nameAr);
+                newRow.setAttribute('data-name-en', nameEn);
+                newRow.setAttribute('data-cat-ar', catAr);
+                newRow.setAttribute('data-cat-en', catEn);
+                newRow.setAttribute('data-unit-val', unitKey);
+
+                newRow.innerHTML = `
+                    <td class="py-3 px-3 text-center">
+                        <input type="checkbox" onchange="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0 cursor-pointer">
+                    </td>
+                    <td class="py-3 px-3 font-mono text-indigo-300 row-sku">${sku}</td>
+                    <td class="py-3 px-3 font-bold text-slate-200 row-name">${displayName}</td>
+                    <td class="py-3 px-3 text-slate-400 row-category">${displayCat}</td>
+                    <td class="py-3 px-3 font-bold ${qtyColor} row-qty">${qty}</td>
+                    <td class="py-3 px-3 font-semibold text-slate-400 row-min">${min}</td>
+                    <td class="py-3 px-3 text-slate-400 row-unit" data-i18n="unit_${unitKey}">${displayUnit}</td>
+                    <td class="py-3 px-3"><span class="${statusColor} px-2 py-0.5 rounded-full text-[11px] status-badge" data-i18n="status_${status}">${statusText}</span></td>
+                    <td class="py-3 px-3 text-center">
+                        <button onclick="openModal('edit', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded text-[11px] font-medium transition" data-i18n="edit_btn">تعديل</button>
+                    </td>
+                `;
+                tbody.appendChild(newRow);
+            }
         }
 
         function toggleSelectAll(masterCheckbox) {
@@ -442,7 +581,6 @@
             const modal = document.getElementById('item-modal');
             const title = document.getElementById('modal-title');
             
-            // تنظيف كل الأخطاء عند الفتح
             document.querySelectorAll('.form-input').forEach(input => clearFieldError(input));
 
             if (mode === 'add') {
@@ -460,7 +598,7 @@
                 document.getElementById('modal-cat-en').value = editingRow.getAttribute('data-cat-en') || '';
                 document.getElementById('modal-qty').value = editingRow.querySelector('.row-qty').innerText.replace(/,/g, '');
                 document.getElementById('modal-min').value = editingRow.querySelector('.row-min').innerText.replace(/,/g, '');
-                document.getElementById('modal-unit').value = editingRow.querySelector('.row-unit').innerText;
+                document.getElementById('modal-unit').value = editingRow.getAttribute('data-unit-val') || 'piece';
                 document.getElementById('modal-status').value = editingRow.getAttribute('data-status');
             }
 
@@ -487,67 +625,13 @@
             
             const rawQty = parseInt(document.getElementById('modal-qty').value);
             const rawMin = parseInt(document.getElementById('modal-min').value);
-            const qty = rawQty.toLocaleString();
-            const min = rawMin.toLocaleString();
-            const unit = document.getElementById('modal-unit').value;
+            const unitVal = document.getElementById('modal-unit').value;
             
             let status = document.getElementById('modal-status').value;
             if (rawQty === 0) status = 'out';
             else if (rawQty <= rawMin) status = 'low';
 
-            let statusText = inventoryTranslations[currentLang][`status_${status}`];
-            let statusColor = status === 'available' ? 'bg-emerald-500/10 text-emerald-400' : (status === 'low' ? 'bg-amber-500/10 text-amber-400' : 'bg-rose-500/10 text-rose-400');
-            let qtyColor = status === 'available' ? 'text-indigo-400' : (status === 'low' ? 'text-amber-400' : 'text-rose-400');
-
-            const displayName = currentLang === 'ar' ? nameAr : nameEn;
-            const displayCat = currentLang === 'ar' ? catAr : catEn;
-
-            if (editingRow) {
-                editingRow.setAttribute('data-status', status);
-                editingRow.setAttribute('data-name-ar', nameAr);
-                editingRow.setAttribute('data-name-en', nameEn);
-                editingRow.setAttribute('data-cat-ar', catAr);
-                editingRow.setAttribute('data-cat-en', catEn);
-
-                editingRow.querySelector('.row-sku').innerText = sku;
-                editingRow.querySelector('.row-name').innerText = displayName;
-                editingRow.querySelector('.row-category').innerText = displayCat;
-                editingRow.querySelector('.row-qty').innerText = qty;
-                editingRow.querySelector('.row-qty').className = `py-3 px-3 font-bold ${qtyColor} row-qty`;
-                editingRow.querySelector('.row-min').innerText = min;
-                editingRow.querySelector('.row-unit').innerText = unit;
-                
-                const badge = editingRow.querySelector('.status-badge');
-                badge.className = `${statusColor} px-2 py-0.5 rounded-full text-[11px] status-badge`;
-                badge.innerText = statusText;
-                badge.setAttribute('data-i18n', `status_${status}`);
-            } else {
-                const tbody = document.getElementById('inventory-table-body');
-                const newRow = document.createElement('tr');
-                newRow.className = 'inventory-row';
-                newRow.setAttribute('data-status', status);
-                newRow.setAttribute('data-name-ar', nameAr);
-                newRow.setAttribute('data-name-en', nameEn);
-                newRow.setAttribute('data-cat-ar', catAr);
-                newRow.setAttribute('data-cat-en', catEn);
-
-                newRow.innerHTML = `
-                    <td class="py-3 px-3 text-center">
-                        <input type="checkbox" onchange="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0 cursor-pointer">
-                    </td>
-                    <td class="py-3 px-3 font-mono text-indigo-300 row-sku">${sku}</td>
-                    <td class="py-3 px-3 font-bold text-slate-200 row-name">${displayName}</td>
-                    <td class="py-3 px-3 text-slate-400 row-category">${displayCat}</td>
-                    <td class="py-3 px-3 font-bold ${qtyColor} row-qty">${qty}</td>
-                    <td class="py-3 px-3 font-semibold text-slate-400 row-min">${min}</td>
-                    <td class="py-3 px-3 text-slate-400 row-unit">${unit}</td>
-                    <td class="py-3 px-3"><span class="${statusColor} px-2 py-0.5 rounded-full text-[11px] status-badge" data-i18n="status_${status}">${statusText}</span></td>
-                    <td class="py-3 px-3 text-center">
-                        <button onclick="openModal('edit', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded text-[11px] font-medium transition" data-i18n="edit_btn">تعديل</button>
-                    </td>
-                `;
-                tbody.appendChild(newRow);
-            }
+            createOrUpdateRow(editingRow, sku, nameAr, nameEn, catAr, catEn, rawQty, rawMin, unitVal, status);
 
             closeModal();
             filterInventory();
@@ -604,7 +688,8 @@
                 filter_low: "قاربت على النفاذ",
                 filter_out: "الأصناف المنتهية",
                 delete_selected_btn: "🗑️ حذف المحدد",
-                download_all_btn: "📥 تنزيل جميع الأصناف",
+                download_template_btn: "📄 تنزيل نموذج الإكسيل",
+                download_all_btn: "📥 تصدير الأصناف",
                 add_item_btn: "+ إضافة صنف",
                 th_sku: "كود SKU",
                 th_item_name: "اسم الصنف",
@@ -617,10 +702,14 @@
                 status_available: "متوفر",
                 status_low: "قارب على النفاذ",
                 status_out: "منتهي",
+                unit_piece: "قطعة",
+                unit_bag: "كيس",
+                unit_carton: "كرتون",
+                unit_gram: "بالغرام",
                 edit_btn: "تعديل",
                 pagination_show: "عرض",
                 pagination_per_page: "صنف لكل صفحة",
-                pagination_info: "عرض 4 من أصل 4 صنف"
+                pagination_info: "عرض 2 من أصل 2 صنف"
             },
             en: {
                 inventory_title: "Inventory Management - Keymerv Warehouse",
@@ -644,7 +733,8 @@
                 filter_low: "Low Stock",
                 filter_out: "Out of Stock",
                 delete_selected_btn: "🗑️ Delete Selected",
-                download_all_btn: "📥 Download All Items",
+                download_template_btn: "📄 Download Template",
+                download_all_btn: "📥 Export Items",
                 add_item_btn: "+ Add Item",
                 th_sku: "SKU Code",
                 th_item_name: "Item Name",
@@ -657,10 +747,14 @@
                 status_available: "Available",
                 status_low: "Low Stock",
                 status_out: "Out of Stock",
+                unit_piece: "Piece",
+                unit_bag: "Bag",
+                unit_carton: "Carton",
+                unit_gram: "Gram",
                 edit_btn: "Edit",
                 pagination_show: "Show",
                 pagination_per_page: "items per page",
-                pagination_info: "Showing 4 of 4 items"
+                pagination_info: "Showing 2 of 2 items"
             }
         };
 
@@ -691,15 +785,18 @@
                 }
             });
 
-            // تحديث طريقة عرض الأسماء والاقسام بحسب اللغة المخزنة
             document.querySelectorAll('.inventory-row').forEach(row => {
                 const nameAr = row.getAttribute('data-name-ar');
                 const nameEn = row.getAttribute('data-name-en');
                 const catAr = row.getAttribute('data-cat-ar');
                 const catEn = row.getAttribute('data-cat-en');
+                const unitVal = row.getAttribute('data-unit-val');
 
                 if (nameAr && nameEn) row.querySelector('.row-name').innerText = lang === 'ar' ? nameAr : nameEn;
                 if (catAr && catEn) row.querySelector('.row-category').innerText = lang === 'ar' ? catAr : catEn;
+                if (unitVal && inventoryTranslations[lang][`unit_${unitVal}`]) {
+                    row.querySelector('.row-unit').innerText = inventoryTranslations[lang][`unit_${unitVal}`];
+                }
             });
 
             filterInventory();
