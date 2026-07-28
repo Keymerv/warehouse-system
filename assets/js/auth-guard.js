@@ -12,12 +12,7 @@ async function protectRoute() {
 
     // 2. معرفة اسم الصفحة الحالية تلقائياً من الرابط
     const path = window.location.pathname;
-    const pageName = path.split('/').pop().replace('.html', '');
-
-    // إذا كانت الصفحة هي الرئيسية أو تسجيل الدخول، يتخطى فحص الصلاحيات الفرعية
-    if (!pageName || pageName === 'dashboard' || pageName === 'index' || pageName === 'login') {
-        return;
-    }
+    const pageName = path.split('/').pop().replace('.html', '') || 'index';
 
     // 3. جلب بيانات دور المستخدم والصلاحيات المسموحة من جدول profiles
     const { data: profile, error: profileError } = await supabase
@@ -31,28 +26,102 @@ async function protectRoute() {
         return;
     }
 
-    // 4. إذا كان مدير/أدمن يتم السماح له بدخول كل الصفحات مباشرة
-    if (profile.role === 'admin' || profile.role === 'مدير') {
-        return;
-    }
-
-    // 5. التحقق مما إذا كانت الصفحة الحالية مسموحة للموظف
+    const isAdmin = profile.role === 'admin' || profile.role === 'مدير';
     const allowedPages = profile.allowed_pages || [];
 
-    // الربط التلقائي بين اسم الملف ومفتاح الصلاحية
-    let isAllowed = allowedPages.includes(pageName);
+    // 4. حماية الصفحة الحالية (إذا لم يكن أدمن ولم تكن صفحة عامة)
+    if (!isAdmin && pageName !== 'dashboard' && pageName !== 'index' && pageName !== 'login' && pageName !== '') {
+        let isAllowed = allowedPages.includes(pageName);
 
-    // معالجة خاصة لصفحة الطلبات (سواء سميت feeding أو orders)
-    if (pageName === 'orders' && (allowedPages.includes('feeding') || allowedPages.includes('orders'))) {
-        isAllowed = true;
+        // معالجة خاصة لصفحة الطلبات (سواء سميت feeding أو orders)
+        if (pageName === 'orders' && (allowedPages.includes('feeding') || allowedPages.includes('orders'))) {
+            isAllowed = true;
+        }
+
+        // إذا لم تكن الصفحة مسموحة، يظهر التنبيه ويتم توجيهه للرئيسية
+        if (!isAllowed) {
+            alert('تنبيه: لا تملك صلاحية لدخول هذه الصفحة!');
+            window.location.href = 'dashboard.html';
+            return;
+        }
     }
 
-    // إذا لم تكن الصفحة مسموحة، يظهر التنبيه ويتم توجيهه للرئيسية
-    if (!isAllowed) {
-        alert('تنبيه: لا تملك صلاحية لدخول هذه الصفحة!');
-        window.location.href = 'dashboard.html';
-    }
+    // 5. تطبيق شارات الصلاحيات على القائمة الجانبية (Sidebar)
+    updateSidebarUI(isAdmin, allowedPages);
 }
 
-// تنفيذ الحماية فور تحميل الصفحة
+// دالة تحديث شكل القائمة الجانبية وحظر الروابط غير المسموحة
+function updateSidebarUI(isAdmin, allowedPages) {
+    // إذا كان مديراً/أدمن، له كامل الصلاحيات ولا داعي لإضافة أي قيود
+    if (isAdmin) return;
+
+    // استهداف جميع روابط القائمة الجانبية
+    const sidebarLinks = document.querySelectorAll('aside a, .sidebar a, nav a, a[data-page]');
+
+    sidebarLinks.forEach(link => {
+        // معرفة اسم الصفحة من data-page أو من رابط href تلقائياً
+        let pageKey = link.getAttribute('data-page');
+
+        if (!pageKey) {
+            const href = link.getAttribute('href');
+            if (href && href !== '#' && !href.startsWith('javascript:')) {
+                pageKey = href.split('/').pop().replace('.html', '');
+            }
+        }
+
+        // تخطي الصفحات العامة والصفحة الرئيسية
+        if (!pageKey || pageKey === 'dashboard' || pageKey === 'index' || pageKey === 'login') {
+            return;
+        }
+
+        // التحقق من الصلاحية
+        let isAllowed = allowedPages.includes(pageKey);
+
+        // معالجة مخصصة للطلبات (orders / feeding)
+        if ((pageKey === 'orders' || pageKey === 'feeding') && 
+            (allowedPages.includes('feeding') || allowedPages.includes('orders'))) {
+            isAllowed = true;
+        }
+
+        // إذا كان لا يملك الصلاحية لهذه الصفحة
+        if (!isAllowed) {
+            // منع تكرار إضافة الوسم
+            if (link.querySelector('.no-perm-badge')) return;
+
+            // 1. إنشاء وسم "لا تمتلك صلاحية"
+            const badge = document.createElement('span');
+            badge.className = 'no-perm-badge';
+            badge.innerText = 'لا تمتلك صلاحية';
+            badge.style.cssText = `
+                font-size: 10px;
+                background-color: #ef4444;
+                color: #ffffff;
+                padding: 2px 6px;
+                border-radius: 4px;
+                margin-right: 8px;
+                display: inline-block;
+                white-space: nowrap;
+                font-weight: normal;
+            `;
+
+            // 2. ضبط تنسيق الرابط ليبدو معطلاً
+            link.style.display = 'flex';
+            link.style.alignItems = 'center';
+            link.style.justifyContent = 'space-between';
+            link.style.opacity = '0.5';
+            link.style.cursor = 'not-allowed';
+
+            // إضافة الوسم داخل الرابط
+            link.appendChild(badge);
+
+            // 3. منع الضغط تماماً على الرابط
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, true);
+        }
+    });
+}
+
+// تنفيذ الفحص والحماية
 protectRoute();
