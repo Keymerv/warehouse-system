@@ -249,11 +249,11 @@
 
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <label class="text-slate-400 font-semibold" data-i18n="modal_label_branches">الفروع المرتبطة</label>
-                            <label class="cursor-pointer text-indigo-400 text-[11px]"><input type="checkbox" id="select-all-branches" class="ml-1"> <span data-i18n="select_all_branches">كل الفروع</span></label>
+                            <label class="text-slate-400 font-semibold" data-i18n="modal_label_branches">الفروع المرتبطة (تظهر بناءً على البراندات المحددة)</label>
+                            <label class="cursor-pointer text-indigo-400 text-[11px]"><input type="checkbox" id="select-all-branches" class="ml-1"> <span data-i18n="select_all_branches">كل الفروع الظاهرة</span></label>
                         </div>
                         <div id="branches-checkboxes-container" class="bg-slate-950 border border-slate-800 rounded-xl p-3 max-h-32 overflow-y-auto space-y-2 text-[11px]">
-                            <span class="text-slate-500">جاري تحميل الفروع...</span>
+                            <span class="text-slate-500">الرجاء اختيار براند أولاً لعرض فروعه المرتبطة...</span>
                         </div>
                     </div>
                 </div>
@@ -462,7 +462,6 @@
             const modal = document.getElementById('addUserModal');
             modal.classList.remove('hidden');
             
-            // تفريغ خانات الإدخال تماماً لمنع ظهور البيانات المحفوظة مسبقاً
             document.getElementById('create-user-form').reset();
             document.getElementById('new-member-name').value = '';
             document.getElementById('new-member-email').value = '';
@@ -486,7 +485,6 @@
             document.getElementById('new-member-pass').value = '';
         }
 
-        // تفعيل أزرار التبديل (Toggles)
         window.toggleSwitch = function(btn) {
             const isRtl = document.documentElement.dir === 'rtl';
             const knob = btn.querySelector('div');
@@ -529,18 +527,18 @@
             e.target.value = filtered;
         });
 
+        // دالة جلب البراندات الحقيقية وربط ظهور الفروع باختيار البراند حصرياً
         async function loadBrandsAndBranchesSelection() {
             const brandsContainer = document.getElementById('brands-checkboxes-container');
             const branchesContainer = document.getElementById('branches-checkboxes-container');
 
             try {
-                // جلب الفروع والبراندات من قاعدة البيانات
-                const { data: branchesData, error: branchesError } = await supabase.from('branches').select('*');
+                const { data: branchesData } = await supabase.from('branches').select('*');
                 const { data: brandsTableData } = await supabase.from('brands').select('*');
                 
-                let brandsMap = new Map(); // مفتاح: اسم البراند، قيمة: مجموعة الفروع التابعة له
+                let brandsMap = new Map(); // Brand Name -> Array of Branches
 
-                // إضافة البراندات من جدول brands إن وجدت
+                // جلب البراندات من جدول brands إن وجدت
                 if (brandsTableData && brandsTableData.length > 0) {
                     brandsTableData.forEach(b => {
                         const bName = b.name || b.brand_name;
@@ -550,12 +548,12 @@
                     });
                 }
 
-                // دمج الفروع واستخراج البراندات المرتبطة بها تماماً كما هي في صفحة الفروع
+                // استخراج البراندات والفروع المرتبطة بها من جدول الفروع بدقة
                 if (branchesData && branchesData.length > 0) {
                     branchesData.forEach(item => {
                         const branchName = item.name || item.branch_name || 'Unnamed Branch';
-                        // استخراج اسم البراند من أعمدة الفرع المختلفة المحتملة
-                        const branchBrand = item.brand || item.brand_name || item.brand_title || (item.brands ? item.brands.name : '') || 'General Brand';
+                        // البحث عن اسم البراند في أعمدة الفرع المختلفة
+                        const branchBrand = item.brand || item.brand_name || item.brand_title || (item.brands ? item.brands.name : '') || 'أخرى';
                         
                         if (!brandsMap.has(branchBrand)) {
                             brandsMap.set(branchBrand, []);
@@ -570,7 +568,7 @@
                     return;
                 }
 
-                // عرض البراندات
+                // 1. عرض البراندات الحقيقية
                 brandsContainer.innerHTML = Array.from(brandsMap.keys()).map(brand => `
                     <label class="flex items-center gap-2 cursor-pointer text-slate-300">
                         <input type="checkbox" name="selected_brands" value="${brand}" data-brand="${brand}" class="brand-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
@@ -578,66 +576,91 @@
                     </label>
                 `).join('');
 
-                // عرض الفروع مع ربطها بالبراند الخاص بها في خاصية data-brand
+                // 2. تجهيز الفروع مخفية مبدئياً ولا تظهر إلا عند تحديد البراند التابع لها
                 let allBranchesHTML = '';
                 brandsMap.forEach((branches, brandName) => {
                     branches.forEach(branch => {
                         allBranchesHTML += `
-                            <label class="flex items-center gap-2 cursor-pointer text-slate-300 pl-2 border-r-2 border-indigo-500/40 my-1">
-                                <input type="checkbox" name="selected_branches" value="${branch.name}" data-brand="${brandName}" class="branch-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
-                                <span>${branch.name} <span class="text-[10px] text-indigo-400">(${brandName})</span></span>
-                            </label>
+                            <div class="branch-item-wrapper hidden" data-brand-owner="${brandName}">
+                                <label class="flex items-center gap-2 cursor-pointer text-slate-300 pl-2 border-r-2 border-indigo-500/40 my-1">
+                                    <input type="checkbox" name="selected_branches" value="${branch.name}" data-brand="${brandName}" class="branch-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
+                                    <span>${branch.name} <span class="text-[10px] text-indigo-400">(${brandName})</span></span>
+                                </label>
+                            </div>
                         `;
                     });
                 });
-                branchesContainer.innerHTML = allBranchesHTML;
 
-                // التفاعل البرمجي المطلوب:
-                // 1. عند تحديد البراند، تتحدد جميع فروعه تلقائياً.
+                branchesContainer.innerHTML = `
+                    <div id="branches-placeholder" class="text-slate-500 text-xs py-1">
+                        ${currentLang === 'ar' ? 'الرجاء اختيار براند أولاً لعرض فروعه المرتبطة' : 'Please select a brand first to view its associated branches'}
+                    </div>
+                    ${allBranchesHTML}
+                `;
+
+                // الاستماع لتغييرات تحديد البراندات لعرض أو إخفاء الفروع المقابلة
                 document.querySelectorAll('.brand-checkbox').forEach(brandCb => {
-                    brandCb.addEventListener('change', (e) => {
-                        const brandName = e.target.getAttribute('data-brand');
+                    brandCb.addEventListener('change', () => {
+                        updateBranchesVisibility();
+                    });
+                });
+
+                // زر تحديد كل البراندات
+                const selectAllBrandsCb = document.getElementById('select-all-brands');
+                if (selectAllBrandsCb) {
+                    selectAllBrandsCb.addEventListener('change', (e) => {
                         const isChecked = e.target.checked;
-                        document.querySelectorAll(`.branch-checkbox[data-brand="${CSS.escape(brandName)}"]`).forEach(branchCb => {
-                            branchCb.checked = isChecked;
+                        document.querySelectorAll('.brand-checkbox').forEach(cb => cb.checked = isChecked);
+                        updateBranchesVisibility();
+                    });
+                }
+
+                // زر تحديد كل الفروع الظاهرة
+                const selectAllBranchesCb = document.getElementById('select-all-branches');
+                if (selectAllBranchesCb) {
+                    selectAllBranchesCb.addEventListener('change', (e) => {
+                        const isChecked = e.target.checked;
+                        document.querySelectorAll('.branch-checkbox').forEach(cb => {
+                            const wrapper = cb.closest('.branch-item-wrapper');
+                            if (wrapper && !wrapper.classList.contains('hidden')) {
+                                cb.checked = isChecked;
+                            }
                         });
                     });
-                });
-
-                // 2. عند تغيير فرع، إذا وجد فرع واحد على الأقل محدد للبراند يبقى البراند محدد، وإذا أُلغيت كل الفروع يلغى تحديد البراند تلقائياً.
-                document.querySelectorAll('.branch-checkbox').forEach(branchCb => {
-                    branchCb.addEventListener('change', (e) => {
-                        const brandName = e.target.getAttribute('data-brand');
-                        if (!brandName) return;
-                        const brandCb = document.querySelector(`.brand-checkbox[data-brand="${CSS.escape(brandName)}"]`);
-                        if (!brandCb) return;
-
-                        const siblingBranches = document.querySelectorAll(`.branch-checkbox[data-brand="${CSS.escape(brandName)}"]`);
-                        const anyChecked = Array.from(siblingBranches).some(cb => cb.checked);
-                        brandCb.checked = anyChecked; 
-                    });
-                });
-
-                // أزرار تحديد الكل
-                document.getElementById('select-all-brands').addEventListener('change', (e) => {
-                    const isChecked = e.target.checked;
-                    document.querySelectorAll('.brand-checkbox').forEach(cb => cb.checked = isChecked);
-                    document.querySelectorAll('.branch-checkbox').forEach(cb => cb.checked = isChecked);
-                });
-
-                document.getElementById('select-all-branches').addEventListener('change', (e) => {
-                    const isChecked = e.target.checked;
-                    document.querySelectorAll('.branch-checkbox').forEach(cb => cb.checked = isChecked);
-                    document.querySelectorAll('.brand-checkbox').forEach(cb => cb.checked = isChecked);
-                });
-
-                document.getElementById('select-all-pages').addEventListener('change', (e) => {
-                    document.querySelectorAll('.page-checkbox').forEach(cb => cb.checked = e.target.checked);
-                });
+                }
 
             } catch (err) {
+                console.error(err);
                 brandsContainer.innerHTML = `<span class="text-rose-400">خطأ في جلب البراندات</span>`;
                 branchesContainer.innerHTML = `<span class="text-rose-400">خطأ في جلب الفروع</span>`;
+            }
+        }
+
+        // دالة التحكم بظهور الفروع بناءً على البراندات المختارة
+        function updateBranchesVisibility() {
+            const placeholder = document.getElementById('branches-placeholder');
+            const wrappers = document.querySelectorAll('.branch-item-wrapper');
+            const checkedBrands = Array.from(document.querySelectorAll('.brand-checkbox:checked')).map(cb => cb.value);
+
+            if (checkedBrands.length > 0) {
+                if (placeholder) placeholder.classList.add('hidden');
+                wrappers.forEach(wrapper => {
+                    const brandOwner = wrapper.getAttribute('data-brand-owner');
+                    if (checkedBrands.includes(brandOwner)) {
+                        wrapper.classList.remove('hidden');
+                    } else {
+                        wrapper.classList.add('hidden');
+                        const cb = wrapper.querySelector('input[type="checkbox"]');
+                        if (cb) cb.checked = false; // إلغاء تحديد الفرع إذا أُزيل البراند
+                    }
+                });
+            } else {
+                if (placeholder) placeholder.classList.remove('hidden');
+                wrappers.forEach(wrapper => {
+                    wrapper.classList.add('hidden');
+                    const cb = wrapper.querySelector('input[type="checkbox"]');
+                    if (cb) cb.checked = false;
+                });
             }
         }
 
@@ -677,7 +700,6 @@
             }
         }
 
-        // تنفيذ إضافة مستخدم جديد مع فحص الإيميل وإظهار الخطأ في الأسفل مباشرة
         document.getElementById('create-user-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const bottomFeedback = document.getElementById('modal-bottom-feedback');
@@ -688,7 +710,6 @@
             const password = document.getElementById('new-member-pass').value.trim();
             const role = document.getElementById('new-member-role').value;
 
-            // التحقق من صحة البريد الإلكتروني
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 bottomFeedback.classList.remove('hidden', 'bg-emerald-500/10', 'text-emerald-400', 'bg-indigo-500/10', 'text-indigo-400');
@@ -707,7 +728,6 @@
             const brandValue = allBrandsChecked ? (currentLang === 'ar' ? 'كل البراندات' : 'All Brands') : (selectedBrands.length > 0 ? selectedBrands.join(', ') : (currentLang === 'ar' ? 'بدون براند' : 'No Brand'));
             const branchValue = allBranchesChecked ? (currentLang === 'ar' ? 'كل الفروع' : 'All Branches') : (selectedBranches.length > 0 ? selectedBranches.join(', ') : (currentLang === 'ar' ? 'المستودع الرئيسي' : 'Main Warehouse'));
 
-            // تعطيل الزر منعاً للضغط المتكرر وحماية من خطأ 429
             submitBtn.disabled = true;
             submitBtn.innerText = currentLang === 'ar' ? 'جاري الإنشاء...' : 'Creating...';
 
