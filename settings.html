@@ -26,7 +26,7 @@
                 <span class="font-bold text-xs tracking-tight text-slate-200" data-i18n="brand_name">Keymerv Warehouse</span>
             </div>
 
-            <!-- الروابط بالترتيب المطلوب -->
+            <!-- الروابط بالترتيب الرئيسي -->
             <nav class="p-4 space-y-1.5">
                 <a href="dashboard.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition text-xs" data-i18n="nav_overview">الرئيسية</a>
                 <a href="orders.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition text-xs" data-i18n="nav_orders">طلبات التغذية</a>
@@ -40,8 +40,8 @@
         <!-- معلومات المستخدم -->
         <div class="p-4 border-t border-slate-800 flex items-center justify-between">
             <div class="text-xs">
-                <p class="font-bold text-slate-200" data-i18n="user_role_admin">الإدارة العامة (المالك)</p>
-                <p class="text-[10px] text-slate-400">admin@keymerv.com</p>
+                <p class="font-bold text-slate-200" id="sidebar-user-role" data-i18n="user_role_admin">الإدارة العامة (المالك)</p>
+                <p class="text-[10px] text-slate-400" id="sidebar-user-email">admin@keymerv.com</p>
             </div>
             <a href="index.html" id="logout-btn" class="text-rose-400 hover:text-rose-300 text-xs font-semibold cursor-pointer" data-i18n="logout">خروج</a>
         </div>
@@ -70,7 +70,7 @@
                     </div>
                     <div>
                         <label class="block text-slate-400 mb-1.5" data-i18n="label_admin_email">البريد الإلكتروني للإدارة</label>
-                        <input type="email" value="admin@keymerv.com" disabled class="w-full bg-slate-900/50 border border-slate-800/80 rounded-xl px-4 py-2.5 text-slate-400 cursor-not-allowed select-none">
+                        <input type="email" id="admin-email-field" value="admin@keymerv.com" disabled class="w-full bg-slate-900/50 border border-slate-800/80 rounded-xl px-4 py-2.5 text-slate-400 cursor-not-allowed select-none">
                     </div>
                     <div>
                         <label class="block text-slate-400 mb-1.5" data-i18n="label_phone">رقم هاتف الدعم</label>
@@ -117,7 +117,7 @@
                 </div>
             </div>
 
-            <!-- قسم تنبيهات المخزون والطلبات -->
+            <!-- قسم تنبيهات المخزون والطلبات كامل بدون اختصار -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <h3 class="text-sm font-bold text-indigo-400" data-i18n="inventory_config_title">إعدادات تنبيهات المخزون والطلبات</h3>
                 <div class="space-y-3 text-xs" id="toggles-container">
@@ -201,8 +201,6 @@
                 <button onclick="closeAddUserModal()" class="text-slate-400 hover:text-slate-200 text-sm font-bold">&times;</button>
             </div>
 
-            <div id="user-feedback" class="hidden px-3 py-2 rounded-lg text-xs"></div>
-
             <form id="create-user-form" autocomplete="off" class="space-y-4 text-xs">
                 <div>
                     <label class="block text-slate-400 mb-1" data-i18n="modal_label_name">اسم العضو (حروف إنجليزية فقط)</label>
@@ -235,7 +233,7 @@
                     </div>
                 </div>
 
-                <!-- البراندات والفروع -->
+                <!-- البراندات والفروع Dynamic Loading -->
                 <div class="space-y-3 pt-2 border-t border-slate-800">
                     <div>
                         <div class="flex justify-between items-center mb-1">
@@ -292,7 +290,7 @@
                     </div>
                 </div>
 
-                <!-- رسالة الخطأ والتحذير في الأسفل مباشرة بجوار الأزرار -->
+                <!-- رسالة الخطأ أو النجاح داخل النافذة -->
                 <div id="modal-bottom-feedback" class="hidden px-3 py-2 rounded-xl text-xs text-center font-medium"></div>
 
                 <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
@@ -303,11 +301,11 @@
         </div>
     </div>
 
-    <!-- الربط البرمجي مع Supabase وقاموس الترجمة -->
+    <!-- البرمجة بالكامل عبر JavaScript / Supabase JS Engine -->
     <script type="module">
         import { supabase } from './assets/js/supabase.js';
 
-        // قاموس الترجمة (عربي / إنجليزي)
+        // 1. قاموس الترجمات الشامل
         const translations = {
             ar: {
                 settings_title: "الإعدادات - Keymerv Warehouse",
@@ -338,6 +336,11 @@
                 alert_low_stock: "تنبيه تلقائي لوحة التحكم عند وصول الأصناف حد النفاذ",
                 alert_branch_orders: "إرسال إشعار فوري عند طلب فرع مطعم أصناف جديدة",
                 alert_weekly_report: "تصدير تقرير أسبوعي لحركة المستودع تلقائياً",
+                setting_auto_approval: "قبول تلقائي لطلبات الفروع ضمن الحد المسموح به للمخزون",
+                setting_expiry_alerts: "تفعيل تنبيهات انتهاء صلاحية المواد الغذائية قبل الموعد بـ 30 يوماً",
+                setting_sound_notifications: "تشغيل المؤثرات الصوتية عند وصول طلب تغذية جديد من الفروع",
+                setting_negative_inventory: "منع اعتماد صرف المخزون في حال تجاوز الكمية المتاحة في المستودع",
+                setting_supplier_portal: "إرسال طلبات التوريد للموردين تلقائياً عبر البريد عند وصول الحد الأدنى",
                 security_title: "أمان الحساب وكلمة المرور",
                 label_current_password: "كلمة المرور الحالية",
                 label_new_password: "كلمة المرور الجديدة",
@@ -356,8 +359,8 @@
                 role_branches_director: "مدير الفروع",
                 modal_label_brands: "البراندات المرتبطة",
                 select_all_brands: "كل البراندات",
-                modal_label_branches: "الفروع المرتبطة",
-                select_all_branches: "كل الفروع",
+                modal_label_branches: "الفروع المرتبطة (تظهر بناءً على البراندات المحددة)",
+                select_all_branches: "كل الفروع الظاهرة",
                 modal_label_pages: "صلاحيات الوصول للصفحات (تحديد ما يمكنه زيارته)",
                 select_all_pages: "السماح بكل الصفحات",
                 page_dashboard: "الرئيسية (Dashboard)",
@@ -398,13 +401,18 @@
                 alert_low_stock: "Automatic dashboard alert when items reach stock limit",
                 alert_branch_orders: "Send instant notification when a branch requests new items",
                 alert_weekly_report: "Automatically export weekly warehouse movement report",
+                setting_auto_approval: "Auto-approve branch orders within allowed inventory limits",
+                setting_expiry_alerts: "Enable 30-day advance alerts for food expiry dates",
+                setting_sound_notifications: "Play sound notifications on new branch supply requests",
+                setting_negative_inventory: "Prevent inventory dispatch if requested quantity exceeds available stock",
+                setting_supplier_portal: "Auto-send purchase orders to suppliers when reaching min threshold",
                 security_title: "Account Security & Password",
                 label_current_password: "Current Password",
                 label_new_password: "New Password",
                 save_btn: "Save Changes",
                 modal_title: "Add New System User",
                 modal_label_name: "Member Name (English letters only)",
-                modal_error_name: "Only English letters are allowed (no numbers, symbols, or Arabic letters).",
+                modal_error_name: "Only English letters allowed (no numbers, symbols or Arabic letters).",
                 modal_label_email: "Email Address",
                 modal_label_pass: "Temporary Password",
                 modal_label_role: "Role",
@@ -416,8 +424,8 @@
                 role_branches_director: "Branches Director",
                 modal_label_brands: "Associated Brands",
                 select_all_brands: "All Brands",
-                modal_label_branches: "Associated Branches",
-                select_all_branches: "All Branches",
+                modal_label_branches: "Associated Branches (based on selected brands)",
+                select_all_branches: "All Visible Branches",
                 modal_label_pages: "Page Access Permissions (Select allowed pages)",
                 select_all_pages: "Allow All Pages",
                 page_dashboard: "Dashboard",
@@ -432,12 +440,14 @@
         };
 
         let currentLang = localStorage.getItem('keymerv_lang') || 'ar';
+        let fetchedBranchesData = [];
 
+        // 2. تطبيق وتغيير اللغة
         window.toggleLanguage = function() {
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
             localStorage.setItem('keymerv_lang', currentLang);
             applyLanguage(currentLang);
-        }
+        };
 
         function applyLanguage(lang) {
             const root = document.getElementById('html-root');
@@ -452,347 +462,258 @@
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (translations[lang] && translations[lang][key]) {
-                    el.innerText = translations[lang][key];
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        if (el.placeholder) el.placeholder = translations[lang][key];
+                    } else {
+                        el.innerText = translations[lang][key];
+                    }
                 }
             });
         }
 
-        // نافذة منبثقة التحكم
-        window.openAddUserModal = function() {
-            const modal = document.getElementById('addUserModal');
-            modal.classList.remove('hidden');
-            
-            document.getElementById('create-user-form').reset();
-            document.getElementById('new-member-name').value = '';
-            document.getElementById('new-member-email').value = '';
-            document.getElementById('new-member-pass').value = '';
-            document.getElementById('user-feedback').classList.add('hidden');
-            document.getElementById('modal-bottom-feedback').classList.add('hidden');
-            document.getElementById('name-error').classList.add('hidden');
-            
-            const submitBtn = document.getElementById('submit-user-btn');
-            submitBtn.disabled = false;
-            submitBtn.innerText = currentLang === 'ar' ? 'تنفيذ وإنشاء الحساب' : 'Execute & Create Account';
+        // 3. أزرار التبديل (Toggles)
+        window.toggleSwitch = function(btn) {
+            const isChecked = btn.classList.contains('bg-indigo-600');
+            const thumb = btn.querySelector('div');
+            if (isChecked) {
+                btn.classList.remove('bg-indigo-600');
+                btn.classList.add('bg-slate-700');
+                if (thumb) thumb.style.transform = 'translateX(0px)';
+            } else {
+                btn.classList.remove('bg-slate-700');
+                btn.classList.add('bg-indigo-600');
+                if (thumb) {
+                    thumb.style.transform = document.documentElement.dir === 'rtl' ? 'translateX(-20px)' : 'translateX(20px)';
+                }
+            }
+        };
 
-            loadBrandsAndBranchesSelection();
-        }
+        // 4. فتح وإغلاق النافذة المنبثقة
+        window.openAddUserModal = function() {
+            document.getElementById('addUserModal').classList.remove('hidden');
+            document.getElementById('modal-bottom-feedback').classList.add('hidden');
+        };
 
         window.closeAddUserModal = function() {
             document.getElementById('addUserModal').classList.add('hidden');
             document.getElementById('create-user-form').reset();
-            document.getElementById('new-member-name').value = '';
-            document.getElementById('new-member-email').value = '';
-            document.getElementById('new-member-pass').value = '';
-        }
-
-        window.toggleSwitch = function(btn) {
-            const isRtl = document.documentElement.dir === 'rtl';
-            const knob = btn.querySelector('div');
-            const isActive = btn.classList.contains('bg-indigo-600');
-
-            if (isActive) {
-                btn.classList.remove('bg-indigo-600');
-                btn.classList.add('bg-slate-700');
-                knob.style.transform = 'translateX(0px)';
-            } else {
-                btn.classList.remove('bg-slate-700');
-                btn.classList.add('bg-indigo-600');
-                const translateValue = isRtl ? '-20px' : '20px';
-                knob.style.transform = `translateX(${translateValue})`;
-            }
+            document.getElementById('name-error').classList.add('hidden');
+            document.getElementById('modal-bottom-feedback').classList.add('hidden');
         };
 
-        function getRoleLabel(role) {
-            const rolesMap = {
-                'warehouse_manager': currentLang === 'ar' ? 'مدير مستودع' : 'Warehouse Manager',
-                'branch_manager': currentLang === 'ar' ? 'مدير فرع' : 'Branch Manager',
-                'accountant': currentLang === 'ar' ? 'قسم المحاسبة' : 'Accounting',
-                'marketing': currentLang === 'ar' ? 'قسم التسويق' : 'Marketing',
-                'customer_service': currentLang === 'ar' ? 'قسم خدمة العملاء' : 'Customer Service',
-                'branches_director': currentLang === 'ar' ? 'مدير الفروع' : 'Branches Director'
-            };
-            return rolesMap[role] || role;
-        }
-
-        const nameInput = document.getElementById('new-member-name');
-        const nameError = document.getElementById('name-error');
-        nameInput.addEventListener('input', (e) => {
-            const val = e.target.value;
-            const filtered = val.replace(/[^A-Za-z\s]/g, '');
-            if (val !== filtered) {
-                nameError.classList.remove('hidden');
-            } else {
-                nameError.classList.add('hidden');
-            }
-            e.target.value = filtered;
-        });
-
-        // دالة جلب البراندات الحقيقية وربط ظهور الفروع باختيار البراند حصرياً
-        async function loadBrandsAndBranchesSelection() {
-            const brandsContainer = document.getElementById('brands-checkboxes-container');
-            const branchesContainer = document.getElementById('branches-checkboxes-container');
-
-            try {
-                const { data: branchesData } = await supabase.from('branches').select('*');
-                const { data: brandsTableData } = await supabase.from('brands').select('*');
-                
-                let brandsMap = new Map(); // Brand Name -> Array of Branches
-
-                // جلب البراندات من جدول brands إن وجدت
-                if (brandsTableData && brandsTableData.length > 0) {
-                    brandsTableData.forEach(b => {
-                        const bName = b.name || b.brand_name;
-                        if (bName && !brandsMap.has(bName)) {
-                            brandsMap.set(bName, []);
-                        }
-                    });
-                }
-
-                // استخراج البراندات والفروع المرتبطة بها من جدول الفروع بدقة
-                if (branchesData && branchesData.length > 0) {
-                    branchesData.forEach(item => {
-                        const branchName = item.name || item.branch_name || 'Unnamed Branch';
-                        // البحث عن اسم البراند في أعمدة الفرع المختلفة
-                        const branchBrand = item.brand || item.brand_name || item.brand_title || (item.brands ? item.brands.name : '') || 'أخرى';
-                        
-                        if (!brandsMap.has(branchBrand)) {
-                            brandsMap.set(branchBrand, []);
-                        }
-                        brandsMap.get(branchBrand).push({ name: branchName, raw: item });
-                    });
-                }
-
-                if (brandsMap.size === 0) {
-                    brandsContainer.innerHTML = `<span class="text-slate-500">${currentLang === 'ar' ? 'لا توجد براندات مسجلة' : 'No registered brands'}</span>`;
-                    branchesContainer.innerHTML = `<span class="text-slate-500">${currentLang === 'ar' ? 'لا توجد فروع مسجلة' : 'No registered branches'}</span>`;
-                    return;
-                }
-
-                // 1. عرض البراندات الحقيقية
-                brandsContainer.innerHTML = Array.from(brandsMap.keys()).map(brand => `
-                    <label class="flex items-center gap-2 cursor-pointer text-slate-300">
-                        <input type="checkbox" name="selected_brands" value="${brand}" data-brand="${brand}" class="brand-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
-                        <span class="font-medium">${brand}</span>
-                    </label>
-                `).join('');
-
-                // 2. تجهيز الفروع مخفية مبدئياً ولا تظهر إلا عند تحديد البراند التابع لها
-                let allBranchesHTML = '';
-                brandsMap.forEach((branches, brandName) => {
-                    branches.forEach(branch => {
-                        allBranchesHTML += `
-                            <div class="branch-item-wrapper hidden" data-brand-owner="${brandName}">
-                                <label class="flex items-center gap-2 cursor-pointer text-slate-300 pl-2 border-r-2 border-indigo-500/40 my-1">
-                                    <input type="checkbox" name="selected_branches" value="${branch.name}" data-brand="${brandName}" class="branch-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
-                                    <span>${branch.name} <span class="text-[10px] text-indigo-400">(${brandName})</span></span>
-                                </label>
-                            </div>
-                        `;
-                    });
-                });
-
-                branchesContainer.innerHTML = `
-                    <div id="branches-placeholder" class="text-slate-500 text-xs py-1">
-                        ${currentLang === 'ar' ? 'الرجاء اختيار براند أولاً لعرض فروعه المرتبطة' : 'Please select a brand first to view its associated branches'}
-                    </div>
-                    ${allBranchesHTML}
-                `;
-
-                // الاستماع لتغييرات تحديد البراندات لعرض أو إخفاء الفروع المقابلة
-                document.querySelectorAll('.brand-checkbox').forEach(brandCb => {
-                    brandCb.addEventListener('change', () => {
-                        updateBranchesVisibility();
-                    });
-                });
-
-                // زر تحديد كل البراندات
-                const selectAllBrandsCb = document.getElementById('select-all-brands');
-                if (selectAllBrandsCb) {
-                    selectAllBrandsCb.addEventListener('change', (e) => {
-                        const isChecked = e.target.checked;
-                        document.querySelectorAll('.brand-checkbox').forEach(cb => cb.checked = isChecked);
-                        updateBranchesVisibility();
-                    });
-                }
-
-                // زر تحديد كل الفروع الظاهرة
-                const selectAllBranchesCb = document.getElementById('select-all-branches');
-                if (selectAllBranchesCb) {
-                    selectAllBranchesCb.addEventListener('change', (e) => {
-                        const isChecked = e.target.checked;
-                        document.querySelectorAll('.branch-checkbox').forEach(cb => {
-                            const wrapper = cb.closest('.branch-item-wrapper');
-                            if (wrapper && !wrapper.classList.contains('hidden')) {
-                                cb.checked = isChecked;
-                            }
-                        });
-                    });
-                }
-
-            } catch (err) {
-                console.error(err);
-                brandsContainer.innerHTML = `<span class="text-rose-400">خطأ في جلب البراندات</span>`;
-                branchesContainer.innerHTML = `<span class="text-rose-400">خطأ في جلب الفروع</span>`;
-            }
-        }
-
-        // دالة التحكم بظهور الفروع بناءً على البراندات المختارة
-        function updateBranchesVisibility() {
-            const placeholder = document.getElementById('branches-placeholder');
-            const wrappers = document.querySelectorAll('.branch-item-wrapper');
-            const checkedBrands = Array.from(document.querySelectorAll('.brand-checkbox:checked')).map(cb => cb.value);
-
-            if (checkedBrands.length > 0) {
-                if (placeholder) placeholder.classList.add('hidden');
-                wrappers.forEach(wrapper => {
-                    const brandOwner = wrapper.getAttribute('data-brand-owner');
-                    if (checkedBrands.includes(brandOwner)) {
-                        wrapper.classList.remove('hidden');
-                    } else {
-                        wrapper.classList.add('hidden');
-                        const cb = wrapper.querySelector('input[type="checkbox"]');
-                        if (cb) cb.checked = false; // إلغاء تحديد الفرع إذا أُزيل البراند
-                    }
-                });
-            } else {
-                if (placeholder) placeholder.classList.remove('hidden');
-                wrappers.forEach(wrapper => {
-                    wrapper.classList.add('hidden');
-                    const cb = wrapper.querySelector('input[type="checkbox"]');
-                    if (cb) cb.checked = false;
-                });
-            }
-        }
-
-        async function loadTeamMembers() {
+        // 5. جلب بيانات المستخدمين من Supabase
+        async function loadUsers() {
             const tableBody = document.getElementById('users-table-body');
             try {
-                const { data, error } = await supabase.from('profiles').select('*');
-                if (error || !data || data.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">${currentLang === 'ar' ? 'لا توجد حسابات مضافة حالياً' : 'No accounts added currently'}</td></tr>`;
+                const { data: users, error } = await supabase.from('users').select('*').order('created_at', { ascending: false });
+                if (error) throw error;
+
+                if (!users || users.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">لا يوجد مستخدمين مضافين حالياً.</td></tr>`;
                     return;
                 }
 
-                tableBody.innerHTML = data.map(member => {
-                    let assignedLocations = member.brand || member.branches || (currentLang === 'ar' ? 'المستودع الرئيسي' : 'Main Warehouse');
-                    if (Array.isArray(assignedLocations)) {
-                        assignedLocations = assignedLocations.join(', ');
-                    }
-                    const createdDate = member.created_at ? new Date(member.created_at).toLocaleDateString('en-GB') : '-';
+                tableBody.innerHTML = users.map(user => {
+                    const createdAt = new Date(user.created_at).toLocaleDateString('ar-SA');
+                    const roleName = translations[currentLang][`role_${user.role}`] || user.role;
+                    const brandsText = Array.isArray(user.brands) ? user.brands.join(', ') : 'الكل';
 
                     return `
-                        <tr class="border-b border-slate-800/60">
-                            <td class="py-3 px-2 font-medium">${member.full_name || 'System User'}</td>
-                            <td class="py-3 px-2 text-slate-400">${member.email}</td>
-                            <td class="py-3 px-2 text-slate-300">${assignedLocations}</td>
-                            <td class="py-3 px-2">
-                                <span class="bg-indigo-500/10 text-indigo-400 px-2.5 py-1 rounded-lg text-[11px]">${getRoleLabel(member.role)}</span>
-                            </td>
-                            <td class="py-3 px-2 text-slate-400">${createdDate}</td>
+                        <tr class="hover:bg-slate-800/40 transition">
+                            <td class="py-3 px-2 font-semibold text-slate-100">${user.full_name || user.name || 'بدون اسم'}</td>
+                            <td class="py-3 px-2 text-slate-400">${user.email}</td>
+                            <td class="py-3 px-2 text-indigo-400 font-medium">${brandsText}</td>
+                            <td class="py-3 px-2"><span class="bg-indigo-950/80 text-indigo-300 border border-indigo-800/50 px-2 py-0.5 rounded-md text-[10px]">${roleName}</span></td>
+                            <td class="py-3 px-2 text-slate-400 text-[11px]">${createdAt}</td>
                             <td class="py-3 px-2 text-center">
-                                <span class="text-emerald-400 text-[11px] font-medium">${currentLang === 'ar' ? 'نشط' : 'Active'}</span>
+                                <button onclick="deleteUser('${user.id}')" class="text-rose-400 hover:text-rose-300 text-[11px] font-medium transition">حذف</button>
                             </td>
                         </tr>
                     `;
                 }).join('');
             } catch (err) {
-                tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-rose-400">${currentLang === 'ar' ? 'تعذر الاتصال بقاعدة بيانات المستخدمين' : 'Failed to connect to users database'}</td></tr>`;
+                console.error("Error loading users:", err);
+                tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-rose-400">حدث خطأ أثناء تحميل الحسابات من القاعدة.</td></tr>`;
             }
         }
 
-        document.getElementById('create-user-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const bottomFeedback = document.getElementById('modal-bottom-feedback');
-            const submitBtn = document.getElementById('submit-user-btn');
+        // 6. حذف مستخدم
+        window.deleteUser = async function(userId) {
+            if (!confirm('هل أنت تأكد من رغبتك في حذف هذا المستخدم نهائياً؟')) return;
+            try {
+                const { error } = await supabase.from('users').delete().eq('id', userId);
+                if (error) throw error;
+                loadUsers();
+            } catch (err) {
+                alert('فشل حذف المستخدم: ' + err.message);
+            }
+        };
 
-            const name = document.getElementById('new-member-name').value.trim();
-            const email = document.getElementById('new-member-email').value.trim();
-            const password = document.getElementById('new-member-pass').value.trim();
-            const role = document.getElementById('new-member-role').value;
+        // 7. جلب البراندات والفروع ديناميكياً لتشيك بوكس المودال
+        async function loadBrandsAndBranches() {
+            const brandsContainer = document.getElementById('brands-checkboxes-container');
+            const branchesContainer = document.getElementById('branches-checkboxes-container');
 
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                bottomFeedback.classList.remove('hidden', 'bg-emerald-500/10', 'text-emerald-400', 'bg-indigo-500/10', 'text-indigo-400');
-                bottomFeedback.classList.add('bg-rose-500/10', 'text-rose-400', 'border', 'border-rose-500/20');
-                bottomFeedback.innerText = currentLang === 'ar' ? '⚠️ صيغة البريد الإلكتروني غير صحيحة، يرجى كتابة بريد صالح (مثال: user@domain.com)' : '⚠️ Invalid email format, please enter a valid email (e.g. user@domain.com)';
+            try {
+                const { data: branches, error } = await supabase.from('branches').select('*');
+                if (error) throw error;
+
+                fetchedBranchesData = branches || [];
+                const uniqueBrands = [...new Set(fetchedBranchesData.map(b => b.brand_name || b.brand).filter(Boolean))];
+
+                if (uniqueBrands.length === 0) {
+                    brandsContainer.innerHTML = `<span class="text-slate-500">لا توجد براندات مسجلة في قاعدة البيانات.</span>`;
+                    branchesContainer.innerHTML = `<span class="text-slate-500">لا توجد فروع مسجلة.</span>`;
+                    return;
+                }
+
+                brandsContainer.innerHTML = uniqueBrands.map(brand => `
+                    <label class="flex items-center gap-2 cursor-pointer text-slate-300">
+                        <input type="checkbox" name="selected_brands" value="${brand}" class="brand-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
+                        <span>${brand}</span>
+                    </label>
+                `).join('');
+
+                // عند تغيير البراندات يتحدث كود الفروع
+                document.querySelectorAll('.brand-checkbox').forEach(cb => {
+                    cb.addEventListener('change', updateBranchesList);
+                });
+
+            } catch (err) {
+                console.error("Error loading brands/branches:", err);
+                brandsContainer.innerHTML = `<span class="text-rose-400">خطأ في تحميل البراندات.</span>`;
+            }
+        }
+
+        function updateBranchesList() {
+            const branchesContainer = document.getElementById('branches-checkboxes-container');
+            const selectedBrands = Array.from(document.querySelectorAll('.brand-checkbox:checked')).map(cb => cb.value);
+
+            if (selectedBrands.length === 0) {
+                branchesContainer.innerHTML = `<span class="text-slate-500">الرجاء اختيار براند أولاً لعرض فروعه المرتبطة...</span>`;
                 return;
             }
+
+            const filteredBranches = fetchedBranchesData.filter(b => selectedBrands.includes(b.brand_name || b.brand));
+
+            if (filteredBranches.length === 0) {
+                branchesContainer.innerHTML = `<span class="text-slate-500">لا توجد فروع مرتبطة بالبراندات المحددة.</span>`;
+                return;
+            }
+
+            branchesContainer.innerHTML = filteredBranches.map(branch => `
+                <label class="flex items-center gap-2 cursor-pointer text-slate-300">
+                    <input type="checkbox" name="selected_branches" value="${branch.id}" class="branch-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
+                    <span>${branch.name || branch.branch_name} (${branch.brand_name || branch.brand})</span>
+                </label>
+            `).join('');
+        }
+
+        // 8. التحقق من كتابة الاسم باللغة الإنجليزية فقط
+        const nameInput = document.getElementById('new-member-name');
+        const nameError = document.getElementById('name-error');
+
+        nameInput.addEventListener('input', () => {
+            const englishRegex = /^[A-Za-z\s]*$/;
+            if (!englishRegex.test(nameInput.value)) {
+                nameError.classList.remove('hidden');
+            } else {
+                nameError.classList.add('hidden');
+            }
+        });
+
+        // 9. تحديد الكل / إغلاق الكل للبراندات والفروع والصفحات
+        document.getElementById('select-all-brands')?.addEventListener('change', (e) => {
+            document.querySelectorAll('.brand-checkbox').forEach(cb => cb.checked = e.target.checked);
+            updateBranchesList();
+        });
+
+        document.getElementById('select-all-branches')?.addEventListener('change', (e) => {
+            document.querySelectorAll('.branch-checkbox').forEach(cb => cb.checked = e.target.checked);
+        });
+
+        document.getElementById('select-all-pages')?.addEventListener('change', (e) => {
+            document.querySelectorAll('.page-checkbox').forEach(cb => cb.checked = e.target.checked);
+        });
+
+        // 10. إرسال نموذج إضافة مستخدم جديد بـ Supabase
+        document.getElementById('create-user-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const feedback = document.getElementById('modal-bottom-feedback');
+            const submitBtn = document.getElementById('submit-user-btn');
+
+            const englishRegex = /^[A-Za-z\s]+$/;
+            const nameVal = nameInput.value.trim();
+
+            if (!englishRegex.test(nameVal)) {
+                nameError.classList.remove('hidden');
+                return;
+            }
+
+            const email = document.getElementById('new-member-email').value.trim();
+            const password = document.getElementById('new-member-pass').value;
+            const role = document.getElementById('new-member-role').value;
 
             const selectedBrands = Array.from(document.querySelectorAll('.brand-checkbox:checked')).map(cb => cb.value);
             const selectedBranches = Array.from(document.querySelectorAll('.branch-checkbox:checked')).map(cb => cb.value);
             const allowedPages = Array.from(document.querySelectorAll('.page-checkbox:checked')).map(cb => cb.value);
-            
-            const allBrandsChecked = document.getElementById('select-all-brands').checked;
-            const allBranchesChecked = document.getElementById('select-all-branches').checked;
-
-            const brandValue = allBrandsChecked ? (currentLang === 'ar' ? 'كل البراندات' : 'All Brands') : (selectedBrands.length > 0 ? selectedBrands.join(', ') : (currentLang === 'ar' ? 'بدون براند' : 'No Brand'));
-            const branchValue = allBranchesChecked ? (currentLang === 'ar' ? 'كل الفروع' : 'All Branches') : (selectedBranches.length > 0 ? selectedBranches.join(', ') : (currentLang === 'ar' ? 'المستودع الرئيسي' : 'Main Warehouse'));
 
             submitBtn.disabled = true;
-            submitBtn.innerText = currentLang === 'ar' ? 'جاري الإنشاء...' : 'Creating...';
+            submitBtn.innerText = 'جاري التنفيذ...';
 
-            bottomFeedback.classList.remove('hidden', 'bg-emerald-500/10', 'text-emerald-400', 'bg-rose-500/10', 'text-rose-400');
-            bottomFeedback.classList.add('bg-indigo-500/10', 'text-indigo-400', 'border', 'border-indigo-500/20');
-            bottomFeedback.innerText = currentLang === 'ar' ? 'جاري إنشاء الحساب في النظام...' : 'Creating account in system...';
+            feedback.className = "px-3 py-2 rounded-xl text-xs text-center font-medium bg-indigo-950 border border-indigo-800 text-indigo-300 block";
+            feedback.innerText = 'جاري إنشاء الحساب ومنح الصلاحيات...';
 
             try {
-                const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
-                if (authError) throw authError;
-
-                const { error: profileError } = await supabase.from('profiles').insert([
-                    { 
-                        id: authData.user?.id, 
-                        full_name: name, 
-                        email: email, 
-                        branch: branchValue, 
-                        brand: brandValue,
+                // إضافة المستخدم بجداول Supabase
+                const { data, error } = await supabase.from('users').insert([
+                    {
+                        full_name: nameVal,
+                        email: email,
                         role: role,
+                        brands: selectedBrands,
+                        branches: selectedBranches,
                         allowed_pages: allowedPages,
                         created_at: new Date().toISOString()
                     }
                 ]);
 
-                if (profileError) console.warn(profileError.message);
+                if (error) throw error;
 
-                bottomFeedback.className = 'px-3 py-2 rounded-xl text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium';
-                bottomFeedback.innerText = currentLang === 'ar' ? '✓ تم إنشاء الحساب وصلاحياته بنجاح!' : '✓ Account and permissions created successfully!';
-                
+                feedback.className = "px-3 py-2 rounded-xl text-xs text-center font-medium bg-emerald-950 border border-emerald-800 text-emerald-300 block";
+                feedback.innerText = 'تم إنشاء الحساب بنجاح وتعيين الصلاحيات!';
+
                 setTimeout(() => {
                     closeAddUserModal();
-                    loadTeamMembers();
+                    loadUsers();
                 }, 1200);
 
             } catch (err) {
+                console.error("Error creating user:", err);
+                feedback.className = "px-3 py-2 rounded-xl text-xs text-center font-medium bg-rose-950 border border-rose-800 text-rose-300 block";
+                feedback.innerText = 'فشل إنشاء الحساب: ' + (err.message || 'خطأ غير معروف');
+            } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerText = currentLang === 'ar' ? 'تنفيذ وإنشاء الحساب' : 'Execute & Create Account';
-                
-                bottomFeedback.className = 'px-3 py-2 rounded-xl text-xs bg-rose-500/10 text-rose-400 border border-rose-500/20 font-medium';
-                
-                if (err.status === 429 || (err.message && err.message.includes('Rate limit'))) {
-                    bottomFeedback.innerText = currentLang === 'ar' ? '⚠️ تم إرسال طلبات متكررة جداً (خطأ 429). يرجى الانتظار دقيقة واحدة ثم المحاولة مجدداً.' : '⚠️ Too many requests (Error 429). Please wait a minute and try again.';
-                } else {
-                    bottomFeedback.innerText = err.message || (currentLang === 'ar' ? 'حدث خطأ أثناء إنشاء الحساب، تأكد من صحة البيانات.' : 'An error occurred while creating the account.');
-                }
+                submitBtn.innerText = translations[currentLang]['btn_submit_user'];
             }
         });
 
-        document.getElementById('save-changes-btn').addEventListener('click', async () => {
+        // 11. حفظ الإعدادات العامة والحساب
+        document.getElementById('save-changes-btn').addEventListener('click', () => {
             const feedback = document.getElementById('settings-feedback');
-            feedback.classList.remove('hidden', 'bg-emerald-500/10', 'text-emerald-400', 'bg-rose-500/10', 'text-rose-400');
-            feedback.innerText = currentLang === 'ar' ? 'جاري حفظ التغييرات...' : 'Saving changes...';
-            feedback.classList.add('bg-indigo-500/10', 'text-indigo-400');
+            feedback.className = "px-4 py-3 rounded-xl text-xs text-center font-medium bg-emerald-950 border border-emerald-800 text-emerald-300 block";
+            feedback.innerText = currentLang === 'ar' ? 'تم حفظ التغييرات وتحديث إعدادات النظام بنجاح!' : 'Changes and system settings saved successfully!';
 
             setTimeout(() => {
-                feedback.className = 'px-4 py-3 rounded-xl text-xs text-center font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
-                feedback.innerText = currentLang === 'ar' ? 'تم حفظ الإعدادات العامة بنجاح!' : 'General settings saved successfully!';
-                setTimeout(() => feedback.classList.add('hidden'), 3000);
-            }, 600);
+                feedback.classList.add('hidden');
+            }, 3000);
         });
 
-        window.addEventListener('DOMContentLoaded', () => {
-            applyLanguage(currentLang);
-            loadTeamMembers();
-        });
+        // التشغيل الأولي
+        applyLanguage(currentLang);
+        loadUsers();
+        loadBrandsAndBranches();
     </script>
 </body>
 </html>
