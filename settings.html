@@ -43,7 +43,7 @@
                 <p class="font-bold text-slate-200" id="sidebar-user-role">...</p>
                 <p class="text-[10px] text-slate-400" id="sidebar-user-email">...</p>
             </div>
-            <a href="index.html" id="logout-btn" class="text-rose-400 hover:text-rose-300 text-xs font-semibold cursor-pointer" data-i18n="logout">خروج</a>
+            <button id="logout-btn" class="text-rose-400 hover:text-rose-300 text-xs font-semibold cursor-pointer border-none bg-transparent" data-i18n="logout">خروج</button>
         </div>
     </aside>
 
@@ -464,8 +464,10 @@
             document.getElementById('create-user-form').reset();
             document.getElementById('name-error').classList.add('hidden');
             document.getElementById('modal-bottom-feedback').classList.add('hidden');
-            if (selectAllPagesCheckbox) selectAllPagesCheckbox.checked = true;
-            pageCheckboxes.forEach(cb => cb.checked = true);
+            
+            const selectAll = document.getElementById('select-all-pages');
+            if (selectAll) selectAll.checked = true;
+            document.querySelectorAll('.page-checkbox').forEach(cb => cb.checked = true);
         };
 
         async function loadUsers() {
@@ -477,7 +479,7 @@
 
                 const res1 = await supabase.from('users').select('*').order('created_at', { ascending: false });
                 if (res1.error) {
-                    const res2 = await supabase.from('profiles').select('*');
+                    const res2 = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
                     if (res2.error) {
                         errorDetails = res1.error.message || JSON.stringify(res1.error);
                     } else {
@@ -495,123 +497,131 @@
                 }
 
                 tableBody.innerHTML = users.map(user => {
-                    const createdAt = user.created_at ? new Date(user.created_at).toLocaleDateString('ar-SA') : '---';
-                    const roleName = (translations[currentLang] && translations[currentLang][`role_${user.role}`]) || user.role || 'غير محدد';
-
+                    const roleKey = `role_${user.role}`;
+                    const roleText = (translations[currentLang] && translations[currentLang][roleKey]) || user.role || 'عضو';
+                    const createdAt = user.created_at ? new Date(user.created_at).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US') : '-';
+                    
                     return `
-                        <tr class="hover:bg-slate-800/40 transition">
-                            <td class="py-3 px-2 font-semibold text-slate-100">${user.full_name || user.name || 'بدون اسم'}</td>
-                            <td class="py-3 px-2 text-slate-400">${user.email || '---'}</td>
-                            <td class="py-3 px-2"><span class="bg-indigo-950/80 text-indigo-300 border border-indigo-800/50 px-2 py-0.5 rounded-md text-[10px]">${roleName}</span></td>
-                            <td class="py-3 px-2 text-slate-400 text-[11px]">${createdAt}</td>
+                        <tr class="hover:bg-slate-800/40 transition border-b border-slate-800/40">
+                            <td class="py-3 px-2 font-medium text-slate-100">${user.full_name || user.name || 'بدون اسم'}</td>
+                            <td class="py-3 px-2 text-slate-400">${user.email || '-'}</td>
+                            <td class="py-3 px-2"><span class="bg-indigo-950 text-indigo-300 border border-indigo-800/50 px-2.5 py-1 rounded-lg text-[11px] font-semibold">${roleText}</span></td>
+                            <td class="py-3 px-2 text-slate-400">${createdAt}</td>
                             <td class="py-3 px-2 text-center">
-                                <button onclick="deleteUser('${user.id}')" class="text-rose-400 hover:text-rose-300 text-[11px] font-medium transition">حذف</button>
+                                <button onclick="deleteUser('${user.id}')" class="text-rose-400 hover:text-rose-300 transition text-xs font-semibold">حذف</button>
                             </td>
                         </tr>
                     `;
                 }).join('');
             } catch (err) {
                 console.error("Error loading users:", err);
-                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-rose-400">حدث خطأ أثناء تحميل الحسابات: <span class="font-mono text-[11px] text-rose-300">${err.message || err}</span></td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-rose-400">فشل في تحميل بيانات الأعضاء: ${err.message}</td></tr>`;
             }
         }
 
         window.deleteUser = async function(userId) {
-            if (!confirm('هل أنت تأكد من رغبتك في حذف هذا المستخدم نهائياً؟')) return;
+            const confirmMsg = currentLang === 'ar' ? 'هل أنت تأكد من رغبتك في حذف هذا المستخدم؟' : 'Are you sure you want to delete this user?';
+            if (!confirm(confirmMsg)) return;
+
             try {
-                let res = await supabase.from('users').delete().eq('id', userId);
-                if (res.error) {
-                    res = await supabase.from('profiles').delete().eq('id', userId);
-                    if (res.error) throw res.error;
+                let { error } = await supabase.from('users').delete().eq('id', userId);
+                if (error) {
+                    const res2 = await supabase.from('profiles').delete().eq('id', userId);
+                    if (res2.error) throw res2.error;
                 }
                 loadUsers();
             } catch (err) {
-                alert('فشل حذف المستخدم: ' + (err.message || 'خطأ غير معروف'));
+                alert((currentLang === 'ar' ? 'حدث خطأ أثناء الحذف: ' : 'Error deleting user: ') + err.message);
             }
         };
 
-        // 1. المنع الفوري لأي إدخال غير الحروف الإنجليزية والمسافات
+        // إدارة تحديد الكل لصلاحيات الصفحات
+        const selectAllPagesCheckbox = document.getElementById('select-all-pages');
+        const pageCheckboxes = document.querySelectorAll('.page-checkbox');
+
+        if (selectAllPagesCheckbox) {
+            selectAllPagesCheckbox.addEventListener('change', (e) => {
+                pageCheckboxes.forEach(cb => cb.checked = e.target.checked);
+            });
+        }
+
+        pageCheckboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                const allChecked = Array.from(pageCheckboxes).every(c => c.checked);
+                if (selectAllPagesCheckbox) selectAllPagesCheckbox.checked = allChecked;
+            });
+        });
+
+        // التحقق من الاسم باللغة الإنجليزية فقط
         const nameInput = document.getElementById('new-member-name');
         const nameError = document.getElementById('name-error');
 
-        nameInput.addEventListener('input', (e) => {
-            const originalValue = e.target.value;
-            // مسح أي حرف غير إنجليزي أو رموز أو أرقام فوراً أثناء الكتابة
-            const sanitizedValue = originalValue.replace(/[^A-Za-z\s]/g, '');
-
-            if (originalValue !== sanitizedValue) {
-                e.target.value = sanitizedValue;
+        nameInput?.addEventListener('input', () => {
+            const englishRegex = /^[a-zA-Z\s]*$/;
+            if (!englishRegex.test(nameInput.value)) {
                 nameError.classList.remove('hidden');
             } else {
                 nameError.classList.add('hidden');
             }
         });
 
-        // 2. المزامنة التلقائية لمربعات اختيار الصلاحيات مع زر "السماح بكل الصفحات"
-        const selectAllPagesCheckbox = document.getElementById('select-all-pages');
-        const pageCheckboxes = document.querySelectorAll('.page-checkbox');
+        // إنشاء مستخدم جديد
+        const createUserForm = document.getElementById('create-user-form');
+        const modalFeedback = document.getElementById('modal-bottom-feedback');
 
-        selectAllPagesCheckbox?.addEventListener('change', (e) => {
-            pageCheckboxes.forEach(cb => cb.checked = e.target.checked);
-        });
-
-        pageCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', () => {
-                const total = pageCheckboxes.length;
-                const checkedCount = document.querySelectorAll('.page-checkbox:checked').length;
-
-                if (selectAllPagesCheckbox) {
-                    // يتحدد تلقائياً فقط إذا جرى تحديد كافة الصفحات، ويتلغى تلقائياً بمجرد إزالة واحدة أو أكثر
-                    selectAllPagesCheckbox.checked = (total === checkedCount && total > 0);
-                }
-            });
-        });
-
-        // 3. إضافة مستخدم جديد للنظام
-        document.getElementById('create-user-form').addEventListener('submit', async (e) => {
+        createUserForm?.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            const name = nameInput.value.trim();
+            const email = document.getElementById('new-member-email').value.trim();
+            const password = document.getElementById('new-member-pass').value;
+            const role = document.getElementById('new-member-role').value;
 
-            const feedback = document.getElementById('modal-bottom-feedback');
-            const submitBtn = document.getElementById('submit-user-btn');
-
-            const nameVal = nameInput.value.trim();
-            const englishRegex = /^[A-Za-z\s]+$/;
-
-            if (!englishRegex.test(nameVal)) {
+            // التأكد من أن الاسم بحروف إنجليزية فقط
+            if (!/^[a-zA-Z\s]+$/.test(name)) {
                 nameError.classList.remove('hidden');
                 return;
             }
 
-            const email = document.getElementById('new-member-email').value.trim();
-            const password = document.getElementById('new-member-pass').value;
-            const role = document.getElementById('new-member-role').value;
             const allowedPages = Array.from(document.querySelectorAll('.page-checkbox:checked')).map(cb => cb.value);
 
-            submitBtn.disabled = true;
-            submitBtn.innerText = 'جاري التنفيذ...';
-
-            feedback.className = "px-3 py-2 rounded-xl text-xs text-center font-medium bg-indigo-950 border border-indigo-800 text-indigo-300 block";
-            feedback.innerText = 'جاري إنشاء الحساب وتعيين الصلاحيات...';
+            modalFeedback.className = "px-3 py-2 rounded-xl text-xs text-center font-medium bg-indigo-950 text-indigo-300 border border-indigo-800";
+            modalFeedback.innerText = currentLang === 'ar' ? "جاري إنشاء الحساب..." : "Creating account...";
+            modalFeedback.classList.remove('hidden');
 
             try {
-                const userData = {
-                    id: crypto.randomUUID(),
-                    full_name: nameVal,
-                    email: email,
-                    role: role,
-                    allowed_pages: allowedPages,
-                    created_by: currentAdminUserId || null,
-                    created_at: new Date().toISOString()
-                };
+                // إنشاء المستخدم في Supabase Auth
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: { full_name: name, role: role }
+                    }
+                });
 
-                let insertRes = await supabase.from('users').insert([userData]);
-                if (insertRes.error) {
-                    insertRes = await supabase.from('profiles').insert([userData]);
-                    if (insertRes.error) throw insertRes.error;
+                if (authError) throw authError;
+
+                const newUserId = authData.user?.id;
+                
+                if (newUserId) {
+                    const userData = {
+                        id: newUserId,
+                        full_name: name,
+                        email: email,
+                        role: role,
+                        allowed_pages: allowedPages,
+                        created_by: currentAdminUserId || null,
+                        created_at: new Date().toISOString()
+                    };
+
+                    let insertRes = await supabase.from('users').insert([userData]);
+                    if (insertRes.error) {
+                        await supabase.from('profiles').insert([userData]);
+                    }
                 }
 
-                feedback.className = "px-3 py-2 rounded-xl text-xs text-center font-medium bg-emerald-950 border border-emerald-800 text-emerald-300 block";
-                feedback.innerText = 'تم إنشاء حساب الموظف وربطه بالنظام بنجاح!';
+                modalFeedback.className = "px-3 py-2 rounded-xl text-xs text-center font-medium bg-emerald-950 text-emerald-300 border border-emerald-800";
+                modalFeedback.innerText = currentLang === 'ar' ? "تم إنشاء الحساب بنجاح!" : "Account created successfully!";
 
                 setTimeout(() => {
                     closeAddUserModal();
@@ -619,32 +629,58 @@
                 }, 1200);
 
             } catch (err) {
-                console.error("Error creating user:", err);
-                feedback.className = "px-3 py-2 rounded-xl text-xs text-center font-medium bg-rose-950 border border-rose-800 text-rose-300 block";
-                
-                if (err.message && err.message.includes('allowed_pages')) {
-                    feedback.innerText = 'تنبيه: يجب إضافة عمود allowed_pages في SQL Editor لقاعدة البيانات أولاً.';
-                } else {
-                    feedback.innerText = 'فشل إنشاء الحساب: ' + (err.message || 'خطأ غير معروف');
-                }
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = translations[currentLang]['btn_submit_user'];
+                console.error("User creation error:", err);
+                modalFeedback.className = "px-3 py-2 rounded-xl text-xs text-center font-medium bg-rose-950 text-rose-300 border border-rose-800";
+                modalFeedback.innerText = err.message || (currentLang === 'ar' ? "حدث خطأ أثناء إنشاء الحساب" : "Error creating account");
             }
         });
 
-        document.getElementById('save-changes-btn').addEventListener('click', () => {
-            const feedback = document.getElementById('settings-feedback');
-            feedback.className = "px-4 py-3 rounded-xl text-xs text-center font-medium bg-emerald-950 border border-emerald-800 text-emerald-300 block";
-            feedback.innerText = currentLang === 'ar' ? 'تم حفظ التغييرات بنجاح!' : 'Changes saved successfully!';
+        // حفظ تغييرات كلمة المرور والإعدادات
+        const saveBtn = document.getElementById('save-changes-btn');
+        const settingsFeedback = document.getElementById('settings-feedback');
 
-            setTimeout(() => {
-                feedback.classList.add('hidden');
-            }, 3000);
+        saveBtn?.addEventListener('click', async () => {
+            const newPass = document.getElementById('new-pass').value;
+
+            settingsFeedback.className = "px-4 py-3 rounded-xl text-xs text-center font-medium bg-indigo-950 text-indigo-300 border border-indigo-800";
+            settingsFeedback.innerText = currentLang === 'ar' ? "جاري حفظ التغييرات..." : "Saving changes...";
+            settingsFeedback.classList.remove('hidden');
+
+            try {
+                if (newPass) {
+                    if (newPass.length < 6) {
+                        throw new Error(currentLang === 'ar' ? "كلمة المرور يجب أن لا تقل عن 6 أحرف" : "Password must be at least 6 characters");
+                    }
+                    const { error } = await supabase.auth.updateUser({ password: newPass });
+                    if (error) throw error;
+                    document.getElementById('current-pass').value = '';
+                    document.getElementById('new-pass').value = '';
+                }
+
+                settingsFeedback.className = "px-4 py-3 rounded-xl text-xs text-center font-medium bg-emerald-950 text-emerald-300 border border-emerald-800";
+                settingsFeedback.innerText = currentLang === 'ar' ? "تم حفظ التغييرات بنجاح!" : "Changes saved successfully!";
+
+                setTimeout(() => {
+                    settingsFeedback.classList.add('hidden');
+                }, 3000);
+
+            } catch (err) {
+                settingsFeedback.className = "px-4 py-3 rounded-xl text-xs text-center font-medium bg-rose-950 text-rose-300 border border-rose-800";
+                settingsFeedback.innerText = err.message || (currentLang === 'ar' ? "حدث خطأ أثناء حفظ التغييرات" : "Error saving changes");
+            }
         });
 
-        applyLanguage(currentLang);
-        verifyUserPermissions();
+        // تسجيل الخروج
+        document.getElementById('logout-btn')?.addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            window.location.href = 'index.html';
+        });
+
+        // البدء عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', () => {
+            applyLanguage(currentLang);
+            verifyUserPermissions();
+        });
     </script>
 </body>
 </html>
