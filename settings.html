@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" id="html-root" style="display: none;">
 <head>
@@ -27,7 +26,7 @@
                 <span class="font-bold text-xs tracking-tight text-slate-200" data-i18n="brand_name">Keymerv Warehouse</span>
             </div>
 
-            <!-- روابط القائمة الجانبية -->
+            <!-- روابط القائمة الجانبية مع إيقاف غير المصرح به -->
             <nav class="p-4 space-y-1.5" id="sidebar-nav">
                 <a href="dashboard.html" data-page="dashboard" class="nav-link flex items-center justify-between px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition text-xs">
                     <span data-i18n="nav_overview">الرئيسية</span>
@@ -125,17 +124,23 @@
                 </div>
             </div>
 
-            <!-- 3. إعدادات التنبيهات والمخزون -->
+            <!-- 3. إعدادات التنبيهات (مع مفتاح التبديل ON/OFF) -->
             <div id="inventory-config-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <h3 class="text-sm font-bold text-indigo-400" data-i18n="inventory_config_title">إعدادات تنبيهات المخزون والطلبات</h3>
-                <div class="space-y-3 text-xs">
+                <div class="space-y-4 text-xs">
                     <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
                         <span class="text-slate-300" data-i18n="alert_low_stock">تنبيه تلقائي عند وصول الأصناف لحد النفاذ</span>
-                        <input type="checkbox" checked class="w-4 h-4 accent-indigo-600 rounded cursor-pointer">
+                        <!-- زر التبديل التفاعلي (Switch ON/OFF) -->
+                        <button type="button" onclick="toggleSwitch(this)" data-state="on" class="w-12 h-6 bg-indigo-600 rounded-full p-1 transition-colors flex items-center justify-end focus:outline-none">
+                            <span class="w-4 h-4 bg-white rounded-full shadow-md transition-transform"></span>
+                        </button>
                     </div>
                     <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
                         <span class="text-slate-300" data-i18n="alert_branch_orders">إرسال إشعار فوري عند طلب فرع مطعم أصناف جديدة</span>
-                        <input type="checkbox" checked class="w-4 h-4 accent-indigo-600 rounded cursor-pointer">
+                        <!-- زر التبديل التفاعلي (Switch ON/OFF) -->
+                        <button type="button" onclick="toggleSwitch(this)" data-state="on" class="w-12 h-6 bg-indigo-600 rounded-full p-1 transition-colors flex items-center justify-end focus:outline-none">
+                            <span class="w-4 h-4 bg-white rounded-full shadow-md transition-transform"></span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -158,11 +163,16 @@
                 <input type="hidden" id="editing-user-id" value="">
 
                 <div>
-                    <label class="block text-slate-400 mb-1" data-i18n="modal_label_name">اسم العضو (حروف إنجليزية فقط)</label>
-                    <!-- تنقية وحظر الأحرف العربية والرموز أثناء الكتابة مباشرة -->
+                    <label class="block text-slate-400 mb-1" data-i18n="modal_label_name">اسم العضو</label>
+                    <!-- تنقية وحظر الأحرف العربية والرموز أثناء الكتابة مع إظهار التنبيه -->
                     <input type="text" id="member-name" autocomplete="off" placeholder="John Doe" required 
                            oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    
+                    <!-- تنبيه موضح للمستخدم بأن الكتابة بالإنجليزية فقط -->
+                    <p class="text-[11px] text-amber-400/90 mt-1.5 flex items-center gap-1 font-medium" data-i18n="english_only_notice">
+                        <span>⚠️ تنبيه: يُسمح بكتابة الاسم باللغة الإنجليزية فقط.</span>
+                    </p>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -170,7 +180,7 @@
                         <label class="block text-slate-400 mb-1" data-i18n="modal_label_email">البريد الإلكتروني</label>
                         <input type="email" id="member-email" autocomplete="off" placeholder="user@keymerv.com" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
                     </div>
-                    <!-- حقل كلمة المرور يظهر فقط عند الإضافة ويختفي عند التعديل لأغراض الأمان -->
+                    <!-- حقل كلمة المرور يظهر عند الإضافة فقط للتأمين -->
                     <div id="password-container">
                         <label class="block text-slate-400 mb-1" data-i18n="modal_label_pass">كلمة المرور المؤقتة</label>
                         <input type="password" id="member-pass" autocomplete="new-password" placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
@@ -195,7 +205,7 @@
                     <div class="flex justify-between items-center mb-1">
                         <label class="text-slate-400 font-semibold" data-i18n="modal_page_permissions">صلاحيات الوصول للصفحات</label>
                         <label class="cursor-pointer text-indigo-400 text-[11px] flex items-center gap-1">
-                            <input type="checkbox" id="select-all-pages" checked class="rounded bg-slate-900 border-slate-700 text-indigo-600"> 
+                            <input type="checkbox" id="select-all-pages" checked class="rounded bg-slate-900 border-slate-700 text-indigo-600 cursor-pointer"> 
                             <span data-i18n="select_all">تحديد الكل</span>
                         </label>
                     </div>
@@ -237,11 +247,11 @@
         </div>
     </div>
 
-    <!-- السكربت البرمجي الكامل مع ملف الترجمة -->
+    <!-- السكربت البرمجي الكامل مع معالجات الأحداث والترجمة -->
     <script type="module">
         import { supabase } from './assets/js/supabase.js';
 
-        // 1. القاموس الكامل للترجمة (قاموس شامل لكل نصوص الصفحة)
+        // 1. القاموس الكامل للترجمة
         const i18n = {
             ar: {
                 settings_title: "الإعدادات - Keymerv Warehouse",
@@ -270,14 +280,15 @@
                 no_users: "لا يوجد مستخدمين مضافين حالياً.",
                 edit_btn: "تعديل",
                 delete_btn: "حذف",
-                no_permission_badge: "لا تملك صلاحية",
+                no_permission_badge: "لا تمتلك صلاحية",
                 inventory_config_title: "إعدادات تنبيهات المخزون والطلبات",
                 alert_low_stock: "تنبيه تلقائي عند وصول الأصناف لحد النفاذ",
                 alert_branch_orders: "إرسال إشعار فوري عند طلب فرع مطعم أصناف جديدة",
                 save_btn: "حفظ التغييرات",
                 modal_add_heading: "إضافة مستخدم جديد للنظام",
                 modal_edit_heading: "تعديل بيانات المستخدم والصلاحيات",
-                modal_label_name: "اسم العضو (حروف إنجليزية فقط)",
+                modal_label_name: "اسم العضو",
+                english_only_notice: "⚠️ تنبيه: يُسمح بكتابة الاسم باللغة الإنجليزية فقط.",
                 modal_label_email: "البريد الإلكتروني",
                 modal_label_pass: "كلمة المرور المؤقتة",
                 modal_label_role: "المسمى الوظيفي",
@@ -327,7 +338,8 @@
                 save_btn: "Save Changes",
                 modal_add_heading: "Add New User to System",
                 modal_edit_heading: "Edit User Data & Permissions",
-                modal_label_name: "Member Name (English Letters Only)",
+                modal_label_name: "Member Name",
+                english_only_notice: "⚠️ Notice: Name must be entered in English letters only.",
                 modal_label_email: "Email Address",
                 modal_label_pass: "Temporary Password",
                 modal_label_role: "Job Title",
@@ -350,7 +362,23 @@
         let isSuperAdmin = false;
         let cachedUsersList = [];
 
-        // تطبيق النصوص حسب اللغة المختارة
+        // مفتاح التبديل التفاعلي ON/OFF
+        window.toggleSwitch = function(btn) {
+            const isOff = btn.getAttribute('data-state') === 'off';
+            const knob = btn.querySelector('span');
+
+            if (isOff) {
+                btn.setAttribute('data-state', 'on');
+                btn.className = "w-12 h-6 bg-indigo-600 rounded-full p-1 transition-colors flex items-center justify-end focus:outline-none";
+                if(knob) knob.className = "w-4 h-4 bg-white rounded-full shadow-md transition-transform translate-x-0";
+            } else {
+                btn.setAttribute('data-state', 'off');
+                btn.className = "w-12 h-6 bg-slate-800 rounded-full p-1 transition-colors flex items-center justify-start focus:outline-none";
+                if(knob) knob.className = "w-4 h-4 bg-slate-400 rounded-full shadow-md transition-transform translate-x-0";
+            }
+        };
+
+        // تطبيق ترجمة النصوص واختيار اتجاه الصفحة
         function applyTranslations() {
             const langData = i18n[currentLang];
             document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -364,7 +392,6 @@
                 }
             });
 
-            // ضبط اتجاه الصفحة (RTL / LTR)
             const htmlRoot = document.getElementById('html-root');
             if (currentLang === 'en') {
                 htmlRoot.setAttribute('dir', 'ltr');
@@ -377,12 +404,12 @@
             }
         }
 
-        // تبديل اللغة
+        // زر تبديل اللغة
         document.getElementById('lang-btn')?.addEventListener('click', () => {
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
             localStorage.setItem('keymerv_lang', currentLang);
             applyTranslations();
-            loadUsers(); // إعادة رسم جدول المستخدمين حسب اللغة
+            loadUsers();
         });
 
         async function initPage() {
@@ -405,18 +432,20 @@
                 const profile = profileRes.data;
                 document.getElementById('sidebar-user-email').innerText = session.user.email || 'admin@keymerv.com';
 
-                // معالجة صلاحيات القائمة الجانبية وتنسيق الأزرار غير المسموحة
                 const allowedPages = profile?.allowed_pages || ['dashboard', 'orders', 'supply', 'inventory', 'branches', 'settings'];
                 
+                // معالجة القائمة الجانبية: تعطيل الأزرار التي لا يملك العضو صلاحياتها وكتابة "لا تمتلك صلاحية"
                 document.querySelectorAll('#sidebar-nav .nav-link').forEach(link => {
                     const pageName = link.getAttribute('data-page');
                     if (profile?.role !== 'admin' && profile?.role !== 'owner' && profile?.created_by && !allowedPages.includes(pageName)) {
-                        link.classList.add('opacity-40', 'pointer-events-none', 'cursor-not-allowed');
+                        // تعطيل الزر تماماً
+                        link.classList.add('opacity-50', 'pointer-events-none', 'cursor-not-allowed');
                         link.classList.remove('hover:bg-slate-800', 'hover:text-white');
                         link.removeAttribute('href');
                         
+                        // إضافة شارة عدم الصلاحية المباشرة
                         const badge = document.createElement('span');
-                        badge.className = "text-[9px] bg-slate-800 text-rose-400 px-2 py-0.5 rounded-md border border-rose-900/40";
+                        badge.className = "text-[10px] bg-rose-950/80 text-rose-400 border border-rose-800/50 px-2 py-0.5 rounded-md font-semibold";
                         badge.innerText = i18n[currentLang].no_permission_badge;
                         link.appendChild(badge);
                     }
@@ -433,7 +462,7 @@
                     document.getElementById('team-settings-card')?.classList.add('hidden');
                 }
 
-                // إظهار الصفحة بأمان تام بعد الانتهاء من فحص الحماية
+                // إظهار الصفحة بعد الانتهاء من تطبيق شروط الأمان
                 document.getElementById('html-root').style.display = 'block';
 
             } catch (err) {
@@ -480,23 +509,23 @@
             }
         }
 
-        // فتح نافذة إضافة مستخدم جديد
+        // فتح نافذة الإضافة
         window.openAddUserModal = function() {
             document.getElementById('editing-user-id').value = '';
             document.getElementById('modal-heading').innerText = i18n[currentLang].modal_add_heading;
             document.getElementById('user-form').reset();
             
-            // إظهار حقل كلمة المرور وجعله مطلوباً عند الإضافة الجديدة
             const passContainer = document.getElementById('password-container');
             passContainer.classList.remove('hidden');
             document.getElementById('member-pass').required = true;
 
             document.querySelectorAll('.page-checkbox').forEach(cb => cb.checked = true);
+            document.getElementById('select-all-pages').checked = true;
             document.getElementById('modal-feedback').classList.add('hidden');
             document.getElementById('userModal').classList.remove('hidden');
         };
 
-        // فتح نافذة تعديل بيانات المستخدم
+        // فتح نافذة التعديل
         window.openEditUserModal = function(userId) {
             const user = cachedUsersList.find(u => u.id === userId);
             if (!user) return;
@@ -507,7 +536,7 @@
             document.getElementById('member-email').value = user.email || '';
             document.getElementById('member-role').value = user.role || 'chef';
             
-            // إخفاء حقل كلمة المرور تماماً عند التعديل بناءً على التحديث الأمني
+            // إخفاء حقل كلمة المرور لحماية الحساب من التغيير القسري
             const passContainer = document.getElementById('password-container');
             passContainer.classList.add('hidden');
             document.getElementById('member-pass').required = false;
@@ -516,6 +545,10 @@
             document.querySelectorAll('.page-checkbox').forEach(cb => {
                 cb.checked = allowedPages.includes(cb.value);
             });
+
+            // ضبط حالة زر تحديد الكل بناءً على اكتمال الصفحات
+            const allChecked = Array.from(document.querySelectorAll('.page-checkbox')).every(cb => cb.checked);
+            document.getElementById('select-all-pages').checked = allChecked;
 
             document.getElementById('modal-feedback').classList.add('hidden');
             document.getElementById('userModal').classList.remove('hidden');
@@ -526,13 +559,21 @@
             document.getElementById('user-form').reset();
         };
 
-        // تحديد / إلغاء تحديد كافة صفحات الصلاحيات
+        // 1. التحكم بـ "تحديد الكل"
         document.getElementById('select-all-pages')?.addEventListener('change', (e) => {
             const checked = e.target.checked;
             document.querySelectorAll('.page-checkbox').forEach(cb => cb.checked = checked);
         });
 
-        // التعامل مع تسليم النموذج (إضافة أو تعديل) مع فحص التكرار
+        // 2. إلغاء تحديد "تحديد الكل" لو أزال المستخدم الصح من أي صفحة واحدة
+        document.querySelectorAll('.page-checkbox').forEach(cb => {
+            cb.addEventListener('change', () => {
+                const allChecked = Array.from(document.querySelectorAll('.page-checkbox')).every(c => c.checked);
+                document.getElementById('select-all-pages').checked = allChecked;
+            });
+        });
+
+        // حفظ بيانات النموذج مع فحص عدم التكرار
         document.getElementById('user-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -549,12 +590,11 @@
             feedback.classList.remove('hidden');
 
             try {
-                // 1. فحص التكرار في قاعدة البيانات للـ Name والـ Email
+                // فحص منع تكرار الاسم والبريد في قاعدة البيانات
                 let query = supabase.from('users').select('id, full_name, email').or(`email.ilike.${email},full_name.ilike.${name}`);
                 const { data: duplicates } = await query;
 
                 if (duplicates && duplicates.length > 0) {
-                    // التنسيق يضمن عدم اعتبار الحساب الحالي نفسه كمُكرر أثناء التعديل
                     const isConflict = duplicates.some(u => u.id !== editingId);
                     if (isConflict) {
                         throw new Error(currentLang === 'ar' 
@@ -563,7 +603,7 @@
                     }
                 }
 
-                // 2. حالة إضافة حساب جديد
+                // إضافة حساب جديد
                 if (!editingId) {
                     const { data: authData, error: authError } = await supabase.auth.signUp({
                         email,
@@ -588,7 +628,7 @@
                         if (ins.error) await supabase.from('profiles').insert([userData]);
                     }
                 } 
-                // 3. حالة تعديل بيانات حساب حالي (بدون لمس كلمة المرور)
+                // تعديل حساب حالي
                 else {
                     const updatePayload = {
                         full_name: name,
