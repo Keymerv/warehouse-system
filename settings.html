@@ -69,7 +69,7 @@
         </header>
 
         <div class="p-6 space-y-6 max-w-5xl">
-            <!-- 1. بيانات المنشأة (تظهر للجميع - للعرض فقط للموظف) -->
+            <!-- 1. بيانات المنشأة -->
             <div id="general-settings-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <h3 class="text-sm font-bold text-indigo-400" data-i18n="general_settings_title">بيانات المنشأة الرئيسية</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
@@ -92,7 +92,7 @@
                 </div>
             </div>
 
-            <!-- 2. تغيير كلمة المرور الشخصية (يظهر للجميع بما فيهم الموظف) -->
+            <!-- 2. تغيير كلمة المرور الشخصية -->
             <div id="change-password-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <h3 class="text-sm font-bold text-indigo-400" data-i18n="change_pass_title">تغيير كلمة المرور الشخصية</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
@@ -111,7 +111,7 @@
                 </div>
             </div>
 
-            <!-- 3. إعدادات الفريق (للأدمن والمالك فقط - مخفية تماماً عن الموظف) -->
+            <!-- 3. إعدادات الفريق (للأدمن فقط) -->
             <div id="team-settings-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 hidden">
                 <div class="flex justify-between items-center">
                     <h3 class="text-sm font-bold text-indigo-400" data-i18n="team_settings_title">إعدادات الفريق والحسابات</h3>
@@ -140,7 +140,7 @@
                 </div>
             </div>
 
-            <!-- 4. إعدادات التنبيهات (للأدمن والمالك فقط - مخفية تماماً عن الموظف) -->
+            <!-- 4. إعدادات التنبيهات (للأدمن فقط) -->
             <div id="inventory-config-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 hidden">
                 <h3 class="text-sm font-bold text-indigo-400" data-i18n="inventory_config_title">إعدادات تنبيهات المخزون والطلبات</h3>
                 <div class="space-y-4 text-xs">
@@ -161,7 +161,7 @@
         </div>
     </main>
 
-    <!-- نافذة إضافة / تعديل مستخدم (خاصة بالأدمن) -->
+    <!-- نافذة إضافة / تعديل مستخدم -->
     <div id="userModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-xl p-6 space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -206,20 +206,25 @@
                     </select>
                 </div>
 
-                <!-- صلاحيات الوصول للصفحات -->
+                <!-- صلاحيات الوصول للصفحات الفرعية -->
                 <div class="space-y-3 pt-3 border-t border-slate-800">
                     <div class="flex justify-between items-center mb-1">
-                        <label class="text-slate-400 font-semibold" data-i18n="modal_page_permissions">صلاحيات الوصول للصفحات</label>
+                        <label class="text-slate-400 font-semibold" data-i18n="modal_page_permissions">صلاحيات الوصول للصفحات الإضافية</label>
                         <label class="cursor-pointer text-indigo-400 text-[11px] flex items-center gap-1">
                             <input type="checkbox" id="select-all-pages" checked class="rounded bg-slate-900 border-slate-700 text-indigo-600 cursor-pointer"> 
                             <span data-i18n="select_all">تحديد الكل</span>
                         </label>
                     </div>
+                    
                     <div id="pages-container" class="bg-slate-950 border border-slate-800 rounded-xl p-3 max-h-36 overflow-y-auto grid grid-cols-2 gap-2 text-[11px]">
-                        <label class="flex items-center gap-2 cursor-pointer text-slate-300">
-                            <input type="checkbox" name="allowed_pages" value="dashboard" checked class="page-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
+                        <!-- الرئيسية (مقفل ومفعل افتراضياً) -->
+                        <label class="flex items-center gap-2 text-slate-400 cursor-not-allowed opacity-60">
+                            <input type="checkbox" checked disabled class="rounded bg-slate-900 border-slate-700 text-indigo-600 cursor-not-allowed">
                             <span data-i18n="nav_overview">الرئيسية (Dashboard)</span>
+                            <span class="text-[9px] text-indigo-400 font-bold">(افتراضي)</span>
                         </label>
+
+                        <!-- باقي الصفحات الاختيارية -->
                         <label class="flex items-center gap-2 cursor-pointer text-slate-300">
                             <input type="checkbox" name="allowed_pages" value="orders" checked class="page-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
                             <span data-i18n="nav_orders">طلبات التغذية</span>
@@ -299,7 +304,7 @@
                 modal_label_email: "البريد الإلكتروني",
                 modal_label_pass: "كلمة المرور المؤقتة",
                 modal_label_role: "المسمى الوظيفي",
-                modal_page_permissions: "صلاحيات الوصول للصفحات",
+                modal_page_permissions: "صلاحيات الوصول للصفحات الإضافية",
                 select_all: "تحديد الكل",
                 btn_cancel: "إلغاء",
                 btn_save_account: "حفظ الحساب",
@@ -356,7 +361,7 @@
                 modal_label_email: "Email Address",
                 modal_label_pass: "Temporary Password",
                 modal_label_role: "Job Title",
-                modal_page_permissions: "Page Access Permissions",
+                modal_page_permissions: "Additional Page Permissions",
                 select_all: "Select All",
                 btn_cancel: "Cancel",
                 btn_save_account: "Save Account",
@@ -445,15 +450,12 @@
                 const profile = profileRes.data || {};
                 document.getElementById('sidebar-user-email').innerText = userEmail;
 
-                // التثبت الصارم من رتبة الأدمن / المالك
                 isSuperAdmin = (userEmail === MASTER_ADMIN_EMAIL || profile.role === 'admin' || profile.role === 'owner');
 
                 let allowedPages = profile.allowed_pages || ['dashboard', 'orders', 'supply', 'inventory', 'branches', 'settings'];
-                if (!allowedPages.includes('settings')) {
-                    allowedPages.push('settings');
-                }
+                if (!allowedPages.includes('dashboard')) allowedPages.push('dashboard');
+                if (!allowedPages.includes('settings')) allowedPages.push('settings');
 
-                // تعطيل روابط الشريط الجانبي غير المسموحة للموظف
                 document.querySelectorAll('#sidebar-nav .nav-link').forEach(link => {
                     const pageName = link.getAttribute('data-page');
                     
@@ -473,7 +475,6 @@
 
                 if (isSuperAdmin) {
                     document.getElementById('sidebar-user-role').innerText = currentLang === 'ar' ? "الإدارة العامة (المالك)" : "General Admin (Owner)";
-                    // إظهار كروت التحكم بالإدارة
                     document.getElementById('team-settings-card')?.classList.remove('hidden');
                     document.getElementById('inventory-config-card')?.classList.remove('hidden');
                     loadUsers();
@@ -482,7 +483,6 @@
                     const translatedRole = i18n[currentLang][roleKey] || profile.role || (currentLang === 'ar' ? 'عضو' : 'Member');
                     document.getElementById('sidebar-user-role').innerText = translatedRole;
                     
-                    // إخفاء كروت إدارة الفريق والتنبيهات عن الموظف العادي بشكل كامل
                     document.getElementById('team-settings-card')?.classList.add('hidden');
                     document.getElementById('inventory-config-card')?.classList.add('hidden');
                 }
@@ -495,7 +495,7 @@
             }
         }
 
-        // تغيير كلمة المرور للمستخدم الحالي (أدمن أو موظف)
+        // تغيير كلمة المرور الشخصية
         document.getElementById('change-password-btn')?.addEventListener('click', async () => {
             const newPass = document.getElementById('new-user-password').value;
             const confirmPass = document.getElementById('confirm-user-password').value;
@@ -661,7 +661,7 @@
             }
         };
 
-        // إدارة إمكانية تحديد الكل للصفحات
+        // إدارة تحديد الكل
         const selectAllCb = document.getElementById('select-all-pages');
         if (selectAllCb) {
             selectAllCb.addEventListener('change', (e) => {
@@ -683,7 +683,7 @@
             cb.addEventListener('change', updateSelectAllCheckbox);
         });
 
-        // حفظ / تعديل المستخدم من قبل الأدمن
+        // حفظ / تعديل المستخدم
         document.getElementById('user-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const feedbackEl = document.getElementById('modal-feedback');
@@ -695,11 +695,14 @@
             const pass = document.getElementById('member-pass').value;
             const role = document.getElementById('member-role').value;
             
-            const allowedPages = [];
+            // إضافة الرئيسية والإعدادات افتراضياً ودائماً
+            const allowedPages = ['dashboard', 'settings'];
+            
             document.querySelectorAll('.page-checkbox:checked').forEach(cb => {
-                allowedPages.push(cb.value);
+                if (!allowedPages.includes(cb.value)) {
+                    allowedPages.push(cb.value);
+                }
             });
-            if (!allowedPages.includes('settings')) allowedPages.push('settings');
 
             feedbackEl.className = "px-3 py-2 rounded-xl text-xs text-center font-medium bg-indigo-950/80 text-indigo-300 border border-indigo-800/50 block";
             feedbackEl.innerText = currentLang === 'ar' ? "جاري حفظ الحساب..." : "Saving account...";
@@ -710,8 +713,7 @@
                     const updateData = {
                         full_name: fullName,
                         role: role,
-                        allowed_pages: allowedPages,
-                        updated_at: new Date().toISOString()
+                        allowed_pages: allowedPages
                     };
                     
                     let { error } = await supabase.from('users').update(updateData).eq('id', userId);
