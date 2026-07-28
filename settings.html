@@ -117,7 +117,7 @@
                 </div>
             </div>
 
-            <!-- قسم تنبيهات المخزون والطلبات كامل بدون اختصار -->
+            <!-- قسم تنبيهات المخزون والطلبات -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <h3 class="text-sm font-bold text-indigo-400" data-i18n="inventory_config_title">إعدادات تنبيهات المخزون والطلبات</h3>
                 <div class="space-y-3 text-xs" id="toggles-container">
@@ -501,12 +501,36 @@
             document.getElementById('modal-bottom-feedback').classList.add('hidden');
         };
 
-        // 5. جلب بيانات المستخدمين من Supabase
+        // 5. جلب بيانات المستخدمين من Supabase (مع معالجة الأخطاء وطباعة نص الخطأ المباشر)
         async function loadUsers() {
             const tableBody = document.getElementById('users-table-body');
             try {
-                const { data: users, error } = await supabase.from('users').select('*').order('created_at', { ascending: false });
-                if (error) throw error;
+                let users = [];
+                let errorDetails = null;
+
+                // محاولة الاستعلام من جدول users
+                const res1 = await supabase.from('users').select('*').order('created_at', { ascending: false });
+                if (res1.error) {
+                    // محاولة بدون الترتيب
+                    const res1_noorder = await supabase.from('users').select('*');
+                    if (res1_noorder.error) {
+                        // محاولة الاستعلام من جدول profiles كبديل
+                        const res2 = await supabase.from('profiles').select('*');
+                        if (res2.error) {
+                            errorDetails = res1.error.message || res1.error.details || JSON.stringify(res1.error);
+                        } else {
+                            users = res2.data;
+                        }
+                    } else {
+                        users = res1_noorder.data;
+                    }
+                } else {
+                    users = res1.data;
+                }
+
+                if (errorDetails) {
+                    throw new Error(errorDetails);
+                }
 
                 if (!users || users.length === 0) {
                     tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">لا يوجد مستخدمين مضافين حالياً.</td></tr>`;
@@ -514,14 +538,14 @@
                 }
 
                 tableBody.innerHTML = users.map(user => {
-                    const createdAt = new Date(user.created_at).toLocaleDateString('ar-SA');
-                    const roleName = translations[currentLang][`role_${user.role}`] || user.role;
-                    const brandsText = Array.isArray(user.brands) ? user.brands.join(', ') : 'الكل';
+                    const createdAt = user.created_at ? new Date(user.created_at).toLocaleDateString('ar-SA') : '---';
+                    const roleName = (translations[currentLang] && translations[currentLang][`role_${user.role}`]) || user.role || 'غير محدد';
+                    const brandsText = Array.isArray(user.brands) ? user.brands.join(', ') : (user.brands || 'الكل');
 
                     return `
                         <tr class="hover:bg-slate-800/40 transition">
                             <td class="py-3 px-2 font-semibold text-slate-100">${user.full_name || user.name || 'بدون اسم'}</td>
-                            <td class="py-3 px-2 text-slate-400">${user.email}</td>
+                            <td class="py-3 px-2 text-slate-400">${user.email || '---'}</td>
                             <td class="py-3 px-2 text-indigo-400 font-medium">${brandsText}</td>
                             <td class="py-3 px-2"><span class="bg-indigo-950/80 text-indigo-300 border border-indigo-800/50 px-2 py-0.5 rounded-md text-[10px]">${roleName}</span></td>
                             <td class="py-3 px-2 text-slate-400 text-[11px]">${createdAt}</td>
@@ -533,7 +557,8 @@
                 }).join('');
             } catch (err) {
                 console.error("Error loading users:", err);
-                tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-rose-400">حدث خطأ أثناء تحميل الحسابات من القاعدة.</td></tr>`;
+                const msg = err.message || JSON.stringify(err);
+                tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-rose-400">حدث خطأ أثناء تحميل الحسابات: <span class="font-mono text-[11px] text-rose-300">${msg}</span></td></tr>`;
             }
         }
 
@@ -541,33 +566,53 @@
         window.deleteUser = async function(userId) {
             if (!confirm('هل أنت تأكد من رغبتك في حذف هذا المستخدم نهائياً؟')) return;
             try {
-                const { error } = await supabase.from('users').delete().eq('id', userId);
-                if (error) throw error;
+                let res = await supabase.from('users').delete().eq('id', userId);
+                if (res.error) {
+                    res = await supabase.from('profiles').delete().eq('id', userId);
+                    if (res.error) throw res.error;
+                }
                 loadUsers();
             } catch (err) {
-                alert('فشل حذف المستخدم: ' + err.message);
+                alert('فشل حذف المستخدم: ' + (err.message || 'خطأ غير معروف'));
             }
         };
 
-        // 7. جلب البراندات والفروع ديناميكياً لتشيك بوكس المودال
+        // 7. جلب البراندات والفروع من جدولي brands و branches
         async function loadBrandsAndBranches() {
             const brandsContainer = document.getElementById('brands-checkboxes-container');
             const branchesContainer = document.getElementById('branches-checkboxes-container');
 
             try {
-                const { data: branches, error } = await supabase.from('branches').select('*');
-                if (error) throw error;
+                let allBrands = [];
 
-                fetchedBranchesData = branches || [];
-                const uniqueBrands = [...new Set(fetchedBranchesData.map(b => b.brand_name || b.brand).filter(Boolean))];
+                // 1. محاولة الجلب من جدول brands
+                const brandsRes = await supabase.from('brands').select('*');
+                if (!brandsRes.error && brandsRes.data) {
+                    brandsRes.data.forEach(b => {
+                        const name = b.name || b.brand_name || b.title;
+                        if (name && !allBrands.includes(name)) allBrands.push(name);
+                    });
+                }
 
-                if (uniqueBrands.length === 0) {
+                // 2. محاولة الجلب من جدول branches
+                const branchesRes = await supabase.from('branches').select('*');
+                if (!branchesRes.error && branchesRes.data) {
+                    fetchedBranchesData = branchesRes.data;
+                    branchesRes.data.forEach(b => {
+                        const bBrand = b.brand_name || b.brand || b.brand_title;
+                        if (bBrand && !allBrands.includes(bBrand)) {
+                            allBrands.push(bBrand);
+                        }
+                    });
+                }
+
+                if (allBrands.length === 0) {
                     brandsContainer.innerHTML = `<span class="text-slate-500">لا توجد براندات مسجلة في قاعدة البيانات.</span>`;
                     branchesContainer.innerHTML = `<span class="text-slate-500">لا توجد فروع مسجلة.</span>`;
                     return;
                 }
 
-                brandsContainer.innerHTML = uniqueBrands.map(brand => `
+                brandsContainer.innerHTML = allBrands.map(brand => `
                     <label class="flex items-center gap-2 cursor-pointer text-slate-300">
                         <input type="checkbox" name="selected_brands" value="${brand}" class="brand-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
                         <span>${brand}</span>
@@ -581,7 +626,8 @@
 
             } catch (err) {
                 console.error("Error loading brands/branches:", err);
-                brandsContainer.innerHTML = `<span class="text-rose-400">خطأ في تحميل البراندات.</span>`;
+                const errorMsg = err.message || JSON.stringify(err);
+                brandsContainer.innerHTML = `<span class="text-rose-400">خطأ في تحميل البراندات: ${errorMsg}</span>`;
             }
         }
 
@@ -594,7 +640,7 @@
                 return;
             }
 
-            const filteredBranches = fetchedBranchesData.filter(b => selectedBrands.includes(b.brand_name || b.brand));
+            const filteredBranches = fetchedBranchesData.filter(b => selectedBrands.includes(b.brand_name || b.brand || b.brand_title));
 
             if (filteredBranches.length === 0) {
                 branchesContainer.innerHTML = `<span class="text-slate-500">لا توجد فروع مرتبطة بالبراندات المحددة.</span>`;
@@ -604,7 +650,7 @@
             branchesContainer.innerHTML = filteredBranches.map(branch => `
                 <label class="flex items-center gap-2 cursor-pointer text-slate-300">
                     <input type="checkbox" name="selected_branches" value="${branch.id}" class="branch-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
-                    <span>${branch.name || branch.branch_name} (${branch.brand_name || branch.brand})</span>
+                    <span>${branch.name || branch.branch_name} (${branch.brand_name || branch.brand || 'عام'})</span>
                 </label>
             `).join('');
         }
@@ -666,20 +712,21 @@
             feedback.innerText = 'جاري إنشاء الحساب ومنح الصلاحيات...';
 
             try {
-                // إضافة المستخدم بجداول Supabase
-                const { data, error } = await supabase.from('users').insert([
-                    {
-                        full_name: nameVal,
-                        email: email,
-                        role: role,
-                        brands: selectedBrands,
-                        branches: selectedBranches,
-                        allowed_pages: allowedPages,
-                        created_at: new Date().toISOString()
-                    }
-                ]);
+                const userData = {
+                    full_name: nameVal,
+                    email: email,
+                    role: role,
+                    brands: selectedBrands,
+                    branches: selectedBranches,
+                    allowed_pages: allowedPages,
+                    created_at: new Date().toISOString()
+                };
 
-                if (error) throw error;
+                let insertRes = await supabase.from('users').insert([userData]);
+                if (insertRes.error) {
+                    insertRes = await supabase.from('profiles').insert([userData]);
+                    if (insertRes.error) throw insertRes.error;
+                }
 
                 feedback.className = "px-3 py-2 rounded-xl text-xs text-center font-medium bg-emerald-950 border border-emerald-800 text-emerald-300 block";
                 feedback.innerText = 'تم إنشاء الحساب بنجاح وتعيين الصلاحيات!';
