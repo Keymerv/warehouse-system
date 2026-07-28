@@ -120,7 +120,7 @@
 
                     <!-- رفع ملف إكسيل -->
                     <label class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-md shadow-emerald-600/20 cursor-pointer flex items-center gap-1.5">
-                        <span>📊 رفع شيت الإكسيل</span>
+                        <span data-i18n="upload_excel_btn">📊 رفع شيت الإكسيل</span>
                         <input type="file" id="excel-file-input" accept=".csv" onchange="importExcelFile(event)" class="hidden">
                     </label>
 
@@ -270,7 +270,7 @@
                     </div>
                 </div>
 
-                <!-- الوحدة (قائمة منسدلة) والحالة -->
+                <!-- الوحدة والحالة -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="field-container">
                         <label class="block text-[11px] text-slate-400 mb-1">الوحدة <span class="text-rose-500">*</span></label>
@@ -302,10 +302,109 @@
         </div>
     </div>
 
-    <!-- JavaScript المحدث -->
+    <!-- JavaScript المحدث والكامل -->
     <script>
         let editingRow = null;
         let currentLang = localStorage.getItem('lang') || 'ar';
+
+        const inventoryTranslations = {
+            ar: {
+                inventory_title: "إدارة المخزون - Keymerv Warehouse",
+                brand_name: "Keymerv Warehouse",
+                nav_overview: "الرئيسية",
+                nav_orders: "طلبات التغذية",
+                nav_supply: "التوريد والموردين",
+                nav_inventory: "إدارة المخزون",
+                nav_branches: "الفروع",
+                nav_settings: "الإعدادات",
+                user_name: "أحمد الغامدي",
+                user_role: "مدير المستودع الرئيسي",
+                logout: "خروج",
+                inventory_header: "إدارة المخزون الرئيسي",
+                stat_total_items: "إجمالي الأصناف",
+                stat_low_stock: "أصناف وشيك نفاذها",
+                stat_out_stock: "أصناف منتهية",
+                search_placeholder: "ابحث عن صنف أو كود SKU...",
+                filter_all: "جميع الأصناف",
+                filter_available: "الأصناف المتوفرة",
+                filter_low: "قاربت على النفاذ",
+                filter_out: "الأصناف المنتهية",
+                delete_selected_btn: "🗑️ حذف المحدد",
+                download_template_btn: "📄 تنزيل نموذج الإكسيل",
+                upload_excel_btn: "📊 رفع شيت الإكسيل",
+                download_all_btn: "📥 تصدير الأصناف",
+                add_item_btn: "+ إضافة صنف",
+                pagination_show: "عرض",
+                pagination_per_page: "صنف لكل صفحة",
+                pagination_info: "عرض {count} من أصل {total} صنف",
+                th_sku: "كود SKU",
+                th_item_name: "اسم الصنف",
+                th_category: "التصنيف",
+                th_quantity: "الكمية الحالية",
+                th_min_limit: "الحد الأدنى",
+                th_unit: "الوحدة",
+                th_status: "الحالة",
+                th_actions: "الإجراءات",
+                edit_btn: "تعديل",
+                status_available: "متوفر",
+                status_low: "قارب على النفاذ",
+                status_out: "منتهي",
+                unit_piece: "قطعة",
+                unit_bag: "كيس",
+                unit_carton: "كرتون",
+                unit_gram: "بالغرام",
+                modal_add_title: "إضافة صنف جديد",
+                modal_edit_title: "تعديل صنف"
+            },
+            en: {
+                inventory_title: "Inventory Management - Keymerv Warehouse",
+                brand_name: "Keymerv Warehouse",
+                nav_overview: "Overview",
+                nav_orders: "Replenishment Orders",
+                nav_supply: "Supply & Suppliers",
+                nav_inventory: "Inventory Management",
+                nav_branches: "Branches",
+                nav_settings: "Settings",
+                user_name: "Ahmed Al-Ghamdi",
+                user_role: "Main Warehouse Manager",
+                logout: "Logout",
+                inventory_header: "Main Inventory Management",
+                stat_total_items: "Total Items",
+                stat_low_stock: "Low Stock Items",
+                stat_out_stock: "Out of Stock",
+                search_placeholder: "Search item name or SKU...",
+                filter_all: "All Items",
+                filter_available: "Available Items",
+                filter_low: "Low Stock",
+                filter_out: "Out of Stock",
+                delete_selected_btn: "🗑️ Delete Selected",
+                download_template_btn: "📄 Download Template",
+                upload_excel_btn: "📊 Upload Excel Sheet",
+                download_all_btn: "📥 Export Items",
+                add_item_btn: "+ Add Item",
+                pagination_show: "Show",
+                pagination_per_page: "items per page",
+                pagination_info: "Showing {count} of {total} items",
+                th_sku: "SKU Code",
+                th_item_name: "Item Name",
+                th_category: "Category",
+                th_quantity: "Current Qty",
+                th_min_limit: "Min Limit",
+                th_unit: "Unit",
+                th_status: "Status",
+                th_actions: "Actions",
+                edit_btn: "Edit",
+                status_available: "Available",
+                status_low: "Low Stock",
+                status_out: "Out of Stock",
+                unit_piece: "Piece",
+                unit_bag: "Bag",
+                unit_carton: "Carton",
+                unit_gram: "Gram",
+                modal_add_title: "Add New Item",
+                modal_edit_title: "Edit Item"
+            }
+        };
 
         document.addEventListener('DOMContentLoaded', () => {
             const inputs = document.querySelectorAll('.form-input');
@@ -314,6 +413,7 @@
                 input.addEventListener('change', () => clearFieldError(input));
             });
             applyInventoryLanguage(currentLang);
+            updateStatsAndCounter();
         });
 
         function clearFieldError(input) {
@@ -367,66 +467,112 @@
             return isValid;
         }
 
-        // تنزيل شيت الإكسيل النموذج للمحاسب
-        function downloadExcelTemplate() {
-            let csv = '\uFEFF'; 
-            csv += 'SKU,Item Name (AR),Item Name (EN),Category (AR),Category (EN),Quantity,Min Limit,Unit (piece/bag/carton/gram)\n';
-            csv += 'SKU-EX-101,جبن شيدر شرائح,Cheddar Cheese Slices,الألبان والاجبان,Dairy,500,50,piece\n';
-            csv += 'SKU-EX-102,بطاطس مقلية,French Fries,المجمدات,Frozen Foods,120,30,carton\n';
-
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `inventory_import_template.csv`;
-            link.click();
+        function toggleLanguage() {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            localStorage.setItem('lang', currentLang);
+            applyInventoryLanguage(currentLang);
         }
 
-        // استيراد وقراءة شيت الإكسيل المرفوع
-        function importExcelFile(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        function applyInventoryLanguage(lang) {
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('lang', lang);
+            htmlRoot.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const content = e.target.result;
-                const lines = content.split('\n');
-                
-                let addedCount = 0;
-                const tbody = document.getElementById('inventory-table-body');
+            document.getElementById('lang-btn').innerText = lang === 'ar' ? 'English' : 'عربي';
 
-                for (let i = 1; i < lines.length; i++) {
-                    const line = lines[i].trim();
-                    if (!line) continue;
-
-                    const cols = line.split(',').map(col => col.replace(/^"(.*)"$/, '$1').trim());
-                    if (cols.length >= 8) {
-                        const [sku, nameAr, nameEn, catAr, catEn, rawQty, rawMin, unitKey] = cols;
-                        
-                        const qtyNum = parseInt(rawQty) || 0;
-                        const minNum = parseInt(rawMin) || 0;
-                        
-                        let status = 'available';
-                        if (qtyNum === 0) status = 'out';
-                        else if (qtyNum <= minNum) status = 'low';
-
-                        let validUnit = ['piece', 'bag', 'carton', 'gram'].includes(unitKey.toLowerCase()) ? unitKey.toLowerCase() : 'piece';
-
-                        createOrUpdateRow(null, sku, nameAr, nameEn, catAr, catEn, qtyNum, minNum, validUnit, status);
-                        addedCount++;
-                    }
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (inventoryTranslations[lang] && inventoryTranslations[lang][key]) {
+                    el.innerText = inventoryTranslations[lang][key];
                 }
+            });
 
-                alert(currentLang === 'ar' ? `تم استيراد ${addedCount} صنف بنجاح!` : `Successfully imported ${addedCount} items!`);
-                filterInventory();
-                event.target.value = '';
-            };
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (inventoryTranslations[lang] && inventoryTranslations[lang][key]) {
+                    el.placeholder = inventoryTranslations[lang][key];
+                }
+            });
 
-            reader.readAsText(file);
+            document.querySelectorAll('.inventory-row').forEach(row => {
+                const nameAr = row.getAttribute('data-name-ar');
+                const nameEn = row.getAttribute('data-name-en');
+                const catAr = row.getAttribute('data-cat-ar');
+                const catEn = row.getAttribute('data-cat-en');
+                const unitVal = row.getAttribute('data-unit-val');
+                const status = row.getAttribute('data-status');
+
+                row.querySelector('.row-name').innerText = lang === 'ar' ? nameAr : nameEn;
+                row.querySelector('.row-category').innerText = lang === 'ar' ? catAr : catEn;
+                row.querySelector('.row-unit').innerText = inventoryTranslations[lang][`unit_${unitVal}`] || unitVal;
+                row.querySelector('.status-badge').innerText = inventoryTranslations[lang][`status_${status}`] || status;
+            });
+
+            updateStatsAndCounter();
+        }
+
+        function openModal(mode, btn = null) {
+            const modal = document.getElementById('item-modal');
+            const form = document.getElementById('item-form');
+            const title = document.getElementById('modal-title');
+
+            form.reset();
+            document.querySelectorAll('.form-input').forEach(input => clearFieldError(input));
+
+            if (mode === 'edit' && btn) {
+                editingRow = btn.closest('tr');
+                title.innerText = inventoryTranslations[currentLang].modal_edit_title;
+
+                document.getElementById('modal-sku').value = editingRow.querySelector('.row-sku').innerText.trim();
+                document.getElementById('modal-name-ar').value = editingRow.getAttribute('data-name-ar') || '';
+                document.getElementById('modal-name-en').value = editingRow.getAttribute('data-name-en') || '';
+                document.getElementById('modal-cat-ar').value = editingRow.getAttribute('data-cat-ar') || '';
+                document.getElementById('modal-cat-en').value = editingRow.getAttribute('data-cat-en') || '';
+                document.getElementById('modal-qty').value = editingRow.querySelector('.row-qty').innerText.replace(/,/g, '').trim();
+                document.getElementById('modal-min').value = editingRow.querySelector('.row-min').innerText.replace(/,/g, '').trim();
+                document.getElementById('modal-unit').value = editingRow.getAttribute('data-unit-val') || '';
+                document.getElementById('modal-status').value = editingRow.getAttribute('data-status') || 'available';
+            } else {
+                editingRow = null;
+                title.innerText = inventoryTranslations[currentLang].modal_add_title;
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('item-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            editingRow = null;
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            if (!validateModalForm()) return;
+
+            const sku = document.getElementById('modal-sku').value.trim();
+            const nameAr = document.getElementById('modal-name-ar').value.trim();
+            const nameEn = document.getElementById('modal-name-en').value.trim();
+            const catAr = document.getElementById('modal-cat-ar').value.trim();
+            const catEn = document.getElementById('modal-cat-en').value.trim();
+            const qty = parseInt(document.getElementById('modal-qty').value) || 0;
+            const min = parseInt(document.getElementById('modal-min').value) || 0;
+            const unit = document.getElementById('modal-unit').value;
+            let status = document.getElementById('modal-status').value;
+
+            if (qty === 0) status = 'out';
+            else if (qty <= min) status = 'low';
+
+            createOrUpdateRow(editingRow, sku, nameAr, nameEn, catAr, catEn, qty, min, unit, status);
+            closeModal();
+            filterInventory();
         }
 
         function createOrUpdateRow(targetRow, sku, nameAr, nameEn, catAr, catEn, rawQty, rawMin, unitKey, status) {
-            const qty = rawQty.toLocaleString();
-            const min = rawMin.toLocaleString();
+            const qty = Number(rawQty).toLocaleString();
+            const min = Number(rawMin).toLocaleString();
 
             let statusText = inventoryTranslations[currentLang][`status_${status}`];
             let statusColor = status === 'available' ? 'bg-emerald-500/10 text-emerald-400' : (status === 'low' ? 'bg-amber-500/10 text-amber-400' : 'bg-rose-500/10 text-rose-400');
@@ -480,87 +626,167 @@
                     <td class="py-3 px-3 text-slate-400 row-unit" data-i18n="unit_${unitKey}">${displayUnit}</td>
                     <td class="py-3 px-3"><span class="${statusColor} px-2 py-0.5 rounded-full text-[11px] status-badge" data-i18n="status_${status}">${statusText}</span></td>
                     <td class="py-3 px-3 text-center">
-                        <button onclick="openModal('edit', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded text-[11px] font-medium transition" data-i18n="edit_btn">تعديل</button>
+                        <button onclick="openModal('edit', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded text-[11px] font-medium transition" data-i18n="edit_btn">${inventoryTranslations[currentLang].edit_btn}</button>
                     </td>
                 `;
                 tbody.appendChild(newRow);
             }
+
+            updateStatsAndCounter();
         }
 
-        function toggleSelectAll(masterCheckbox) {
+        function downloadExcelTemplate() {
+            let csv = '\uFEFF'; 
+            csv += 'SKU,Item Name (AR),Item Name (EN),Category (AR),Category (EN),Quantity,Min Limit,Unit (piece/bag/carton/gram)\n';
+            csv += 'SKU-EX-101,جبن شيدر شرائح,Cheddar Cheese Slices,الألبان والاجبان,Dairy,500,50,piece\n';
+            csv += 'SKU-EX-102,بطاطس مقلية,French Fries,المجمدات,Frozen Foods,120,30,carton\n';
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `inventory_import_template.csv`;
+            link.click();
+        }
+
+        function importExcelFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const lines = content.split('\n');
+                
+                let addedCount = 0;
+
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+
+                    const cols = line.split(',').map(col => col.replace(/^"(.*)"$/, '$1').trim());
+                    if (cols.length >= 8) {
+                        const [sku, nameAr, nameEn, catAr, catEn, rawQty, rawMin, unitKey] = cols;
+                        
+                        const qtyNum = parseInt(rawQty) || 0;
+                        const minNum = parseInt(rawMin) || 0;
+                        
+                        let status = 'available';
+                        if (qtyNum === 0) status = 'out';
+                        else if (qtyNum <= minNum) status = 'low';
+
+                        let validUnit = ['piece', 'bag', 'carton', 'gram'].includes(unitKey.toLowerCase()) ? unitKey.toLowerCase() : 'piece';
+
+                        createOrUpdateRow(null, sku, nameAr, nameEn, catAr, catEn, qtyNum, minNum, validUnit, status);
+                        addedCount++;
+                    }
+                }
+
+                alert(currentLang === 'ar' ? `تم استيراد ${addedCount} صنف بنجاح!` : `Successfully imported ${addedCount} items!`);
+                filterInventory();
+                event.target.value = '';
+            };
+
+            reader.readAsText(file);
+        }
+
+        function downloadCSV() {
+            let csv = '\uFEFF';
+            csv += 'SKU,Name (AR),Name (EN),Category (AR),Category (EN),Quantity,Min Limit,Unit,Status\n';
+
+            const rows = document.querySelectorAll('.inventory-row');
+            rows.forEach(row => {
+                const sku = row.querySelector('.row-sku').innerText.trim();
+                const nameAr = row.getAttribute('data-name-ar') || '';
+                const nameEn = row.getAttribute('data-name-en') || '';
+                const catAr = row.getAttribute('data-cat-ar') || '';
+                const catEn = row.getAttribute('data-cat-en') || '';
+                const qty = row.querySelector('.row-qty').innerText.replace(/,/g, '').trim();
+                const min = row.querySelector('.row-min').innerText.replace(/,/g, '').trim();
+                const unit = row.getAttribute('data-unit-val') || '';
+                const status = row.getAttribute('data-status') || '';
+
+                csv += `"${sku}","${nameAr}","${nameEn}","${catAr}","${catEn}","${qty}","${min}","${unit}","${status}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `inventory_export_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+        }
+
+        function filterInventory() {
+            const searchValue = document.getElementById('search-input').value.toLowerCase().trim();
+            const statusFilter = document.getElementById('status-filter').value;
+            const rows = document.querySelectorAll('.inventory-row');
+
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const sku = row.querySelector('.row-sku').innerText.toLowerCase();
+                const nameAr = (row.getAttribute('data-name-ar') || '').toLowerCase();
+                const nameEn = (row.getAttribute('data-name-en') || '').toLowerCase();
+                const status = row.getAttribute('data-status');
+
+                const matchesSearch = sku.includes(searchValue) || nameAr.includes(searchValue) || nameEn.includes(searchValue);
+                const matchesStatus = statusFilter === 'all' || status === statusFilter;
+
+                if (matchesSearch && matchesStatus) {
+                    row.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+
+            updateResultsCounter(visibleCount, rows.length);
+        }
+
+        function toggleSelectAll(master) {
             const checkboxes = document.querySelectorAll('.row-checkbox');
             checkboxes.forEach(cb => {
-                if (cb.closest('tr').style.display !== 'none') {
-                    cb.checked = masterCheckbox.checked;
+                if (!cb.closest('tr').classList.contains('hidden')) {
+                    cb.checked = master.checked;
                 }
             });
             updateSelection();
         }
 
         function updateSelection() {
-            const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+            const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
             const bulkBtn = document.getElementById('bulk-delete-btn');
-            const countSpan = document.getElementById('selected-count');
+            const selectedCount = document.getElementById('selected-count');
 
-            if (selectedCheckboxes.length > 0) {
+            if (checkedBoxes.length > 0) {
                 bulkBtn.classList.remove('hidden');
-                countSpan.innerText = selectedCheckboxes.length;
+                selectedCount.innerText = checkedBoxes.length;
             } else {
                 bulkBtn.classList.add('hidden');
-                document.getElementById('select-all').checked = false;
+                selectedCount.innerText = '0';
             }
         }
 
         function deleteSelected() {
-            const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
-            if (selectedCheckboxes.length === 0) return;
+            const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
+            if (checkedBoxes.length === 0) return;
 
-            const confirmMessage = currentLang === 'ar' 
-                ? `هل أنت أصل من حذف ${selectedCheckboxes.length} صنف؟` 
-                : `Are you sure you want to delete ${selectedCheckboxes.length} item(s)?`;
+            const confirmMsg = currentLang === 'ar' 
+                ? `هل أنت تأكد من حذف ${checkedBoxes.length} صنف؟` 
+                : `Are you sure you want to delete ${checkedBoxes.length} items?`;
 
-            if (confirm(confirmMessage)) {
-                selectedCheckboxes.forEach(cb => cb.closest('tr').remove());
+            if (confirm(confirmMsg)) {
+                checkedBoxes.forEach(cb => {
+                    const row = cb.closest('tr');
+                    row.remove();
+                });
                 document.getElementById('select-all').checked = false;
                 updateSelection();
                 filterInventory();
+                updateStatsAndCounter();
             }
         }
 
-        function filterInventory() {
-            const statusFilter = document.getElementById('status-filter').value;
-            const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
-            const rows = document.querySelectorAll('.inventory-row');
-            
-            let visibleCount = 0;
-            let totalCount = rows.length;
-
-            rows.forEach(row => {
-                const rowStatus = row.getAttribute('data-status');
-                const rowContent = row.innerText.toLowerCase();
-
-                const matchesStatus = (statusFilter === 'all' || rowStatus === statusFilter);
-                const matchesSearch = (rowContent.includes(searchQuery));
-
-                if (matchesStatus && matchesSearch) {
-                    row.style.display = '';
-                    visibleCount++;
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-
-            const counterElement = document.getElementById('results-counter');
-            if (currentLang === 'ar') {
-                counterElement.innerText = `عرض ${visibleCount} من أصل ${totalCount} صنف`;
-            } else {
-                counterElement.innerText = `Showing ${visibleCount} of ${totalCount} items`;
-            }
-
-            updateStats();
-        }
-
-        function updateStats() {
+        function updateStatsAndCounter() {
             const rows = document.querySelectorAll('.inventory-row');
             let total = rows.length;
             let low = 0;
@@ -575,236 +801,15 @@
             document.getElementById('stat-total').innerText = total;
             document.getElementById('stat-low').innerText = low;
             document.getElementById('stat-out').innerText = out;
-        }
-
-        function openModal(mode, buttonElement = null) {
-            const modal = document.getElementById('item-modal');
-            const title = document.getElementById('modal-title');
-            
-            document.querySelectorAll('.form-input').forEach(input => clearFieldError(input));
-
-            if (mode === 'add') {
-                editingRow = null;
-                title.innerText = currentLang === 'ar' ? 'إضافة صنف جديد' : 'Add New Item';
-                document.getElementById('item-form').reset();
-            } else if (mode === 'edit' && buttonElement) {
-                editingRow = buttonElement.closest('tr');
-                title.innerText = currentLang === 'ar' ? 'تعديل صنف' : 'Edit Item';
-
-                document.getElementById('modal-sku').value = editingRow.querySelector('.row-sku').innerText;
-                document.getElementById('modal-name-ar').value = editingRow.getAttribute('data-name-ar') || editingRow.querySelector('.row-name').innerText;
-                document.getElementById('modal-name-en').value = editingRow.getAttribute('data-name-en') || '';
-                document.getElementById('modal-cat-ar').value = editingRow.getAttribute('data-cat-ar') || editingRow.querySelector('.row-category').innerText;
-                document.getElementById('modal-cat-en').value = editingRow.getAttribute('data-cat-en') || '';
-                document.getElementById('modal-qty').value = editingRow.querySelector('.row-qty').innerText.replace(/,/g, '');
-                document.getElementById('modal-min').value = editingRow.querySelector('.row-min').innerText.replace(/,/g, '');
-                document.getElementById('modal-unit').value = editingRow.getAttribute('data-unit-val') || 'piece';
-                document.getElementById('modal-status').value = editingRow.getAttribute('data-status');
-            }
-
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('item-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
-
-        function handleFormSubmit(event) {
-            event.preventDefault();
-
-            if (!validateModalForm()) return;
-            
-            const sku = document.getElementById('modal-sku').value;
-            const nameAr = document.getElementById('modal-name-ar').value;
-            const nameEn = document.getElementById('modal-name-en').value;
-            const catAr = document.getElementById('modal-cat-ar').value;
-            const catEn = document.getElementById('modal-cat-en').value;
-            
-            const rawQty = parseInt(document.getElementById('modal-qty').value);
-            const rawMin = parseInt(document.getElementById('modal-min').value);
-            const unitVal = document.getElementById('modal-unit').value;
-            
-            let status = document.getElementById('modal-status').value;
-            if (rawQty === 0) status = 'out';
-            else if (rawQty <= rawMin) status = 'low';
-
-            createOrUpdateRow(editingRow, sku, nameAr, nameEn, catAr, catEn, rawQty, rawMin, unitVal, status);
-
-            closeModal();
-            filterInventory();
-        }
-
-        function downloadCSV() {
-            let csv = '\uFEFF'; 
-            csv += 'كود SKU,اسم الصنف بالعربي,Item Name (EN),التصنيف بالعربي,Category (EN),الكمية الحالية,الحد الأدنى,الوحدة,الحالة\n';
-
-            const rows = document.querySelectorAll('.inventory-row');
-            rows.forEach(row => {
-                if (row.style.display !== 'none') {
-                    const sku = row.querySelector('.row-sku').innerText;
-                    const nameAr = `"${row.getAttribute('data-name-ar') || ''}"`;
-                    const nameEn = `"${row.getAttribute('data-name-en') || ''}"`;
-                    const catAr = `"${row.getAttribute('data-cat-ar') || ''}"`;
-                    const catEn = `"${row.getAttribute('data-cat-en') || ''}"`;
-                    const qty = row.querySelector('.row-qty').innerText.replace(/,/g, '');
-                    const min = row.querySelector('.row-min').innerText.replace(/,/g, '');
-                    const unit = row.querySelector('.row-unit').innerText;
-                    const status = row.querySelector('.status-badge').innerText;
-
-                    csv += `${sku},${nameAr},${nameEn},${catAr},${catEn},${qty},${min},${unit},${status}\n`;
-                }
-            });
-
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `inventory_export_${new Date().toISOString().slice(0, 10)}.csv`;
-            link.click();
-        }
-
-        const inventoryTranslations = {
-            ar: {
-                inventory_title: "إدارة المخزون - Keymerv Warehouse",
-                brand_name: "Keymerv Warehouse",
-                nav_overview: "الرئيسية",
-                nav_inventory: "إدارة المخزون",
-                nav_orders: "طلبات التغذية",
-                nav_supply: "التوريد والموردين",
-                nav_branches: "الفروع",
-                nav_settings: "الإعدادات",
-                user_name: "أحمد الغامدي",
-                user_role: "مدير المستودع الرئيسي",
-                logout: "خروج",
-                inventory_header: "إدارة المخزون الرئيسي",
-                stat_total_items: "إجمالي الأصناف",
-                stat_low_stock: "أصناف وشيك نفاذها",
-                stat_out_stock: "أصناف منتهية",
-                search_placeholder: "ابحث عن صنف أو كود SKU...",
-                filter_all: "جميع الأصناف",
-                filter_available: "الأصناف المتوفرة",
-                filter_low: "قاربت على النفاذ",
-                filter_out: "الأصناف المنتهية",
-                delete_selected_btn: "🗑️ حذف المحدد",
-                download_template_btn: "📄 تنزيل نموذج الإكسيل",
-                download_all_btn: "📥 تصدير الأصناف",
-                add_item_btn: "+ إضافة صنف",
-                th_sku: "كود SKU",
-                th_item_name: "اسم الصنف",
-                th_category: "التصنيف",
-                th_quantity: "الكمية الحالية",
-                th_min_limit: "الحد الأدنى",
-                th_unit: "الوحدة",
-                th_status: "الحالة",
-                th_actions: "الإجراءات",
-                status_available: "متوفر",
-                status_low: "قارب على النفاذ",
-                status_out: "منتهي",
-                unit_piece: "قطعة",
-                unit_bag: "كيس",
-                unit_carton: "كرتون",
-                unit_gram: "بالغرام",
-                edit_btn: "تعديل",
-                pagination_show: "عرض",
-                pagination_per_page: "صنف لكل صفحة",
-                pagination_info: "عرض 2 من أصل 2 صنف"
-            },
-            en: {
-                inventory_title: "Inventory Management - Keymerv Warehouse",
-                brand_name: "Keymerv Warehouse",
-                nav_overview: "Overview",
-                nav_inventory: "Inventory",
-                nav_orders: "Replenishment Orders",
-                nav_supply: "Suppliers",
-                nav_branches: "Branches",
-                nav_settings: "Settings",
-                user_name: "Ahmed Al-Ghamdi",
-                user_role: "Main Warehouse Manager",
-                logout: "Logout",
-                inventory_header: "Main Inventory Management",
-                stat_total_items: "Total Items",
-                stat_low_stock: "Low Stock Items",
-                stat_out_stock: "Out of Stock",
-                search_placeholder: "Search item or SKU code...",
-                filter_all: "All Items",
-                filter_available: "Available Items",
-                filter_low: "Low Stock",
-                filter_out: "Out of Stock",
-                delete_selected_btn: "🗑️ Delete Selected",
-                download_template_btn: "📄 Download Template",
-                download_all_btn: "📥 Export Items",
-                add_item_btn: "+ Add Item",
-                th_sku: "SKU Code",
-                th_item_name: "Item Name",
-                th_category: "Category",
-                th_quantity: "Current Qty",
-                th_min_limit: "Min Limit",
-                th_unit: "Unit",
-                th_status: "Status",
-                th_actions: "Actions",
-                status_available: "Available",
-                status_low: "Low Stock",
-                status_out: "Out of Stock",
-                unit_piece: "Piece",
-                unit_bag: "Bag",
-                unit_carton: "Carton",
-                unit_gram: "Gram",
-                edit_btn: "Edit",
-                pagination_show: "Show",
-                pagination_per_page: "items per page",
-                pagination_info: "Showing 2 of 2 items"
-            }
-        };
-
-        function applyInventoryLanguage(lang) {
-            currentLang = lang;
-            localStorage.setItem('lang', lang);
-            
-            const htmlRoot = document.getElementById('html-root');
-            htmlRoot.setAttribute('lang', lang);
-            htmlRoot.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
-
-            const langBtn = document.getElementById('lang-btn');
-            if (langBtn) {
-                langBtn.innerText = lang === 'ar' ? 'English' : 'العربية';
-            }
-
-            document.querySelectorAll('[data-i18n]').forEach(element => {
-                const key = element.getAttribute('data-i18n');
-                if (inventoryTranslations[lang] && inventoryTranslations[lang][key]) {
-                    element.innerText = inventoryTranslations[lang][key];
-                }
-            });
-
-            document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
-                const key = element.getAttribute('data-i18n-placeholder');
-                if (inventoryTranslations[lang] && inventoryTranslations[lang][key]) {
-                    element.setAttribute('placeholder', inventoryTranslations[lang][key]);
-                }
-            });
-
-            document.querySelectorAll('.inventory-row').forEach(row => {
-                const nameAr = row.getAttribute('data-name-ar');
-                const nameEn = row.getAttribute('data-name-en');
-                const catAr = row.getAttribute('data-cat-ar');
-                const catEn = row.getAttribute('data-cat-en');
-                const unitVal = row.getAttribute('data-unit-val');
-
-                if (nameAr && nameEn) row.querySelector('.row-name').innerText = lang === 'ar' ? nameAr : nameEn;
-                if (catAr && catEn) row.querySelector('.row-category').innerText = lang === 'ar' ? catAr : catEn;
-                if (unitVal && inventoryTranslations[lang][`unit_${unitVal}`]) {
-                    row.querySelector('.row-unit').innerText = inventoryTranslations[lang][`unit_${unitVal}`];
-                }
-            });
 
             filterInventory();
         }
 
-        function toggleLanguage() {
-            const newLang = currentLang === 'ar' ? 'en' : 'ar';
-            applyInventoryLanguage(newLang);
+        function updateResultsCounter(visible, total) {
+            const infoText = inventoryTranslations[currentLang].pagination_info
+                .replace('{count}', visible)
+                .replace('{total}', total);
+            document.getElementById('results-counter').innerText = infoText;
         }
     </script>
 </body>
