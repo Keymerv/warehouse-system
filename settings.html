@@ -40,8 +40,8 @@
         <!-- معلومات المستخدم -->
         <div class="p-4 border-t border-slate-800 flex items-center justify-between">
             <div class="text-xs">
-                <p class="font-bold text-slate-200" id="sidebar-user-role" data-i18n="user_role_admin">الإدارة العامة (المالك)</p>
-                <p class="text-[10px] text-slate-400" id="sidebar-user-email">admin@keymerv.com</p>
+                <p class="font-bold text-slate-200" id="sidebar-user-role">...</p>
+                <p class="text-[10px] text-slate-400" id="sidebar-user-email">...</p>
             </div>
             <a href="index.html" id="logout-btn" class="text-rose-400 hover:text-rose-300 text-xs font-semibold cursor-pointer" data-i18n="logout">خروج</a>
         </div>
@@ -60,8 +60,8 @@
             <!-- رسالة التنبيه العامة -->
             <div id="settings-feedback" class="hidden px-4 py-3 rounded-xl text-xs text-center font-medium"></div>
 
-            <!-- قسم بيانات المنشأة -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+            <!-- 1. قسم بيانات المنشأة (يظهر للجميع: الأدمن والموظفين) -->
+            <div id="general-settings-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <h3 class="text-sm font-bold text-indigo-400" data-i18n="general_settings_title">بيانات المنشأة الرئيسية</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                     <div>
@@ -86,8 +86,8 @@
                 </div>
             </div>
 
-            <!-- قسم إعدادات الفريق والصلاحيات -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+            <!-- 2. قسم إعدادات الفريق والصلاحيات (خاص بالأدمن فقط) -->
+            <div id="team-settings-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <div class="flex justify-between items-center">
                     <h3 class="text-sm font-bold text-indigo-400" data-i18n="team_settings_title">إعدادات الفريق والصلاحيات</h3>
                     <button onclick="openAddUserModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-md shadow-indigo-600/20">
@@ -102,7 +102,6 @@
                             <tr class="border-b border-slate-800 text-slate-400">
                                 <th class="py-3 px-2" data-i18n="table_member_name">اسم العضو</th>
                                 <th class="py-3 px-2" data-i18n="table_member_email">البريد الإلكتروني</th>
-                                <th class="py-3 px-2" data-i18n="table_member_locations">البراندات والفروع</th>
                                 <th class="py-3 px-2" data-i18n="table_member_role">الصلاحية</th>
                                 <th class="py-3 px-2" data-i18n="table_member_date">تاريخ الإنشاء</th>
                                 <th class="py-3 px-2 text-center" data-i18n="table_member_actions">الإجراءات</th>
@@ -110,15 +109,15 @@
                         </thead>
                         <tbody id="users-table-body" class="divide-y divide-slate-800/60 text-slate-200">
                             <tr>
-                                <td colspan="6" class="text-center py-4 text-slate-500">جاري تحميل الحسابات...</td>
+                                <td colspan="5" class="text-center py-4 text-slate-500">جاري تحميل الحسابات...</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- قسم تنبيهات المخزون والطلبات -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+            <!-- 3. قسم تنبيهات المخزون والطلبات (خاص بالأدمن فقط) -->
+            <div id="inventory-config-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <h3 class="text-sm font-bold text-indigo-400" data-i18n="inventory_config_title">إعدادات تنبيهات المخزون والطلبات</h3>
                 <div class="space-y-3 text-xs" id="toggles-container">
                     <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
@@ -134,46 +133,16 @@
                         </button>
                     </div>
                     <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
-                        <span class="text-slate-300" data-i18n="alert_weekly_report">تصدير تقرير أسبوعي لحركة المستودع تلقائياً</span>
-                        <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-slate-700 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
-                            <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
-                        </button>
-                    </div>
-                    <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
-                        <span class="text-slate-300" data-i18n="setting_auto_approval">قبول تلقائي لطلبات الفروع ضمن الحد المسموح به للمخزون</span>
-                        <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-slate-700 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
-                            <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
-                        </button>
-                    </div>
-                    <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
-                        <span class="text-slate-300" data-i18n="setting_expiry_alerts">تفعيل تنبيهات انتهاء صلاحية المواد الغذائية قبل الموعد بـ 30 يوماً</span>
-                        <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-indigo-600 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
-                            <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
-                        </button>
-                    </div>
-                    <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
-                        <span class="text-slate-300" data-i18n="setting_sound_notifications">تشغيل المؤثرات الصوتية عند وصول طلب تغذية جديد من الفروع</span>
-                        <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-indigo-600 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
-                            <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
-                        </button>
-                    </div>
-                    <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
                         <span class="text-slate-300" data-i18n="setting_negative_inventory">منع اعتماد صرف المخزون في حال تجاوز الكمية المتاحة في المستودع</span>
                         <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-indigo-600 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
-                            <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
-                        </button>
-                    </div>
-                    <div class="flex items-center justify-between py-2">
-                        <span class="text-slate-300" data-i18n="setting_supplier_portal">إرسال طلبات التوريد للموردين تلقائياً عبر البريد عند وصول الحد الأدنى</span>
-                        <button type="button" onclick="toggleSwitch(this)" class="w-11 h-6 bg-slate-700 rounded-full relative transition-colors duration-200 focus:outline-none p-1">
                             <div class="w-4 h-4 bg-white rounded-full transition-transform duration-200"></div>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- أمان الحساب -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+            <!-- 4. أمان الحساب (يظهر للجميع: الأدمن والموظفين) -->
+            <div id="security-settings-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <h3 class="text-sm font-bold text-indigo-400" data-i18n="security_title">أمان الحساب وكلمة المرور</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                     <div>
@@ -219,41 +188,17 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-slate-400 mb-1" data-i18n="modal_label_role">الصلاحية</label>
-                        <select id="new-member-role" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
-                            <option value="warehouse_manager" data-i18n="role_warehouse_manager">مدير مستودع</option>
-                            <option value="branch_manager" data-i18n="role_branch_manager">مدير فرع</option>
-                            <option value="accountant" data-i18n="role_accountant">قسم المحاسبة</option>
-                            <option value="marketing" data-i18n="role_marketing">قسم التسويق</option>
-                            <option value="customer_service" data-i18n="role_customer_service">قسم خدمة العملاء</option>
-                            <option value="branches_director" data-i18n="role_branches_director">مدير الفروع</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- البراندات والفروع Dynamic Loading -->
-                <div class="space-y-3 pt-2 border-t border-slate-800">
-                    <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="text-slate-400 font-semibold" data-i18n="modal_label_brands">البراندات المرتبطة</label>
-                            <label class="cursor-pointer text-indigo-400 text-[11px]"><input type="checkbox" id="select-all-brands" class="ml-1"> <span data-i18n="select_all_brands">كل البراندات</span></label>
-                        </div>
-                        <div id="brands-checkboxes-container" class="bg-slate-950 border border-slate-800 rounded-xl p-3 max-h-32 overflow-y-auto space-y-2 text-[11px]">
-                            <span class="text-slate-500">جاري تحميل البراندات...</span>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="text-slate-400 font-semibold" data-i18n="modal_label_branches">الفروع المرتبطة (تظهر بناءً على البراندات المحددة)</label>
-                            <label class="cursor-pointer text-indigo-400 text-[11px]"><input type="checkbox" id="select-all-branches" class="ml-1"> <span data-i18n="select_all_branches">كل الفروع الظاهرة</span></label>
-                        </div>
-                        <div id="branches-checkboxes-container" class="bg-slate-950 border border-slate-800 rounded-xl p-3 max-h-32 overflow-y-auto space-y-2 text-[11px]">
-                            <span class="text-slate-500">الرجاء اختيار براند أولاً لعرض فروعه المرتبطة...</span>
-                        </div>
-                    </div>
+                <div>
+                    <label class="block text-slate-400 mb-1" data-i18n="modal_label_role">الصلاحية</label>
+                    <select id="new-member-role" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <option value="chef" data-i18n="role_chef">شيف (طباخ)</option>
+                        <option value="warehouse_manager" data-i18n="role_warehouse_manager">مدير مستودع</option>
+                        <option value="branch_manager" data-i18n="role_branch_manager">مدير فرع</option>
+                        <option value="accountant" data-i18n="role_accountant">قسم المحاسبة</option>
+                        <option value="marketing" data-i18n="role_marketing">قسم التسويق</option>
+                        <option value="customer_service" data-i18n="role_customer_service">قسم خدمة العملاء</option>
+                        <option value="branches_director" data-i18n="role_branches_director">مدير الفروع</option>
+                    </select>
                 </div>
 
                 <!-- صلاحيات الوصول للصفحات -->
@@ -262,7 +207,7 @@
                         <label class="text-slate-400 font-semibold" data-i18n="modal_label_pages">صلاحيات الوصول للصفحات (تحديد ما يمكنه زيارته)</label>
                         <label class="cursor-pointer text-indigo-400 text-[11px]"><input type="checkbox" id="select-all-pages" checked class="ml-1"> <span data-i18n="select_all_pages">السماح بكل الصفحات</span></label>
                     </div>
-                    <div id="pages-checkboxes-container" class="bg-slate-950 border border-slate-800 rounded-xl p-3 max-h-32 overflow-y-auto grid grid-cols-2 gap-2 text-[11px]">
+                    <div id="pages-checkboxes-container" class="bg-slate-950 border border-slate-800 rounded-xl p-3 max-h-36 overflow-y-auto grid grid-cols-2 gap-2 text-[11px]">
                         <label class="flex items-center gap-2 cursor-pointer text-slate-300">
                             <input type="checkbox" name="allowed_pages" value="dashboard" checked class="page-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
                             <span data-i18n="page_dashboard">الرئيسية (Dashboard)</span>
@@ -290,7 +235,7 @@
                     </div>
                 </div>
 
-                <!-- رسالة الخطأ أو النجاح داخل النافذة -->
+                <!-- رسالة الخطأ أو النجاح -->
                 <div id="modal-bottom-feedback" class="hidden px-3 py-2 rounded-xl text-xs text-center font-medium"></div>
 
                 <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
@@ -301,11 +246,11 @@
         </div>
     </div>
 
-    <!-- البرمجة بالكامل عبر JavaScript / Supabase JS Engine -->
+    <!-- البرمجة السحابية عبر JavaScript / Supabase JS Engine -->
     <script type="module">
         import { supabase } from './assets/js/supabase.js';
 
-        // 1. قاموس الترجمات الشامل
+        // 1. قاموس الترجمات المحدث
         const translations = {
             ar: {
                 settings_title: "الإعدادات - Keymerv Warehouse",
@@ -328,19 +273,13 @@
                 btn_add_user: "+ إضافة مستخدم جديد",
                 table_member_name: "اسم العضو",
                 table_member_email: "البريد الإلكتروني",
-                table_member_locations: "البراندات والفروع",
                 table_member_role: "الصلاحية",
                 table_member_date: "تاريخ الإنشاء",
                 table_member_actions: "الإجراءات",
                 inventory_config_title: "إعدادات تنبيهات المخزون والطلبات",
                 alert_low_stock: "تنبيه تلقائي لوحة التحكم عند وصول الأصناف حد النفاذ",
                 alert_branch_orders: "إرسال إشعار فوري عند طلب فرع مطعم أصناف جديدة",
-                alert_weekly_report: "تصدير تقرير أسبوعي لحركة المستودع تلقائياً",
-                setting_auto_approval: "قبول تلقائي لطلبات الفروع ضمن الحد المسموح به للمخزون",
-                setting_expiry_alerts: "تفعيل تنبيهات انتهاء صلاحية المواد الغذائية قبل الموعد بـ 30 يوماً",
-                setting_sound_notifications: "تشغيل المؤثرات الصوتية عند وصول طلب تغذية جديد من الفروع",
                 setting_negative_inventory: "منع اعتماد صرف المخزون في حال تجاوز الكمية المتاحة في المستودع",
-                setting_supplier_portal: "إرسال طلبات التوريد للموردين تلقائياً عبر البريد عند وصول الحد الأدنى",
                 security_title: "أمان الحساب وكلمة المرور",
                 label_current_password: "كلمة المرور الحالية",
                 label_new_password: "كلمة المرور الجديدة",
@@ -351,16 +290,13 @@
                 modal_label_email: "البريد الإلكتروني",
                 modal_label_pass: "رمز المرور المؤقت",
                 modal_label_role: "الصلاحية",
+                role_chef: "شيف (طباخ)",
                 role_warehouse_manager: "مدير مستودع",
                 role_branch_manager: "مدير فرع",
                 role_accountant: "قسم المحاسبة",
                 role_marketing: "قسم التسويق",
                 role_customer_service: "قسم خدمة العملاء",
                 role_branches_director: "مدير الفروع",
-                modal_label_brands: "البراندات المرتبطة",
-                select_all_brands: "كل البراندات",
-                modal_label_branches: "الفروع المرتبطة (تظهر بناءً على البراندات المحددة)",
-                select_all_branches: "كل الفروع الظاهرة",
                 modal_label_pages: "صلاحيات الوصول للصفحات (تحديد ما يمكنه زيارته)",
                 select_all_pages: "السماح بكل الصفحات",
                 page_dashboard: "الرئيسية (Dashboard)",
@@ -393,19 +329,13 @@
                 btn_add_user: "+ Add New User",
                 table_member_name: "Member Name",
                 table_member_email: "Email",
-                table_member_locations: "Brands & Branches",
                 table_member_role: "Role",
                 table_member_date: "Creation Date",
                 table_member_actions: "Actions",
                 inventory_config_title: "Inventory & Orders Alerts Settings",
                 alert_low_stock: "Automatic dashboard alert when items reach stock limit",
                 alert_branch_orders: "Send instant notification when a branch requests new items",
-                alert_weekly_report: "Automatically export weekly warehouse movement report",
-                setting_auto_approval: "Auto-approve branch orders within allowed inventory limits",
-                setting_expiry_alerts: "Enable 30-day advance alerts for food expiry dates",
-                setting_sound_notifications: "Play sound notifications on new branch supply requests",
                 setting_negative_inventory: "Prevent inventory dispatch if requested quantity exceeds available stock",
-                setting_supplier_portal: "Auto-send purchase orders to suppliers when reaching min threshold",
                 security_title: "Account Security & Password",
                 label_current_password: "Current Password",
                 label_new_password: "New Password",
@@ -416,16 +346,13 @@
                 modal_label_email: "Email Address",
                 modal_label_pass: "Temporary Password",
                 modal_label_role: "Role",
+                role_chef: "Chef (Cook)",
                 role_warehouse_manager: "Warehouse Manager",
                 role_branch_manager: "Branch Manager",
                 role_accountant: "Accounting Department",
                 role_marketing: "Marketing Department",
                 role_customer_service: "Customer Service",
                 role_branches_director: "Branches Director",
-                modal_label_brands: "Associated Brands",
-                select_all_brands: "All Brands",
-                modal_label_branches: "Associated Branches (based on selected brands)",
-                select_all_branches: "All Visible Branches",
                 modal_label_pages: "Page Access Permissions (Select allowed pages)",
                 select_all_pages: "Allow All Pages",
                 page_dashboard: "Dashboard",
@@ -440,9 +367,10 @@
         };
 
         let currentLang = localStorage.getItem('keymerv_lang') || 'ar';
-        let fetchedBranchesData = [];
+        let currentAdminUserId = null;
+        let isSuperAdmin = false;
 
-        // 2. تطبيق وتغيير اللغة
+        // 2. تطبيق اللغة
         window.toggleLanguage = function() {
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
             localStorage.setItem('keymerv_lang', currentLang);
@@ -455,9 +383,7 @@
             root.dir = lang === 'ar' ? 'rtl' : 'ltr';
 
             const langBtn = document.getElementById('lang-btn');
-            if (langBtn) {
-                langBtn.innerText = lang === 'ar' ? 'English' : 'عربي';
-            }
+            if (langBtn) langBtn.innerText = lang === 'ar' ? 'English' : 'عربي';
 
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
@@ -471,7 +397,54 @@
             });
         }
 
-        // 3. أزرار التبديل (Toggles)
+        // 3. التحقق من صلاحيات الحساب وإخفاء الأقسام للموظفين
+        async function verifyUserPermissions() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session && session.user) {
+                    currentAdminUserId = session.user.id;
+                    
+                    // محاولة جلب بيانات مستخدم السشن الحالية
+                    let profileRes = await supabase.from('users').select('*').eq('id', session.user.id).single();
+                    if (profileRes.error) {
+                        profileRes = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+                    }
+
+                    const profile = profileRes.data;
+                    document.getElementById('sidebar-user-email').innerText = session.user.email || 'admin@keymerv.com';
+
+                    // إذا كان الحساب هو الأدمن المباشر (ليس له created_by أو رتبته admin/owner)
+                    if (!profile || !profile.created_by || profile.role === 'admin' || profile.role === 'owner') {
+                        isSuperAdmin = true;
+                        document.getElementById('sidebar-user-role').innerText = translations[currentLang]['user_role_admin'];
+                        // إظهار الأقسام الكاملة للأدمن
+                        document.getElementById('team-settings-card')?.classList.remove('hidden');
+                        document.getElementById('inventory-config-card')?.classList.remove('hidden');
+                        loadUsers();
+                    } else {
+                        // الموظف المضاف عبر الأدمن: تخفى عنه أقسام إدارة الفريق والتنبيهات
+                        isSuperAdmin = false;
+                        const roleName = (translations[currentLang] && translations[currentLang][`role_${profile.role}`]) || profile.role;
+                        document.getElementById('sidebar-user-role').innerText = roleName;
+                        
+                        document.getElementById('team-settings-card')?.classList.add('hidden');
+                        document.getElementById('inventory-config-card')?.classList.add('hidden');
+                    }
+                } else {
+                    // في حال عدم وجود جلسة مباشرة، نعتبره الأدمن افتراضياً للتطوير
+                    isSuperAdmin = true;
+                    document.getElementById('sidebar-user-role').innerText = translations[currentLang]['user_role_admin'];
+                    loadUsers();
+                }
+            } catch (err) {
+                console.error("Permission check error:", err);
+                // الافتراضي في حال عدم الربط بعد
+                isSuperAdmin = true;
+                loadUsers();
+            }
+        }
+
+        // 4. أزرار التبديل (Toggles)
         window.toggleSwitch = function(btn) {
             const isChecked = btn.classList.contains('bg-indigo-600');
             const thumb = btn.querySelector('div');
@@ -488,7 +461,7 @@
             }
         };
 
-        // 4. فتح وإغلاق النافذة المنبثقة
+        // 5. فتح وإغلاق النافذة المنبثقة
         window.openAddUserModal = function() {
             document.getElementById('addUserModal').classList.remove('hidden');
             document.getElementById('modal-bottom-feedback').classList.add('hidden');
@@ -501,52 +474,41 @@
             document.getElementById('modal-bottom-feedback').classList.add('hidden');
         };
 
-        // 5. جلب بيانات المستخدمين من Supabase (مع معالجة الأخطاء وطباعة نص الخطأ المباشر)
+        // 6. جلب قائمة المستخدمين
         async function loadUsers() {
+            if (!isSuperAdmin) return;
             const tableBody = document.getElementById('users-table-body');
             try {
                 let users = [];
                 let errorDetails = null;
 
-                // محاولة الاستعلام من جدول users
                 const res1 = await supabase.from('users').select('*').order('created_at', { ascending: false });
                 if (res1.error) {
-                    // محاولة بدون الترتيب
-                    const res1_noorder = await supabase.from('users').select('*');
-                    if (res1_noorder.error) {
-                        // محاولة الاستعلام من جدول profiles كبديل
-                        const res2 = await supabase.from('profiles').select('*');
-                        if (res2.error) {
-                            errorDetails = res1.error.message || res1.error.details || JSON.stringify(res1.error);
-                        } else {
-                            users = res2.data;
-                        }
+                    const res2 = await supabase.from('profiles').select('*');
+                    if (res2.error) {
+                        errorDetails = res1.error.message || JSON.stringify(res1.error);
                     } else {
-                        users = res1_noorder.data;
+                        users = res2.data;
                     }
                 } else {
                     users = res1.data;
                 }
 
-                if (errorDetails) {
-                    throw new Error(errorDetails);
-                }
+                if (errorDetails) throw new Error(errorDetails);
 
                 if (!users || users.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">لا يوجد مستخدمين مضافين حالياً.</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-slate-500">لا يوجد مستخدمين مضافين حالياً.</td></tr>`;
                     return;
                 }
 
                 tableBody.innerHTML = users.map(user => {
                     const createdAt = user.created_at ? new Date(user.created_at).toLocaleDateString('ar-SA') : '---';
                     const roleName = (translations[currentLang] && translations[currentLang][`role_${user.role}`]) || user.role || 'غير محدد';
-                    const brandsText = Array.isArray(user.brands) ? user.brands.join(', ') : (user.brands || 'الكل');
 
                     return `
                         <tr class="hover:bg-slate-800/40 transition">
                             <td class="py-3 px-2 font-semibold text-slate-100">${user.full_name || user.name || 'بدون اسم'}</td>
                             <td class="py-3 px-2 text-slate-400">${user.email || '---'}</td>
-                            <td class="py-3 px-2 text-indigo-400 font-medium">${brandsText}</td>
                             <td class="py-3 px-2"><span class="bg-indigo-950/80 text-indigo-300 border border-indigo-800/50 px-2 py-0.5 rounded-md text-[10px]">${roleName}</span></td>
                             <td class="py-3 px-2 text-slate-400 text-[11px]">${createdAt}</td>
                             <td class="py-3 px-2 text-center">
@@ -557,12 +519,11 @@
                 }).join('');
             } catch (err) {
                 console.error("Error loading users:", err);
-                const msg = err.message || JSON.stringify(err);
-                tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-rose-400">حدث خطأ أثناء تحميل الحسابات: <span class="font-mono text-[11px] text-rose-300">${msg}</span></td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-rose-400">حدث خطأ أثناء تحميل الحسابات: <span class="font-mono text-[11px] text-rose-300">${err.message || err}</span></td></tr>`;
             }
         }
 
-        // 6. حذف مستخدم
+        // 7. حذف مستخدم
         window.deleteUser = async function(userId) {
             if (!confirm('هل أنت تأكد من رغبتك في حذف هذا المستخدم نهائياً؟')) return;
             try {
@@ -577,85 +538,7 @@
             }
         };
 
-        // 7. جلب البراندات والفروع من جدولي brands و branches
-        async function loadBrandsAndBranches() {
-            const brandsContainer = document.getElementById('brands-checkboxes-container');
-            const branchesContainer = document.getElementById('branches-checkboxes-container');
-
-            try {
-                let allBrands = [];
-
-                // 1. محاولة الجلب من جدول brands
-                const brandsRes = await supabase.from('brands').select('*');
-                if (!brandsRes.error && brandsRes.data) {
-                    brandsRes.data.forEach(b => {
-                        const name = b.name || b.brand_name || b.title;
-                        if (name && !allBrands.includes(name)) allBrands.push(name);
-                    });
-                }
-
-                // 2. محاولة الجلب من جدول branches
-                const branchesRes = await supabase.from('branches').select('*');
-                if (!branchesRes.error && branchesRes.data) {
-                    fetchedBranchesData = branchesRes.data;
-                    branchesRes.data.forEach(b => {
-                        const bBrand = b.brand_name || b.brand || b.brand_title;
-                        if (bBrand && !allBrands.includes(bBrand)) {
-                            allBrands.push(bBrand);
-                        }
-                    });
-                }
-
-                if (allBrands.length === 0) {
-                    brandsContainer.innerHTML = `<span class="text-slate-500">لا توجد براندات مسجلة في قاعدة البيانات.</span>`;
-                    branchesContainer.innerHTML = `<span class="text-slate-500">لا توجد فروع مسجلة.</span>`;
-                    return;
-                }
-
-                brandsContainer.innerHTML = allBrands.map(brand => `
-                    <label class="flex items-center gap-2 cursor-pointer text-slate-300">
-                        <input type="checkbox" name="selected_brands" value="${brand}" class="brand-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
-                        <span>${brand}</span>
-                    </label>
-                `).join('');
-
-                // عند تغيير البراندات يتحدث كود الفروع
-                document.querySelectorAll('.brand-checkbox').forEach(cb => {
-                    cb.addEventListener('change', updateBranchesList);
-                });
-
-            } catch (err) {
-                console.error("Error loading brands/branches:", err);
-                const errorMsg = err.message || JSON.stringify(err);
-                brandsContainer.innerHTML = `<span class="text-rose-400">خطأ في تحميل البراندات: ${errorMsg}</span>`;
-            }
-        }
-
-        function updateBranchesList() {
-            const branchesContainer = document.getElementById('branches-checkboxes-container');
-            const selectedBrands = Array.from(document.querySelectorAll('.brand-checkbox:checked')).map(cb => cb.value);
-
-            if (selectedBrands.length === 0) {
-                branchesContainer.innerHTML = `<span class="text-slate-500">الرجاء اختيار براند أولاً لعرض فروعه المرتبطة...</span>`;
-                return;
-            }
-
-            const filteredBranches = fetchedBranchesData.filter(b => selectedBrands.includes(b.brand_name || b.brand || b.brand_title));
-
-            if (filteredBranches.length === 0) {
-                branchesContainer.innerHTML = `<span class="text-slate-500">لا توجد فروع مرتبطة بالبراندات المحددة.</span>`;
-                return;
-            }
-
-            branchesContainer.innerHTML = filteredBranches.map(branch => `
-                <label class="flex items-center gap-2 cursor-pointer text-slate-300">
-                    <input type="checkbox" name="selected_branches" value="${branch.id}" class="branch-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
-                    <span>${branch.name || branch.branch_name} (${branch.brand_name || branch.brand || 'عام'})</span>
-                </label>
-            `).join('');
-        }
-
-        // 8. التحقق من كتابة الاسم باللغة الإنجليزية فقط
+        // 8. التحقق من اسم العضو بالإنجليزي
         const nameInput = document.getElementById('new-member-name');
         const nameError = document.getElementById('name-error');
 
@@ -668,21 +551,11 @@
             }
         });
 
-        // 9. تحديد الكل / إغلاق الكل للبراندات والفروع والصفحات
-        document.getElementById('select-all-brands')?.addEventListener('change', (e) => {
-            document.querySelectorAll('.brand-checkbox').forEach(cb => cb.checked = e.target.checked);
-            updateBranchesList();
-        });
-
-        document.getElementById('select-all-branches')?.addEventListener('change', (e) => {
-            document.querySelectorAll('.branch-checkbox').forEach(cb => cb.checked = e.target.checked);
-        });
-
         document.getElementById('select-all-pages')?.addEventListener('change', (e) => {
             document.querySelectorAll('.page-checkbox').forEach(cb => cb.checked = e.target.checked);
         });
 
-        // 10. إرسال نموذج إضافة مستخدم جديد بـ Supabase
+        // 9. إضافة مستخدم جديد وربطه بالأدمن
         document.getElementById('create-user-form').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -700,25 +573,21 @@
             const email = document.getElementById('new-member-email').value.trim();
             const password = document.getElementById('new-member-pass').value;
             const role = document.getElementById('new-member-role').value;
-
-            const selectedBrands = Array.from(document.querySelectorAll('.brand-checkbox:checked')).map(cb => cb.value);
-            const selectedBranches = Array.from(document.querySelectorAll('.branch-checkbox:checked')).map(cb => cb.value);
             const allowedPages = Array.from(document.querySelectorAll('.page-checkbox:checked')).map(cb => cb.value);
 
             submitBtn.disabled = true;
             submitBtn.innerText = 'جاري التنفيذ...';
 
             feedback.className = "px-3 py-2 rounded-xl text-xs text-center font-medium bg-indigo-950 border border-indigo-800 text-indigo-300 block";
-            feedback.innerText = 'جاري إنشاء الحساب ومنح الصلاحيات...';
+            feedback.innerText = 'جاري إنشاء الحساب وتعيين الصلاحيات...';
 
             try {
                 const userData = {
                     full_name: nameVal,
                     email: email,
                     role: role,
-                    brands: selectedBrands,
-                    branches: selectedBranches,
                     allowed_pages: allowedPages,
+                    created_by: currentAdminUserId || null, // ربط المستخدم المضاف بيوزر الأدمن
                     created_at: new Date().toISOString()
                 };
 
@@ -729,7 +598,7 @@
                 }
 
                 feedback.className = "px-3 py-2 rounded-xl text-xs text-center font-medium bg-emerald-950 border border-emerald-800 text-emerald-300 block";
-                feedback.innerText = 'تم إنشاء الحساب بنجاح وتعيين الصلاحيات!';
+                feedback.innerText = 'تم إنشاء حساب الموظف وربطه بالنظام بنجاح!';
 
                 setTimeout(() => {
                     closeAddUserModal();
@@ -746,11 +615,11 @@
             }
         });
 
-        // 11. حفظ الإعدادات العامة والحساب
+        // 10. حفظ الإعدادات
         document.getElementById('save-changes-btn').addEventListener('click', () => {
             const feedback = document.getElementById('settings-feedback');
             feedback.className = "px-4 py-3 rounded-xl text-xs text-center font-medium bg-emerald-950 border border-emerald-800 text-emerald-300 block";
-            feedback.innerText = currentLang === 'ar' ? 'تم حفظ التغييرات وتحديث إعدادات النظام بنجاح!' : 'Changes and system settings saved successfully!';
+            feedback.innerText = currentLang === 'ar' ? 'تم حفظ التغييرات بنجاح!' : 'Changes saved successfully!';
 
             setTimeout(() => {
                 feedback.classList.add('hidden');
@@ -759,8 +628,7 @@
 
         // التشغيل الأولي
         applyLanguage(currentLang);
-        loadUsers();
-        loadBrandsAndBranches();
+        verifyUserPermissions();
     </script>
 </body>
 </html>
