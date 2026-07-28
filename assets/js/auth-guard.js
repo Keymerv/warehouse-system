@@ -1,6 +1,5 @@
 import { supabase } from './supabase.js';
 
-// دالة فحص الجلسة والصلاحيات المركزية
 async function protectRoute() {
     // 1. فحص وجود جلسة تسجيل دخول نشطة
     const { data: { session }, error } = await supabase.auth.getSession();
@@ -15,24 +14,31 @@ async function protectRoute() {
         .from('profiles')
         .select('role, allowed_pages')
         .eq('id', session.user.id)
-        .single();
+        .maybeSingle();
 
-    // 🔴 سد الثغرة: إذا كان الحساب مفقوداً أو تم حذفه، يتم تسجيل الخروج فوراً وطرده
-    if (profileError || !profile) {
-        console.warn('الحساب غير موجود أو تم حذفه من النظام.');
+    // 3. فحص هل المستخدم أدمن (من بيانات profiles أو من metadata الجلسة)
+    const userMetaRole = session.user.user_metadata?.role;
+    const isAdmin = 
+        profile?.role === 'admin' || 
+        profile?.role === 'مدير' || 
+        userMetaRole === 'admin' || 
+        userMetaRole === 'مدير';
+
+    // 4. طرد الحسابات المحذوفة فقط (إذا لم يكن أدمن ولا يوجد له صف في profiles)
+    if (!profile && !isAdmin) {
+        console.warn('الحساب غير موجود في profiles وتم تسجيل الخروج.');
         await supabase.auth.signOut();
         window.location.href = 'login.html';
         return;
     }
 
-    // 3. معرفة اسم الصفحة الحالية تلقائياً من الرابط
+    // 5. معرفة اسم الصفحة الحالية
     const path = window.location.pathname;
     const pageName = path.split('/').pop().replace('.html', '') || 'index';
 
-    const isAdmin = profile.role === 'admin' || profile.role === 'مدير';
-    const allowedPages = profile.allowed_pages || [];
+    const allowedPages = profile?.allowed_pages || [];
 
-    // 4. حماية الصفحة الحالية (إذا لم يكن أدمن ولم تكن صفحة عامة)
+    // 6. حماية الصفحة الحالية للموظفين العاديين
     if (!isAdmin && pageName !== 'dashboard' && pageName !== 'index' && pageName !== 'login' && pageName !== '') {
         let isAllowed = allowedPages.includes(pageName);
 
@@ -42,7 +48,6 @@ async function protectRoute() {
             isAllowed = true;
         }
 
-        // إذا لم تكن الصفحة مسموحة، يظهر التنبيه ويتم توجيهه للرئيسية
         if (!isAllowed) {
             alert('تنبيه: لا تملك صلاحية لدخول هذه الصفحة!');
             window.location.href = 'dashboard.html';
@@ -50,13 +55,13 @@ async function protectRoute() {
         }
     }
 
-    // 5. تطبيق شارات الصلاحيات على القائمة الجانبية (Sidebar)
+    // 7. تحديث القائمة الجانبية
     updateSidebarUI(isAdmin, allowedPages);
 }
 
-// دالة تحديث شكل القائمة الجانبية وحظر الروابط غير المسموحة
+// دالة تحديث شكل القائمة الجانبية
 function updateSidebarUI(isAdmin, allowedPages) {
-    if (isAdmin) return;
+    if (isAdmin) return; // الأدمن يرى كل القوائم بدون شارات أو حظر
 
     const sidebarLinks = document.querySelectorAll('aside a, .sidebar a, nav a, a[data-page]');
 
@@ -115,5 +120,5 @@ function updateSidebarUI(isAdmin, allowedPages) {
     });
 }
 
-// تنفيذ الفحص والحماية
+// تنفيذ الفحص فوراً
 protectRoute();
