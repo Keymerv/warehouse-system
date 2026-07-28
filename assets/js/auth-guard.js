@@ -10,21 +10,24 @@ async function protectRoute() {
         return;
     }
 
-    // 2. معرفة اسم الصفحة الحالية تلقائياً من الرابط
-    const path = window.location.pathname;
-    const pageName = path.split('/').pop().replace('.html', '') || 'index';
-
-    // 3. جلب بيانات دور المستخدم والصلاحيات المسموحة من جدول profiles
+    // 2. جلب بيانات دور المستخدم والصلاحيات المسموحة من جدول profiles
     const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role, allowed_pages')
         .eq('id', session.user.id)
         .single();
 
+    // 🔴 سد الثغرة: إذا كان الحساب مفقوداً أو تم حذفه، يتم تسجيل الخروج فوراً وطرده
     if (profileError || !profile) {
-        console.error('خطأ في قراءة بيانات الصلاحيات:', profileError);
+        console.warn('الحساب غير موجود أو تم حذفه من النظام.');
+        await supabase.auth.signOut();
+        window.location.href = 'login.html';
         return;
     }
+
+    // 3. معرفة اسم الصفحة الحالية تلقائياً من الرابط
+    const path = window.location.pathname;
+    const pageName = path.split('/').pop().replace('.html', '') || 'index';
 
     const isAdmin = profile.role === 'admin' || profile.role === 'مدير';
     const allowedPages = profile.allowed_pages || [];
@@ -33,8 +36,9 @@ async function protectRoute() {
     if (!isAdmin && pageName !== 'dashboard' && pageName !== 'index' && pageName !== 'login' && pageName !== '') {
         let isAllowed = allowedPages.includes(pageName);
 
-        // معالجة خاصة لصفحة الطلبات (سواء سميت feeding أو orders)
-        if (pageName === 'orders' && (allowedPages.includes('feeding') || allowedPages.includes('orders'))) {
+        // معالجة خاصة لصفحة الطلبات
+        if ((pageName === 'orders' || pageName === 'feeding') && 
+            (allowedPages.includes('feeding') || allowedPages.includes('orders'))) {
             isAllowed = true;
         }
 
@@ -52,14 +56,11 @@ async function protectRoute() {
 
 // دالة تحديث شكل القائمة الجانبية وحظر الروابط غير المسموحة
 function updateSidebarUI(isAdmin, allowedPages) {
-    // إذا كان مديراً/أدمن، له كامل الصلاحيات ولا داعي لإضافة أي قيود
     if (isAdmin) return;
 
-    // استهداف جميع روابط القائمة الجانبية
     const sidebarLinks = document.querySelectorAll('aside a, .sidebar a, nav a, a[data-page]');
 
     sidebarLinks.forEach(link => {
-        // معرفة اسم الصفحة من data-page أو من رابط href تلقائياً
         let pageKey = link.getAttribute('data-page');
 
         if (!pageKey) {
@@ -69,26 +70,20 @@ function updateSidebarUI(isAdmin, allowedPages) {
             }
         }
 
-        // تخطي الصفحات العامة والصفحة الرئيسية
         if (!pageKey || pageKey === 'dashboard' || pageKey === 'index' || pageKey === 'login') {
             return;
         }
 
-        // التحقق من الصلاحية
         let isAllowed = allowedPages.includes(pageKey);
 
-        // معالجة مخصصة للطلبات (orders / feeding)
         if ((pageKey === 'orders' || pageKey === 'feeding') && 
             (allowedPages.includes('feeding') || allowedPages.includes('orders'))) {
             isAllowed = true;
         }
 
-        // إذا كان لا يملك الصلاحية لهذه الصفحة
         if (!isAllowed) {
-            // منع تكرار إضافة الوسم
             if (link.querySelector('.no-perm-badge')) return;
 
-            // 1. إنشاء وسم "لا تمتلك صلاحية"
             const badge = document.createElement('span');
             badge.className = 'no-perm-badge';
             badge.innerText = 'لا تمتلك صلاحية';
@@ -104,17 +99,14 @@ function updateSidebarUI(isAdmin, allowedPages) {
                 font-weight: normal;
             `;
 
-            // 2. ضبط تنسيق الرابط ليبدو معطلاً
             link.style.display = 'flex';
             link.style.alignItems = 'center';
             link.style.justifyContent = 'space-between';
             link.style.opacity = '0.5';
             link.style.cursor = 'not-allowed';
 
-            // إضافة الوسم داخل الرابط
             link.appendChild(badge);
 
-            // 3. منع الضغط تماماً على الرابط
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
