@@ -194,7 +194,7 @@
                     </select>
                 </div>
 
-                <!-- صلاحيات الوصول للصفحات (تم إزالة الإعدادات لتظل مفتوحة دائماً) -->
+                <!-- صلاحيات الوصول للصفحات -->
                 <div class="space-y-3 pt-3 border-t border-slate-800">
                     <div class="flex justify-between items-center mb-1">
                         <label class="text-slate-400 font-semibold" data-i18n="modal_page_permissions">صلاحيات الوصول للصفحات</label>
@@ -420,22 +420,18 @@
 
                 let allowedPages = profile?.allowed_pages || ['dashboard', 'orders', 'supply', 'inventory', 'branches', 'settings'];
                 
-                // الإعدادات دائماً مسموحة ومفتوحة
                 if (!allowedPages.includes('settings')) {
                     allowedPages.push('settings');
                 }
 
-                // فحص وتطبيق شارة "لا تمتلك صلاحية" وتعديل روابط القائمة الجانبية
                 document.querySelectorAll('#sidebar-nav .nav-link').forEach(link => {
                     const pageName = link.getAttribute('data-page');
                     
                     if (profile?.role !== 'admin' && profile?.role !== 'owner' && profile?.created_by && !allowedPages.includes(pageName)) {
-                        // تعطيل الزر ومنع الضغط عليه
                         link.classList.add('opacity-50', 'pointer-events-none', 'cursor-not-allowed');
                         link.classList.remove('hover:bg-slate-800', 'hover:text-white');
                         link.removeAttribute('href');
                         
-                        // إضافة شارة عدم الصلاحية إذا لم تكن موجودة
                         if (!link.querySelector('.no-perm-badge')) {
                             const badge = document.createElement('span');
                             badge.className = "no-perm-badge text-[10px] bg-rose-950/80 text-rose-400 border border-rose-800/50 px-2 py-0.5 rounded-md font-semibold shrink-0";
@@ -508,11 +504,18 @@
             document.getElementById('user-form').reset();
             
             const passContainer = document.getElementById('password-container');
-            passContainer.classList.remove('hidden');
-            document.getElementById('member-pass').required = true;
+            if (passContainer) passContainer.classList.remove('hidden');
+            
+            const emailInput = document.getElementById('member-email');
+            if (emailInput) {
+                emailInput.disabled = false;
+                emailInput.classList.remove('cursor-not-allowed', 'opacity-60');
+            }
 
             document.querySelectorAll('.page-checkbox').forEach(cb => cb.checked = true);
-            document.getElementById('select-all-pages').checked = true;
+            const selectAllCb = document.getElementById('select-all-pages');
+            if (selectAllCb) selectAllCb.checked = true;
+
             document.getElementById('modal-feedback').classList.add('hidden');
             document.getElementById('userModal').classList.remove('hidden');
         };
@@ -523,116 +526,138 @@
 
             document.getElementById('editing-user-id').value = user.id;
             document.getElementById('modal-heading').innerText = i18n[currentLang].modal_edit_heading;
-            document.getElementById('member-name').value = user.full_name || '';
-            document.getElementById('member-email').value = user.email || '';
-            document.getElementById('member-role').value = user.role || 'chef';
             
-            const passContainer = document.getElementById('password-container');
-            passContainer.classList.add('hidden');
-            document.getElementById('member-pass').required = false;
+            document.getElementById('member-name').value = user.full_name || '';
+            const emailInput = document.getElementById('member-email');
+            if (emailInput) {
+                emailInput.value = user.email || '';
+                emailInput.disabled = true;
+                emailInput.classList.add('cursor-not-allowed', 'opacity-60');
+            }
 
-            const allowedPages = user.allowed_pages || [];
+            document.getElementById('member-role').value = user.role || 'chef';
+
+            const passContainer = document.getElementById('password-container');
+            if (passContainer) passContainer.classList.add('hidden');
+
+            const allowed = user.allowed_pages || ['dashboard', 'orders', 'supply', 'inventory', 'branches'];
             document.querySelectorAll('.page-checkbox').forEach(cb => {
-                cb.checked = allowedPages.includes(cb.value);
+                cb.checked = allowed.includes(cb.value);
             });
 
-            const allChecked = Array.from(document.querySelectorAll('.page-checkbox')).every(cb => cb.checked);
-            document.getElementById('select-all-pages').checked = allChecked;
-
+            updateSelectAllCheckbox();
             document.getElementById('modal-feedback').classList.add('hidden');
             document.getElementById('userModal').classList.remove('hidden');
         };
 
         window.closeUserModal = function() {
             document.getElementById('userModal').classList.add('hidden');
-            document.getElementById('user-form').reset();
+            document.getElementById('modal-feedback').classList.add('hidden');
         };
 
-        // التحكم بـ "تحديد الكل"
-        document.getElementById('select-all-pages')?.addEventListener('change', (e) => {
-            const checked = e.target.checked;
-            document.querySelectorAll('.page-checkbox').forEach(cb => cb.checked = checked);
-        });
-
-        // مزامنة إلغاء تحديد الكل عند إزالة الصح من أي صفحة
-        document.querySelectorAll('.page-checkbox').forEach(cb => {
-            cb.addEventListener('change', () => {
-                const allChecked = Array.from(document.querySelectorAll('.page-checkbox')).every(c => c.checked);
-                document.getElementById('select-all-pages').checked = allChecked;
-            });
-        });
-
-        // حفظ الحساب وتضمين الإعدادات تلقائياً
-        document.getElementById('user-form')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const editingId = document.getElementById('editing-user-id').value;
-            const name = document.getElementById('member-name').value.trim();
-            const email = document.getElementById('member-email').value.trim().toLowerCase();
-            const password = document.getElementById('member-pass').value;
-            const role = document.getElementById('member-role').value;
-            
-            // جمع الصفحات المحددة وإضافة الإعدادات تلقائياً دائماً
-            let allowedPages = Array.from(document.querySelectorAll('.page-checkbox:checked')).map(cb => cb.value);
-            if (!allowedPages.includes('settings')) {
-                allowedPages.push('settings');
-            }
-
-            const feedback = document.getElementById('modal-feedback');
-            feedback.className = "px-3 py-2 rounded-xl text-xs text-center font-medium bg-indigo-950 text-indigo-300 border border-indigo-800";
-            feedback.innerText = currentLang === 'ar' ? "جاري التحقق وحفظ البيانات..." : "Checking & saving data...";
-            feedback.classList.remove('hidden');
+        window.deleteUser = async function(userId) {
+            const confirmMsg = currentLang === 'ar' ? "هل أنت تأكد من رغبتك في حذف هذا المستخدم؟" : "Are you sure you want to delete this user?";
+            if (!confirm(confirmMsg)) return;
 
             try {
-                let query = supabase.from('users').select('id, full_name, email').or(`email.ilike.${email},full_name.ilike.${name}`);
-                const { data: duplicates } = await query;
-
-                if (duplicates && duplicates.length > 0) {
-                    const isConflict = duplicates.some(u => u.id !== editingId);
-                    if (isConflict) {
-                        throw new Error(currentLang === 'ar' 
-                            ? "اسم العضو أو البريد الإلكتروني مسجل مسبقاً لمستخدم آخر! يرجى التغيير." 
-                            : "Member name or email is already registered to another user!");
-                    }
+                let res = await supabase.from('users').delete().eq('id', userId);
+                if (res.error) {
+                    res = await supabase.from('profiles').delete().eq('id', userId);
                 }
+                
+                if (res.error) throw res.error;
+                
+                await loadUsers();
+            } catch (err) {
+                console.error("Delete Error:", err);
+                alert(currentLang === 'ar' ? "حدث خطأ أثناء حذف المستخدم." : "An error occurred while deleting the user.");
+            }
+        };
 
-                if (!editingId) {
-                    const { data: authData, error: authError } = await supabase.auth.signUp({
-                        email,
-                        password,
-                        options: { data: { full_name: name, role: role } }
-                    });
+        // إدارة إمكانية تحديد الكل للصفحات
+        const selectAllCb = document.getElementById('select-all-pages');
+        if (selectAllCb) {
+            selectAllCb.addEventListener('change', (e) => {
+                document.querySelectorAll('.page-checkbox').forEach(cb => {
+                    cb.checked = e.target.checked;
+                });
+            });
+        }
 
-                    if (authError) throw authError;
+        function updateSelectAllCheckbox() {
+            const allCbs = document.querySelectorAll('.page-checkbox');
+            const checkedCbs = document.querySelectorAll('.page-checkbox:checked');
+            if (selectAllCb && allCbs.length > 0) {
+                selectAllCb.checked = (allCbs.length === checkedCbs.length);
+            }
+        }
 
-                    const newUserId = authData.user?.id;
-                    if (newUserId) {
-                        const userData = {
-                            id: newUserId,
-                            full_name: name,
-                            email: email,
-                            role: role,
-                            allowed_pages: allowedPages,
-                            created_by: currentAdminUserId,
-                            created_at: new Date().toISOString()
-                        };
-                        let ins = await supabase.from('users').insert([userData]);
-                        if (ins.error) await supabase.from('profiles').insert([userData]);
+        document.querySelectorAll('.page-checkbox').forEach(cb => {
+            cb.addEventListener('change', updateSelectAllCheckbox);
+        });
+
+        // حفظ / تعديل المستخدم
+        document.getElementById('user-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const feedbackEl = document.getElementById('modal-feedback');
+            const submitBtn = document.getElementById('submit-user-btn');
+            
+            const userId = document.getElementById('editing-user-id').value;
+            const fullName = document.getElementById('member-name').value.trim();
+            const email = document.getElementById('member-email').value.trim();
+            const pass = document.getElementById('member-pass').value;
+            const role = document.getElementById('member-role').value;
+            
+            const allowedPages = [];
+            document.querySelectorAll('.page-checkbox:checked').forEach(cb => {
+                allowedPages.push(cb.value);
+            });
+            if (!allowedPages.includes('settings')) allowedPages.push('settings');
+
+            feedbackEl.className = "px-3 py-2 rounded-xl text-xs text-center font-medium bg-indigo-950/80 text-indigo-300 border border-indigo-800/50 block";
+            feedbackEl.innerText = currentLang === 'ar' ? "جاري حفظ الحساب..." : "Saving account...";
+            submitBtn.disabled = true;
+
+            try {
+                if (userId) {
+                    const updateData = {
+                        full_name: fullName,
+                        role: role,
+                        allowed_pages: allowedPages,
+                        updated_at: new Date().toISOString()
+                    };
+                    
+                    let { error } = await supabase.from('users').update(updateData).eq('id', userId);
+                    if (error) {
+                        ({ error } = await supabase.from('profiles').update(updateData).eq('id', userId));
                     }
+                    if (error) throw error;
+
+                    feedbackEl.className = "px-3 py-2 rounded-xl text-xs text-center font-medium bg-emerald-950/80 text-emerald-400 border border-emerald-800/50 block";
+                    feedbackEl.innerText = currentLang === 'ar' ? "تم تحديث الحساب بنجاح!" : "Account updated successfully!";
                 } else {
-                    const updatePayload = {
-                        full_name: name,
+                    if (!pass || pass.length < 6) {
+                        throw new Error(currentLang === 'ar' ? "كلمة المرور يجب أن لا تقل عن 6 خانات." : "Password must be at least 6 characters.");
+                    }
+
+                    const newUserData = {
+                        full_name: fullName,
                         email: email,
                         role: role,
-                        allowed_pages: allowedPages
+                        allowed_pages: allowedPages,
+                        created_by: currentAdminUserId,
+                        created_at: new Date().toISOString()
                     };
 
-                    let upd = await supabase.from('users').update(updatePayload).eq('id', editingId);
-                    if (upd.error) await supabase.from('profiles').update(updatePayload).eq('id', editingId);
-                }
+                    let { error } = await supabase.from('users').insert([newUserData]);
+                    if (error) {
+                        ({ error } = await supabase.from('profiles').insert([newUserData]));
+                    }
+                    if (error) throw error;
 
-                feedback.className = "px-3 py-2 rounded-xl text-xs text-center font-medium bg-emerald-950 text-emerald-300 border border-emerald-800";
-                feedback.innerText = currentLang === 'ar' ? "تمت العملية بنجاح!" : "Saved successfully!";
+                    feedbackEl.className = "px-3 py-2 rounded-xl text-xs text-center font-medium bg-emerald-950/80 text-emerald-400 border border-emerald-800/50 block";
+                    feedbackEl.innerText = currentLang === 'ar' ? "تم إنشاء الحساب بنجاح!" : "Account created successfully!";
+                }
 
                 setTimeout(() => {
                     closeUserModal();
@@ -640,30 +665,32 @@
                 }, 1000);
 
             } catch (err) {
-                feedback.className = "px-3 py-2 rounded-xl text-xs text-center font-medium bg-rose-950 text-rose-300 border border-rose-800";
-                feedback.innerText = err.message;
+                console.error("Save User Error:", err);
+                feedbackEl.className = "px-3 py-2 rounded-xl text-xs text-center font-medium bg-rose-950/80 text-rose-400 border border-rose-800/50 block";
+                feedbackEl.innerText = err.message || (currentLang === 'ar' ? "حدث خطأ أثناء الحفظ." : "An error occurred while saving.");
+            } finally {
+                submitBtn.disabled = false;
             }
         });
 
-        window.deleteUser = async function(userId) {
-            const confirmMsg = currentLang === 'ar' ? "هل أنت تأكد من رغبتك في حذف هذا الحساب نهائياً؟" : "Are you sure you want to permanently delete this user?";
-            if (!confirm(confirmMsg)) return;
+        // حفظ إعدادات النظام العامة
+        document.getElementById('save-settings-btn')?.addEventListener('click', () => {
+            const phone = document.getElementById('support-phone').value;
+            const currency = document.getElementById('default-currency').value;
+            
+            localStorage.setItem('keymerv_phone', phone);
+            localStorage.setItem('keymerv_currency', currency);
+            
+            alert(currentLang === 'ar' ? "تم حفظ الإعدادات العامة بنجاح!" : "General settings saved successfully!");
+        });
 
-            try {
-                let { error } = await supabase.from('users').delete().eq('id', userId);
-                if (error) await supabase.from('profiles').delete().eq('id', userId);
-                loadUsers();
-            } catch (err) {
-                alert("Error deleting user: " + err.message);
-            }
-        };
-
+        // تسجيل الخروج
         document.getElementById('logout-btn')?.addEventListener('click', async () => {
             await supabase.auth.signOut();
             window.location.replace('index.html');
         });
 
-        document.addEventListener('DOMContentLoaded', initPage);
+        initPage();
     </script>
 </body>
 </html>
