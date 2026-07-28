@@ -12,7 +12,7 @@
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
         ::-webkit-scrollbar-thumb:hover { background: #334155; }
     </style>
-    <!-- حماية الصفحة الفورية قبل عرض البيانات -->
+
     <script type="module" src="assets/js/auth-guard.js"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden">
@@ -26,7 +26,7 @@
                 <span class="font-bold text-xs tracking-tight text-slate-200" data-i18n="brand_name">Keymerv Warehouse</span>
             </div>
 
-            <!-- روابط القائمة الجانبية مع إيقاف غير المصرح به -->
+            <!-- روابط القائمة الجانبية -->
             <nav class="p-4 space-y-1.5" id="sidebar-nav">
                 <a href="dashboard.html" data-page="dashboard" class="nav-link flex items-center justify-between px-4 py-2.5 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition text-xs">
                     <span data-i18n="nav_overview">الرئيسية</span>
@@ -49,7 +49,7 @@
             </nav>
         </div>
 
-        <!-- معلومات المستخدم الحالي -->
+        <!-- معلومات المستخدم -->
         <div class="p-4 border-t border-slate-800 flex items-center justify-between">
             <div class="text-xs">
                 <p class="font-bold text-slate-200" id="sidebar-user-role">...</p>
@@ -95,7 +95,7 @@
                 </div>
             </div>
 
-            <!-- 2. إعدادات الفريق وإدارة الحسابات -->
+            <!-- 2. إعدادات الفريق -->
             <div id="team-settings-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <div class="flex justify-between items-center">
                     <h3 class="text-sm font-bold text-indigo-400" data-i18n="team_settings_title">إعدادات الفريق والحسابات</h3>
@@ -124,20 +124,18 @@
                 </div>
             </div>
 
-            <!-- 3. إعدادات التنبيهات (مع مفتاح التبديل ON/OFF) -->
+            <!-- 3. إعدادات التنبيهات -->
             <div id="inventory-config-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <h3 class="text-sm font-bold text-indigo-400" data-i18n="inventory_config_title">إعدادات تنبيهات المخزون والطلبات</h3>
                 <div class="space-y-4 text-xs">
                     <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
                         <span class="text-slate-300" data-i18n="alert_low_stock">تنبيه تلقائي عند وصول الأصناف لحد النفاذ</span>
-                        <!-- زر التبديل التفاعلي (Switch ON/OFF) -->
                         <button type="button" onclick="toggleSwitch(this)" data-state="on" class="w-12 h-6 bg-indigo-600 rounded-full p-1 transition-colors flex items-center justify-end focus:outline-none">
                             <span class="w-4 h-4 bg-white rounded-full shadow-md transition-transform"></span>
                         </button>
                     </div>
                     <div class="flex items-center justify-between py-2 border-b border-slate-800/60">
                         <span class="text-slate-300" data-i18n="alert_branch_orders">إرسال إشعار فوري عند طلب فرع مطعم أصناف جديدة</span>
-                        <!-- زر التبديل التفاعلي (Switch ON/OFF) -->
                         <button type="button" onclick="toggleSwitch(this)" data-state="on" class="w-12 h-6 bg-indigo-600 rounded-full p-1 transition-colors flex items-center justify-end focus:outline-none">
                             <span class="w-4 h-4 bg-white rounded-full shadow-md transition-transform"></span>
                         </button>
@@ -151,7 +149,7 @@
         </div>
     </main>
 
-    <!-- نافذة إضافة / تعديل مستخدم (Modal) -->
+    <!-- نافذة إضافة / تعديل مستخدم -->
     <div id="userModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-xl p-6 space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -164,12 +162,9 @@
 
                 <div>
                     <label class="block text-slate-400 mb-1" data-i18n="modal_label_name">اسم العضو</label>
-                    <!-- تنقية وحظر الأحرف العربية والرموز أثناء الكتابة مع إظهار التنبيه -->
                     <input type="text" id="member-name" autocomplete="off" placeholder="John Doe" required 
                            oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
-                    
-                    <!-- تنبيه موضح للمستخدم بأن الكتابة بالإنجليزية فقط -->
                     <p class="text-[11px] text-amber-400/90 mt-1.5 flex items-center gap-1 font-medium" data-i18n="english_only_notice">
                         <span>⚠️ تنبيه: يُسمح بكتابة الاسم باللغة الإنجليزية فقط.</span>
                     </p>
@@ -180,7 +175,6 @@
                         <label class="block text-slate-400 mb-1" data-i18n="modal_label_email">البريد الإلكتروني</label>
                         <input type="email" id="member-email" autocomplete="off" placeholder="user@keymerv.com" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
                     </div>
-                    <!-- حقل كلمة المرور يظهر عند الإضافة فقط للتأمين -->
                     <div id="password-container">
                         <label class="block text-slate-400 mb-1" data-i18n="modal_label_pass">كلمة المرور المؤقتة</label>
                         <input type="password" id="member-pass" autocomplete="new-password" placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
@@ -200,7 +194,7 @@
                     </select>
                 </div>
 
-                <!-- صلاحيات الوصول للصفحات -->
+                <!-- صلاحيات الوصول للصفحات (تم إزالة الإعدادات لتظل مفتوحة دائماً) -->
                 <div class="space-y-3 pt-3 border-t border-slate-800">
                     <div class="flex justify-between items-center mb-1">
                         <label class="text-slate-400 font-semibold" data-i18n="modal_page_permissions">صلاحيات الوصول للصفحات</label>
@@ -230,10 +224,6 @@
                             <input type="checkbox" name="allowed_pages" value="branches" checked class="page-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
                             <span data-i18n="nav_branches">الفروع</span>
                         </label>
-                        <label class="flex items-center gap-2 cursor-pointer text-slate-300">
-                            <input type="checkbox" name="allowed_pages" value="settings" checked class="page-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
-                            <span data-i18n="nav_settings">الإعدادات</span>
-                        </label>
                     </div>
                 </div>
 
@@ -247,11 +237,10 @@
         </div>
     </div>
 
-    <!-- السكربت البرمجي الكامل مع معالجات الأحداث والترجمة -->
+    <!-- السكربت التفاعلي -->
     <script type="module">
         import { supabase } from './assets/js/supabase.js';
 
-        // 1. القاموس الكامل للترجمة
         const i18n = {
             ar: {
                 settings_title: "الإعدادات - Keymerv Warehouse",
@@ -362,7 +351,6 @@
         let isSuperAdmin = false;
         let cachedUsersList = [];
 
-        // مفتاح التبديل التفاعلي ON/OFF
         window.toggleSwitch = function(btn) {
             const isOff = btn.getAttribute('data-state') === 'off';
             const knob = btn.querySelector('span');
@@ -378,7 +366,6 @@
             }
         };
 
-        // تطبيق ترجمة النصوص واختيار اتجاه الصفحة
         function applyTranslations() {
             const langData = i18n[currentLang];
             document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -404,7 +391,6 @@
             }
         }
 
-        // زر تبديل اللغة
         document.getElementById('lang-btn')?.addEventListener('click', () => {
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
             localStorage.setItem('keymerv_lang', currentLang);
@@ -432,22 +418,30 @@
                 const profile = profileRes.data;
                 document.getElementById('sidebar-user-email').innerText = session.user.email || 'admin@keymerv.com';
 
-                const allowedPages = profile?.allowed_pages || ['dashboard', 'orders', 'supply', 'inventory', 'branches', 'settings'];
+                let allowedPages = profile?.allowed_pages || ['dashboard', 'orders', 'supply', 'inventory', 'branches', 'settings'];
                 
-                // معالجة القائمة الجانبية: تعطيل الأزرار التي لا يملك العضو صلاحياتها وكتابة "لا تمتلك صلاحية"
+                // الإعدادات دائماً مسموحة ومفتوحة
+                if (!allowedPages.includes('settings')) {
+                    allowedPages.push('settings');
+                }
+
+                // فحص وتطبيق شارة "لا تمتلك صلاحية" وتعديل روابط القائمة الجانبية
                 document.querySelectorAll('#sidebar-nav .nav-link').forEach(link => {
                     const pageName = link.getAttribute('data-page');
+                    
                     if (profile?.role !== 'admin' && profile?.role !== 'owner' && profile?.created_by && !allowedPages.includes(pageName)) {
-                        // تعطيل الزر تماماً
+                        // تعطيل الزر ومنع الضغط عليه
                         link.classList.add('opacity-50', 'pointer-events-none', 'cursor-not-allowed');
                         link.classList.remove('hover:bg-slate-800', 'hover:text-white');
                         link.removeAttribute('href');
                         
-                        // إضافة شارة عدم الصلاحية المباشرة
-                        const badge = document.createElement('span');
-                        badge.className = "text-[10px] bg-rose-950/80 text-rose-400 border border-rose-800/50 px-2 py-0.5 rounded-md font-semibold";
-                        badge.innerText = i18n[currentLang].no_permission_badge;
-                        link.appendChild(badge);
+                        // إضافة شارة عدم الصلاحية إذا لم تكن موجودة
+                        if (!link.querySelector('.no-perm-badge')) {
+                            const badge = document.createElement('span');
+                            badge.className = "no-perm-badge text-[10px] bg-rose-950/80 text-rose-400 border border-rose-800/50 px-2 py-0.5 rounded-md font-semibold shrink-0";
+                            badge.innerText = i18n[currentLang].no_permission_badge;
+                            link.appendChild(badge);
+                        }
                     }
                 });
 
@@ -462,7 +456,6 @@
                     document.getElementById('team-settings-card')?.classList.add('hidden');
                 }
 
-                // إظهار الصفحة بعد الانتهاء من تطبيق شروط الأمان
                 document.getElementById('html-root').style.display = 'block';
 
             } catch (err) {
@@ -509,7 +502,6 @@
             }
         }
 
-        // فتح نافذة الإضافة
         window.openAddUserModal = function() {
             document.getElementById('editing-user-id').value = '';
             document.getElementById('modal-heading').innerText = i18n[currentLang].modal_add_heading;
@@ -525,7 +517,6 @@
             document.getElementById('userModal').classList.remove('hidden');
         };
 
-        // فتح نافذة التعديل
         window.openEditUserModal = function(userId) {
             const user = cachedUsersList.find(u => u.id === userId);
             if (!user) return;
@@ -536,7 +527,6 @@
             document.getElementById('member-email').value = user.email || '';
             document.getElementById('member-role').value = user.role || 'chef';
             
-            // إخفاء حقل كلمة المرور لحماية الحساب من التغيير القسري
             const passContainer = document.getElementById('password-container');
             passContainer.classList.add('hidden');
             document.getElementById('member-pass').required = false;
@@ -546,7 +536,6 @@
                 cb.checked = allowedPages.includes(cb.value);
             });
 
-            // ضبط حالة زر تحديد الكل بناءً على اكتمال الصفحات
             const allChecked = Array.from(document.querySelectorAll('.page-checkbox')).every(cb => cb.checked);
             document.getElementById('select-all-pages').checked = allChecked;
 
@@ -559,13 +548,13 @@
             document.getElementById('user-form').reset();
         };
 
-        // 1. التحكم بـ "تحديد الكل"
+        // التحكم بـ "تحديد الكل"
         document.getElementById('select-all-pages')?.addEventListener('change', (e) => {
             const checked = e.target.checked;
             document.querySelectorAll('.page-checkbox').forEach(cb => cb.checked = checked);
         });
 
-        // 2. إلغاء تحديد "تحديد الكل" لو أزال المستخدم الصح من أي صفحة واحدة
+        // مزامنة إلغاء تحديد الكل عند إزالة الصح من أي صفحة
         document.querySelectorAll('.page-checkbox').forEach(cb => {
             cb.addEventListener('change', () => {
                 const allChecked = Array.from(document.querySelectorAll('.page-checkbox')).every(c => c.checked);
@@ -573,7 +562,7 @@
             });
         });
 
-        // حفظ بيانات النموذج مع فحص عدم التكرار
+        // حفظ الحساب وتضمين الإعدادات تلقائياً
         document.getElementById('user-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -582,7 +571,12 @@
             const email = document.getElementById('member-email').value.trim().toLowerCase();
             const password = document.getElementById('member-pass').value;
             const role = document.getElementById('member-role').value;
-            const allowedPages = Array.from(document.querySelectorAll('.page-checkbox:checked')).map(cb => cb.value);
+            
+            // جمع الصفحات المحددة وإضافة الإعدادات تلقائياً دائماً
+            let allowedPages = Array.from(document.querySelectorAll('.page-checkbox:checked')).map(cb => cb.value);
+            if (!allowedPages.includes('settings')) {
+                allowedPages.push('settings');
+            }
 
             const feedback = document.getElementById('modal-feedback');
             feedback.className = "px-3 py-2 rounded-xl text-xs text-center font-medium bg-indigo-950 text-indigo-300 border border-indigo-800";
@@ -590,7 +584,6 @@
             feedback.classList.remove('hidden');
 
             try {
-                // فحص منع تكرار الاسم والبريد في قاعدة البيانات
                 let query = supabase.from('users').select('id, full_name, email').or(`email.ilike.${email},full_name.ilike.${name}`);
                 const { data: duplicates } = await query;
 
@@ -603,7 +596,6 @@
                     }
                 }
 
-                // إضافة حساب جديد
                 if (!editingId) {
                     const { data: authData, error: authError } = await supabase.auth.signUp({
                         email,
@@ -627,9 +619,7 @@
                         let ins = await supabase.from('users').insert([userData]);
                         if (ins.error) await supabase.from('profiles').insert([userData]);
                     }
-                } 
-                // تعديل حساب حالي
-                else {
+                } else {
                     const updatePayload = {
                         full_name: name,
                         email: email,
@@ -655,7 +645,6 @@
             }
         });
 
-        // حذف الحساب
         window.deleteUser = async function(userId) {
             const confirmMsg = currentLang === 'ar' ? "هل أنت تأكد من رغبتك في حذف هذا الحساب نهائياً؟" : "Are you sure you want to permanently delete this user?";
             if (!confirm(confirmMsg)) return;
@@ -669,7 +658,6 @@
             }
         };
 
-        // تسجيل الخروج
         document.getElementById('logout-btn')?.addEventListener('click', async () => {
             await supabase.auth.signOut();
             window.location.replace('index.html');
