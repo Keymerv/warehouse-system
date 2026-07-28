@@ -534,51 +534,66 @@
             const branchesContainer = document.getElementById('branches-checkboxes-container');
 
             try {
-                // جلب الفروع والبراندات من قاعدة البيانات مع ضمان الدمج الصحيح
+                // جلب الفروع والبراندات من قاعدة البيانات
                 const { data: branchesData, error: branchesError } = await supabase.from('branches').select('*');
-                const { data: brandsTableData, error: brandsError } = await supabase.from('brands').select('*');
+                const { data: brandsTableData } = await supabase.from('brands').select('*');
                 
-                let brandsList = [];
-                if (!brandsError && brandsTableData && brandsTableData.length > 0) {
-                    brandsList = brandsTableData.map(b => b.name || b.brand_name);
-                }
-                
-                // استخراج البراندات تلقائياً من الفروع أيضاً لضمان عدم حدوث فراغ
-                if (branchesData) {
-                    const brandsSet = new Set(brandsList);
-                    branchesData.forEach(item => {
-                        if (item.brand || item.brand_name) brandsSet.add(item.brand || item.brand_name);
+                let brandsMap = new Map(); // مفتاح: اسم البراند، قيمة: مجموعة الفروع التابعة له
+
+                // إضافة البراندات من جدول brands إن وجدت
+                if (brandsTableData && brandsTableData.length > 0) {
+                    brandsTableData.forEach(b => {
+                        const bName = b.name || b.brand_name;
+                        if (bName && !brandsMap.has(bName)) {
+                            brandsMap.set(bName, []);
+                        }
                     });
-                    brandsList = Array.from(brandsSet);
                 }
 
-                if (brandsList.length === 0) {
+                // دمج الفروع واستخراج البراندات المرتبطة بها تماماً كما هي في صفحة الفروع
+                if (branchesData && branchesData.length > 0) {
+                    branchesData.forEach(item => {
+                        const branchName = item.name || item.branch_name || 'Unnamed Branch';
+                        // استخراج اسم البراند من أعمدة الفرع المختلفة المحتملة
+                        const branchBrand = item.brand || item.brand_name || item.brand_title || (item.brands ? item.brands.name : '') || 'General Brand';
+                        
+                        if (!brandsMap.has(branchBrand)) {
+                            brandsMap.set(branchBrand, []);
+                        }
+                        brandsMap.get(branchBrand).push({ name: branchName, raw: item });
+                    });
+                }
+
+                if (brandsMap.size === 0) {
                     brandsContainer.innerHTML = `<span class="text-slate-500">${currentLang === 'ar' ? 'لا توجد براندات مسجلة' : 'No registered brands'}</span>`;
-                } else {
-                    brandsContainer.innerHTML = brandsList.map(brand => `
-                        <label class="flex items-center gap-2 cursor-pointer text-slate-300">
-                            <input type="checkbox" name="selected_brands" value="${brand}" data-brand="${brand}" class="brand-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
-                            <span>${brand}</span>
-                        </label>
-                    `).join('');
+                    branchesContainer.innerHTML = `<span class="text-slate-500">${currentLang === 'ar' ? 'لا توجد فروع مسجلة' : 'No registered branches'}</span>`;
+                    return;
                 }
 
-                if (branchesError || !branchesData || branchesData.length === 0) {
-                    branchesContainer.innerHTML = `<span class="text-slate-500">${currentLang === 'ar' ? 'لا توجد فروع مسجلة' : 'No registered branches'}</span>`;
-                } else {
-                    branchesContainer.innerHTML = branchesData.map(b => {
-                        const branchName = b.name || b.branch_name || 'Unnamed Branch';
-                        const branchBrand = b.brand || b.brand_name || '';
-                        return `
-                            <label class="flex items-center gap-2 cursor-pointer text-slate-300">
-                                <input type="checkbox" name="selected_branches" value="${branchName}" data-brand="${branchBrand}" class="branch-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
-                                <span>${branchName} ${branchBrand ? '(' + branchBrand + ')' : ''}</span>
+                // عرض البراندات
+                brandsContainer.innerHTML = Array.from(brandsMap.keys()).map(brand => `
+                    <label class="flex items-center gap-2 cursor-pointer text-slate-300">
+                        <input type="checkbox" name="selected_brands" value="${brand}" data-brand="${brand}" class="brand-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
+                        <span class="font-medium">${brand}</span>
+                    </label>
+                `).join('');
+
+                // عرض الفروع مع ربطها بالبراند الخاص بها في خاصية data-brand
+                let allBranchesHTML = '';
+                brandsMap.forEach((branches, brandName) => {
+                    branches.forEach(branch => {
+                        allBranchesHTML += `
+                            <label class="flex items-center gap-2 cursor-pointer text-slate-300 pl-2 border-r-2 border-indigo-500/40 my-1">
+                                <input type="checkbox" name="selected_branches" value="${branch.name}" data-brand="${brandName}" class="branch-checkbox rounded bg-slate-900 border-slate-700 text-indigo-600">
+                                <span>${branch.name} <span class="text-[10px] text-indigo-400">(${brandName})</span></span>
                             </label>
                         `;
-                    }).join('');
-                }
+                    });
+                });
+                branchesContainer.innerHTML = allBranchesHTML;
 
-                // ربط الأحداث التفاعلية بين البراندات وفروعها
+                // التفاعل البرمجي المطلوب:
+                // 1. عند تحديد البراند، تتحدد جميع فروعه تلقائياً.
                 document.querySelectorAll('.brand-checkbox').forEach(brandCb => {
                     brandCb.addEventListener('change', (e) => {
                         const brandName = e.target.getAttribute('data-brand');
@@ -589,6 +604,7 @@
                     });
                 });
 
+                // 2. عند تغيير فرع، إذا وجد فرع واحد على الأقل محدد للبراند يبقى البراند محدد، وإذا أُلغيت كل الفروع يلغى تحديد البراند تلقائياً.
                 document.querySelectorAll('.branch-checkbox').forEach(branchCb => {
                     branchCb.addEventListener('change', (e) => {
                         const brandName = e.target.getAttribute('data-brand');
@@ -596,13 +612,13 @@
                         const brandCb = document.querySelector(`.brand-checkbox[data-brand="${CSS.escape(brandName)}"]`);
                         if (!brandCb) return;
 
-                        // التحقق هل يوجد فرع واحد على الأقل محدد لنفس البراند
                         const siblingBranches = document.querySelectorAll(`.branch-checkbox[data-brand="${CSS.escape(brandName)}"]`);
                         const anyChecked = Array.from(siblingBranches).some(cb => cb.checked);
-                        brandCb.checked = anyChecked; // يتم تحديد البراند إذا وجد فرع واحد على الأقل، ويُلغى إذا أُلغيت كل الفروع
+                        brandCb.checked = anyChecked; 
                     });
                 });
 
+                // أزرار تحديد الكل
                 document.getElementById('select-all-brands').addEventListener('change', (e) => {
                     const isChecked = e.target.checked;
                     document.querySelectorAll('.brand-checkbox').forEach(cb => cb.checked = isChecked);
