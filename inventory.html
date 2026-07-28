@@ -44,10 +44,12 @@
             </nav>
         </div>
 
+        <!-- معلومات المستخدم والوظيفة والبريد -->
         <div class="p-3 border-t border-slate-800 flex items-center justify-between">
             <div>
-                <p class="font-bold text-slate-200 text-xs" data-i18n="user_role_admin">الإدارة العامة (المالك)</p>
-                <p class="text-[10px] text-slate-400">admin@keymerv.com</p>
+                <p class="font-bold text-slate-200 text-xs" id="user-name" data-i18n="user_name">أحمد الغامدي</p>
+                <p class="text-[10px] text-indigo-400 font-semibold" id="user-role" data-i18n="user_role">مدير المستودع الرئيسي</p>
+                <p class="text-[10px] text-slate-500" id="user-email">a.alghamdi@keymerv.com</p>
             </div>
             <a href="login.html" class="text-rose-400 hover:text-rose-300 text-[11px] font-semibold" data-i18n="logout">خروج</a>
         </div>
@@ -91,7 +93,7 @@
                 </div>
             </div>
 
-            <!-- شريط الأدوات والفلترة وزر التحميل -->
+            <!-- شريط الأدوات والفلترة وزر التحميل والحذف الجملة -->
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 bg-slate-900 border border-slate-800 p-3 rounded-xl">
                 
                 <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
@@ -106,6 +108,11 @@
                 </div>
 
                 <div class="flex items-center gap-2 w-full lg:w-auto justify-end">
+                    <!-- زر الحذف المجمع (يظهر فقط عند التحديد) -->
+                    <button id="bulk-delete-btn" onclick="deleteSelected()" class="hidden bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-600/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5" data-i18n="delete_selected_btn">
+                        🗑️ حذف المحدد (<span id="selected-count">0</span>)
+                    </button>
+
                     <button onclick="downloadCSV()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 border border-slate-700" data-i18n="download_all_btn">
                         📥 تنزيل جميع الأصناف
                     </button>
@@ -138,10 +145,14 @@
                     <table class="w-full text-right border-collapse">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 text-[11px]">
+                                <th class="py-2.5 px-3 text-center w-8">
+                                    <input type="checkbox" id="select-all" onclick="toggleSelectAll(this)" class="rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0 cursor-pointer">
+                                </th>
                                 <th class="py-2.5 px-3" data-i18n="th_sku">كود SKU</th>
                                 <th class="py-2.5 px-3" data-i18n="th_item_name">اسم الصنف</th>
                                 <th class="py-2.5 px-3" data-i18n="th_category">التصنيف</th>
                                 <th class="py-2.5 px-3" data-i18n="th_quantity">الكمية الحالية</th>
+                                <th class="py-2.5 px-3" data-i18n="th_min_limit">الحد الأدنى</th>
                                 <th class="py-2.5 px-3" data-i18n="th_unit">الوحدة</th>
                                 <th class="py-2.5 px-3" data-i18n="th_status">الحالة</th>
                                 <th class="py-2.5 px-3 text-center" data-i18n="th_actions">الإجراءات</th>
@@ -149,10 +160,14 @@
                         </thead>
                         <tbody class="text-xs divide-y divide-slate-800/40" id="inventory-table-body">
                             <tr class="inventory-row" data-status="available">
+                                <td class="py-3 px-3 text-center">
+                                    <input type="checkbox" onchange="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0 cursor-pointer">
+                                </td>
                                 <td class="py-3 px-3 font-mono text-indigo-300 row-sku">SKU-BRG-001</td>
                                 <td class="py-3 px-3 font-bold text-slate-200 row-name">لحم برجر مجمد (أصلي)</td>
                                 <td class="py-3 px-3 text-slate-400 row-category">مستودع اللحوم والبراندات</td>
                                 <td class="py-3 px-3 font-bold text-indigo-400 row-qty">1,450</td>
+                                <td class="py-3 px-3 font-semibold text-slate-400 row-min">200</td>
                                 <td class="py-3 px-3 text-slate-400 row-unit">قطعة</td>
                                 <td class="py-3 px-3"><span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full text-[11px] status-badge" data-i18n="status_available">متوفر</span></td>
                                 <td class="py-3 px-3 text-center">
@@ -160,10 +175,14 @@
                                 </td>
                             </tr>
                             <tr class="inventory-row" data-status="low">
+                                <td class="py-3 px-3 text-center">
+                                    <input type="checkbox" onchange="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0 cursor-pointer">
+                                </td>
                                 <td class="py-3 px-3 font-mono text-indigo-300 row-sku">SKU-BAK-042</td>
                                 <td class="py-3 px-3 font-bold text-slate-200 row-name">خبز برجر بطاطس</td>
                                 <td class="py-3 px-3 text-slate-400 row-category">المخابز والمخازن الجافة</td>
                                 <td class="py-3 px-3 font-bold text-amber-400 row-qty">85</td>
+                                <td class="py-3 px-3 font-semibold text-slate-400 row-min">100</td>
                                 <td class="py-3 px-3 text-slate-400 row-unit">كيس</td>
                                 <td class="py-3 px-3"><span class="bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-full text-[11px] status-badge" data-i18n="status_low">قارب على النفاذ</span></td>
                                 <td class="py-3 px-3 text-center">
@@ -171,10 +190,14 @@
                                 </td>
                             </tr>
                             <tr class="inventory-row" data-status="available">
+                                <td class="py-3 px-3 text-center">
+                                    <input type="checkbox" onchange="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0 cursor-pointer">
+                                </td>
                                 <td class="py-3 px-3 font-mono text-indigo-300 row-sku">SKU-SRC-105</td>
                                 <td class="py-3 px-3 font-bold text-slate-200 row-name">صوص الصيل الخاص</td>
                                 <td class="py-3 px-3 text-slate-400 row-category">الصلصات والمواد السائلة</td>
                                 <td class="py-3 px-3 font-bold text-indigo-400 row-qty">620</td>
+                                <td class="py-3 px-3 font-semibold text-slate-400 row-min">150</td>
                                 <td class="py-3 px-3 text-slate-400 row-unit">عبوة</td>
                                 <td class="py-3 px-3"><span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full text-[11px] status-badge" data-i18n="status_available">متوفر</span></td>
                                 <td class="py-3 px-3 text-center">
@@ -182,10 +205,14 @@
                                 </td>
                             </tr>
                             <tr class="inventory-row" data-status="out">
+                                <td class="py-3 px-3 text-center">
+                                    <input type="checkbox" onchange="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0 cursor-pointer">
+                                </td>
                                 <td class="py-3 px-3 font-mono text-indigo-300 row-sku">SKU-PKG-019</td>
                                 <td class="py-3 px-3 font-bold text-slate-200 row-name">أكياس تعبئة ورق 1 كجم</td>
                                 <td class="py-3 px-3 text-slate-400 row-category">مستودع التغليف</td>
                                 <td class="py-3 px-3 font-bold text-rose-400 row-qty">0</td>
+                                <td class="py-3 px-3 font-semibold text-slate-400 row-min">50</td>
                                 <td class="py-3 px-3 text-slate-400 row-unit">شدة</td>
                                 <td class="py-3 px-3"><span class="bg-rose-500/10 text-rose-400 px-2 py-0.5 rounded-full text-[11px] status-badge" data-i18n="status_out">منتهي</span></td>
                                 <td class="py-3 px-3 text-center">
@@ -199,7 +226,7 @@
         </div>
     </main>
 
-    <!-- Modal النافذة المنبثقة للإضافة/التعديل -->
+    <!-- Modal النافذة المنبثقة للإضافة/التعديل المحدثة -->
     <div id="item-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-md p-5 space-y-4 shadow-xl">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -222,21 +249,27 @@
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-[11px] text-slate-400 mb-1">الكمية</label>
+                        <label class="block text-[11px] text-slate-400 mb-1">الكمية الحالية</label>
                         <input type="number" id="modal-qty" min="0" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
                     </div>
+                    <div>
+                        <label class="block text-[11px] text-amber-400 mb-1">الحد الأدنى للتنبيه ⚠️</label>
+                        <input type="number" id="modal-min" min="1" required placeholder="مثال: 50" class="w-full bg-slate-950 border border-amber-500/30 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-amber-500">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="block text-[11px] text-slate-400 mb-1">الوحدة</label>
                         <input type="text" id="modal-unit" placeholder="قطعة, كيس..." required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
                     </div>
-                </div>
-                <div>
-                    <label class="block text-[11px] text-slate-400 mb-1">الحالة</label>
-                    <select id="modal-status" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
-                        <option value="available">متوفر</option>
-                        <option value="low">قارب على النفاذ</option>
-                        <option value="out">منتهي</option>
-                    </select>
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">الحالة</label>
+                        <select id="modal-status" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                            <option value="available">متوفر</option>
+                            <option value="low">قارب على النفاذ</option>
+                            <option value="out">منتهي</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
@@ -247,9 +280,52 @@
         </div>
     </div>
 
-    <!-- محرك الترجمة والتصفية -->
+    <!-- محرك البرمجة والترجمة والتحديد -->
     <script>
         let editingRow = null;
+
+        // وظائف تحديد العناصر والحذف الجملة
+        function toggleSelectAll(masterCheckbox) {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(cb => {
+                if (cb.closest('tr').style.display !== 'none') {
+                    cb.checked = masterCheckbox.checked;
+                }
+            });
+            updateSelection();
+        }
+
+        function updateSelection() {
+            const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+            const bulkBtn = document.getElementById('bulk-delete-btn');
+            const countSpan = document.getElementById('selected-count');
+
+            if (selectedCheckboxes.length > 0) {
+                bulkBtn.classList.remove('hidden');
+                countSpan.innerText = selectedCheckboxes.length;
+            } else {
+                bulkBtn.classList.add('hidden');
+                document.getElementById('select-all').checked = false;
+            }
+        }
+
+        function deleteSelected() {
+            const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+            if (selectedCheckboxes.length === 0) return;
+
+            const confirmMessage = currentLang === 'ar' 
+                ? `هل أنت أصل من حذف ${selectedCheckboxes.length} صنف؟` 
+                : `Are you sure you want to delete ${selectedCheckboxes.length} item(s)?`;
+
+            if (confirm(confirmMessage)) {
+                selectedCheckboxes.forEach(cb => {
+                    cb.closest('tr').remove();
+                });
+                document.getElementById('select-all').checked = false;
+                updateSelection();
+                filterInventory();
+            }
+        }
 
         function filterInventory() {
             const statusFilter = document.getElementById('status-filter').value;
@@ -275,9 +351,7 @@
             });
 
             const counterElement = document.getElementById('results-counter');
-            const lang = document.getElementById('html-root').getAttribute('lang') || 'ar';
-            
-            if (lang === 'ar') {
+            if (currentLang === 'ar') {
                 counterElement.innerText = `عرض ${visibleCount} من أصل ${totalCount} صنف`;
             } else {
                 counterElement.innerText = `Showing ${visibleCount} of ${totalCount} items`;
@@ -319,6 +393,7 @@
                 document.getElementById('modal-name').value = editingRow.querySelector('.row-name').innerText;
                 document.getElementById('modal-category').value = editingRow.querySelector('.row-category').innerText;
                 document.getElementById('modal-qty').value = editingRow.querySelector('.row-qty').innerText.replace(/,/g, '');
+                document.getElementById('modal-min').value = editingRow.querySelector('.row-min').innerText.replace(/,/g, '');
                 document.getElementById('modal-unit').value = editingRow.querySelector('.row-unit').innerText;
                 document.getElementById('modal-status').value = editingRow.getAttribute('data-status');
             }
@@ -339,9 +414,16 @@
             const sku = document.getElementById('modal-sku').value;
             const name = document.getElementById('modal-name').value;
             const category = document.getElementById('modal-category').value;
-            const qty = parseInt(document.getElementById('modal-qty').value).toLocaleString();
+            const rawQty = parseInt(document.getElementById('modal-qty').value);
+            const rawMin = parseInt(document.getElementById('modal-min').value);
+            const qty = rawQty.toLocaleString();
+            const min = rawMin.toLocaleString();
             const unit = document.getElementById('modal-unit').value;
-            const status = document.getElementById('modal-status').value;
+            
+            // تحديد حالة المنتج تلقائياً بناءً على الحد الأدنى لو أراد المستخدم
+            let status = document.getElementById('modal-status').value;
+            if (rawQty === 0) status = 'out';
+            else if (rawQty <= rawMin) status = 'low';
 
             let statusText = inventoryTranslations[currentLang][`status_${status}`];
             let statusColor = status === 'available' ? 'bg-emerald-500/10 text-emerald-400' : (status === 'low' ? 'bg-amber-500/10 text-amber-400' : 'bg-rose-500/10 text-rose-400');
@@ -354,6 +436,7 @@
                 editingRow.querySelector('.row-category').innerText = category;
                 editingRow.querySelector('.row-qty').innerText = qty;
                 editingRow.querySelector('.row-qty').className = `py-3 px-3 font-bold ${qtyColor} row-qty`;
+                editingRow.querySelector('.row-min').innerText = min;
                 editingRow.querySelector('.row-unit').innerText = unit;
                 
                 const badge = editingRow.querySelector('.status-badge');
@@ -366,10 +449,14 @@
                 newRow.className = 'inventory-row';
                 newRow.setAttribute('data-status', status);
                 newRow.innerHTML = `
+                    <td class="py-3 px-3 text-center">
+                        <input type="checkbox" onchange="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0 cursor-pointer">
+                    </td>
                     <td class="py-3 px-3 font-mono text-indigo-300 row-sku">${sku}</td>
                     <td class="py-3 px-3 font-bold text-slate-200 row-name">${name}</td>
                     <td class="py-3 px-3 text-slate-400 row-category">${category}</td>
                     <td class="py-3 px-3 font-bold ${qtyColor} row-qty">${qty}</td>
+                    <td class="py-3 px-3 font-semibold text-slate-400 row-min">${min}</td>
                     <td class="py-3 px-3 text-slate-400 row-unit">${unit}</td>
                     <td class="py-3 px-3"><span class="${statusColor} px-2 py-0.5 rounded-full text-[11px] status-badge" data-i18n="status_${status}">${statusText}</span></td>
                     <td class="py-3 px-3 text-center">
@@ -384,8 +471,8 @@
         }
 
         function downloadCSV() {
-            let csv = '\uFEFF'; // UTF-8 BOM لضمان فتح اللغة العربية صح في Excel
-            csv += 'كود SKU,اسم الصنف,التصنيف,الكمية الحالية,الوحدة,الحالة\n';
+            let csv = '\uFEFF'; 
+            csv += 'كود SKU,اسم الصنف,التصنيف,الكمية الحالية,الحد الأدنى,الوحدة,الحالة\n';
 
             const rows = document.querySelectorAll('.inventory-row');
             rows.forEach(row => {
@@ -394,10 +481,11 @@
                     const name = `"${row.querySelector('.row-name').innerText}"`;
                     const cat = `"${row.querySelector('.row-category').innerText}"`;
                     const qty = row.querySelector('.row-qty').innerText.replace(/,/g, '');
+                    const min = row.querySelector('.row-min').innerText.replace(/,/g, '');
                     const unit = row.querySelector('.row-unit').innerText;
                     const status = row.querySelector('.status-badge').innerText;
 
-                    csv += `${sku},${name},${cat},${qty},${unit},${status}\n`;
+                    csv += `${sku},${name},${cat},${qty},${min},${unit},${status}\n`;
                 }
             });
 
@@ -418,7 +506,8 @@
                 nav_supply: "التوريد والموردين",
                 nav_branches: "الفروع",
                 nav_settings: "الإعدادات",
-                user_role_admin: "الإدارة العامة (المالك)",
+                user_name: "أحمد الغامدي",
+                user_role: "مدير المستودع الرئيسي",
                 logout: "خروج",
                 inventory_header: "إدارة المخزون الرئيسي",
                 stat_total_items: "إجمالي الأصناف",
@@ -429,12 +518,14 @@
                 filter_available: "الأصناف المتوفرة",
                 filter_low: "قاربت على النفاذ",
                 filter_out: "الأصناف المنتهية",
+                delete_selected_btn: "🗑️ حذف المحدد",
                 download_all_btn: "📥 تنزيل جميع الأصناف",
                 add_item_btn: "+ إضافة صنف",
                 th_sku: "كود SKU",
                 th_item_name: "اسم الصنف",
                 th_category: "التصنيف",
                 th_quantity: "الكمية الحالية",
+                th_min_limit: "الحد الأدنى",
                 th_unit: "الوحدة",
                 th_status: "الحالة",
                 th_actions: "الإجراءات",
@@ -455,7 +546,8 @@
                 nav_supply: "Suppliers",
                 nav_branches: "Branches",
                 nav_settings: "Settings",
-                user_role_admin: "General Admin (Owner)",
+                user_name: "Ahmed Al-Ghamdi",
+                user_role: "Main Warehouse Manager",
                 logout: "Logout",
                 inventory_header: "Main Inventory Management",
                 stat_total_items: "Total Items",
@@ -466,12 +558,14 @@
                 filter_available: "Available Items",
                 filter_low: "Low Stock",
                 filter_out: "Out of Stock",
+                delete_selected_btn: "🗑️ Delete Selected",
                 download_all_btn: "📥 Download All Items",
                 add_item_btn: "+ Add Item",
                 th_sku: "SKU Code",
                 th_item_name: "Item Name",
                 th_category: "Category",
                 th_quantity: "Current Qty",
+                th_min_limit: "Min Limit",
                 th_unit: "Unit",
                 th_status: "Status",
                 th_actions: "Actions",
