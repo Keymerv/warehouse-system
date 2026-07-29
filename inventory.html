@@ -22,8 +22,8 @@
             background: #334155;
         }
         @keyframes toastIn {
-            from { transform: translateY(100%) opacity: 0; }
-            to { transform: translateY(0) opacity: 1; }
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
         .toast-animate {
             animation: toastIn 0.25s ease-out forwards;
@@ -34,16 +34,16 @@
 <body class="bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden text-xs">
 
     <!-- نظام التنبيهات العائمة الاحترافي (Toast Container) -->
-    <div id="toast-container" class="fixed bottom-5 left-5 z-[100] flex flex-col gap-2.5 pointer-events-none max-w-sm w-full"></div>
+    <div id="toast-container" class="fixed bottom-5 left-5 z-[100] flex flex-col gap-2.5 pointer-events-none max-w-md w-full"></div>
 
-    <!-- نافذة تأكيد الإجراءات الاحترافية (Custom Confirm Dialog) -->
+    <!-- نافذة تأكيد الإجراءات (Custom Confirm Dialog) -->
     <div id="confirm-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-[90] p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-md p-5 space-y-4 shadow-2xl">
             <div class="flex items-center gap-3">
                 <div id="confirm-icon" class="w-10 h-10 rounded-lg bg-rose-500/10 text-rose-400 flex items-center justify-center font-bold text-lg shrink-0">⚠️</div>
                 <div>
                     <h3 id="confirm-title" class="font-bold text-slate-200 text-sm">تأكيد الإجراء</h3>
-                    <p id="confirm-message" class="text-slate-400 text-xs mt-0.5">هل أنت تأكد من متابعة هذه العملية؟</p>
+                    <p id="confirm-message" class="text-slate-400 text-xs mt-0.5">هل أنت متأكد من متابعة هذه العملية؟</p>
                 </div>
             </div>
             <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
@@ -280,7 +280,7 @@
         </div>
     </div>
 
-    <!-- كود JavaScript للربط المباشر مع Supabase وإدارة التنبيهات -->
+    <!-- كود JavaScript مع فحص الأكواد المكررة وتوضيح سبب الخطأ -->
     <script type="module">
         import { supabase } from './assets/js/supabase.js';
 
@@ -380,7 +380,7 @@
             }
         };
 
-        // --- نظام التنبيهات الاحترافي البديل لـ alert و confirm ---
+        // --- نظام التنبيهات العائمة ---
         function showNotification(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -401,18 +401,18 @@
 
             toast.className = `toast-animate pointer-events-auto border backdrop-blur-md p-3.5 rounded-xl shadow-2xl flex items-center justify-between gap-3 text-xs font-semibold ${bgBorder}`;
             toast.innerHTML = `
-                <div class="flex items-center gap-2.5">
-                    <span class="text-base">${icon}</span>
-                    <span>${message}</span>
+                <div class="flex items-start gap-2.5">
+                    <span class="text-base shrink-0 mt-0.5">${icon}</span>
+                    <span class="leading-relaxed">${message}</span>
                 </div>
-                <button type="button" onclick="this.parentElement.remove()" class="text-slate-400 hover:text-white font-bold ml-2 text-sm">&times;</button>
+                <button type="button" onclick="this.parentElement.remove()" class="text-slate-400 hover:text-white font-bold ml-2 text-sm shrink-0">&times;</button>
             `;
 
             container.appendChild(toast);
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'transition', 'duration-300');
                 setTimeout(() => toast.remove(), 300);
-            }, 4000);
+            }, 6000);
         }
 
         function showConfirmModal(title, message, onConfirm) {
@@ -448,7 +448,6 @@
             applyInventoryLanguage(currentLang);
         });
 
-        // 1. تحميل معلومات المستخدم
         async function loadLoggedInUser() {
             let userName = "";
             let userRole = "";
@@ -475,7 +474,6 @@
             document.getElementById('user-email').innerText = userEmail || "user@keymerv.com";
         }
 
-        // 2. تنزيل نموذج الإكسيل
         function downloadExcelTemplate() {
             const headers = ["كود SKU", "اسم الصنف بالعربي", "اسم الصنف بالانجليزي", "التصنيف بالعربي", "التصنيف بالانجليزي", "الكمية الحالية", "الحد الادنى", "الوحدة"];
             const exampleRow = ["SKU-1001", "ماء ميني 200 مل", "Mini Water 200ml", "المشروبات", "Beverages", "500", "50", "piece"];
@@ -494,7 +492,6 @@
             showNotification(currentLang === 'ar' ? "تم تحميل النموذج بنجاح" : "Template downloaded successfully", "info");
         }
 
-        // 3. جلب المخزون الحقيقي من Supabase
         async function fetchInventoryFromDB() {
             try {
                 const { data, error } = await supabase.from('inventory').select('*').order('created_at', { ascending: false });
@@ -509,7 +506,6 @@
             }
         }
 
-        // 4. عرض الجدول
         function renderTable() {
             const tbody = document.getElementById('inventory-table-body');
             tbody.innerHTML = '';
@@ -580,7 +576,9 @@
             renderTable();
         }
 
-        // 5. رفع وقراءة CSV والحفظ المباشر بـ Supabase
+        // =========================================================
+        // 📌 الخوارزمية المحدثة: قراءة الإكسيل + فحص الأكواد المكررة وبيان الخطأ
+        // =========================================================
         async function importExcelFile(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -590,23 +588,54 @@
                 try {
                     const text = evt.target.result;
                     const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+                    
                     if (lines.length < 2) {
-                        showNotification(currentLang === 'ar' ? "الملف فارغ أو غير صالح." : "File is empty or invalid.", "error");
+                        showNotification(
+                            currentLang === 'ar' ? "خطأ: شيت الإكسيل فارغ أو لا يحتوي على صفوف بيانات." : "Error: File is empty or missing data rows.", 
+                            "error"
+                        );
+                        e.target.value = '';
                         return;
                     }
 
-                    const newItems = [];
+                    // 1. جلب جميع أكواد SKU الموجودة حالياً في قاعدة البيانات
+                    const existingSKUs = new Set(inventoryItems.map(item => (item.sku || '').toString().toLowerCase().trim()));
+                    
+                    const seenInFile = new Set();
+                    const duplicateInFile = [];
+                    const duplicateInDB = [];
+                    const validItems = [];
+
                     for (let i = 1; i < lines.length; i++) {
                         const cols = lines[i].split(",").map(c => c.replace(/^"|"$/g, '').trim());
-                        if (cols.length >= 6) {
+                        if (cols.length >= 2) {
+                            const rawSku = (cols[0] || '').trim();
+                            if (!rawSku) continue;
+
+                            const skuLower = rawSku.toLowerCase();
+
+                            // فحص التكرار داخل الشيت نفسه
+                            if (seenInFile.has(skuLower)) {
+                                if (!duplicateInFile.includes(rawSku)) duplicateInFile.push(rawSku);
+                                continue;
+                            }
+                            seenInFile.add(skuLower);
+
+                            // فحص التكرار مع الأكواد المسجلة مسبقاً في قاعدة البيانات
+                            if (existingSKUs.has(skuLower)) {
+                                if (!duplicateInDB.includes(rawSku)) duplicateInDB.push(rawSku);
+                                continue;
+                            }
+
+                            // تجميع العناصر الصالحة للرفع
                             const qty = parseInt(cols[5]) || 0;
                             const min = parseInt(cols[6]) || 10;
                             let status = 'available';
                             if (qty === 0) status = 'out';
                             else if (qty <= min) status = 'low';
 
-                            newItems.push({
-                                sku: cols[0] || `SKU-${Math.floor(Math.random()*10000)}`,
+                            validItems.push({
+                                sku: rawSku,
                                 name_ar: cols[1] || 'صنف جديد',
                                 name_en: cols[2] || cols[1] || 'New Item',
                                 cat_ar: cols[3] || 'عام',
@@ -619,23 +648,63 @@
                         }
                     }
 
-                    if (newItems.length > 0) {
-                        const { error } = await supabase.from('inventory').insert(newItems);
-                        if (error) throw error;
-                        
-                        await fetchInventoryFromDB();
-                        showNotification(currentLang === 'ar' ? `تم حفظ ${newItems.length} صنف بنجاح!` : `Saved ${newItems.length} items successfully!`, "success");
+                    // 2. صياغة التنبيه بالخطأ في حال وجود أكواد مكررة
+                    let errorDetails = [];
+                    if (duplicateInDB.length > 0) {
+                        errorDetails.push(
+                            currentLang === 'ar' 
+                                ? `أكواد مسجلة مسبقاً في النظام: [ ${duplicateInDB.join(', ')} ]` 
+                                : `Already in system: [ ${duplicateInDB.join(', ')} ]`
+                        );
                     }
+                    if (duplicateInFile.length > 0) {
+                        errorDetails.push(
+                            currentLang === 'ar' 
+                                ? `أكواد مكررة داخل ملف الإكسيل: [ ${duplicateInFile.join(', ')} ]` 
+                                : `Duplicates inside file: [ ${duplicateInFile.join(', ')} ]`
+                        );
+                    }
+
+                    // 3. إظهار التنبيه التفصيلي للمستخدم
+                    if (errorDetails.length > 0) {
+                        const fullMsg = errorDetails.join(' | ');
+                        showNotification(
+                            currentLang === 'ar' ? `⚠️ تعذر إدخال بعض العناصر! ${fullMsg}` : `⚠️ Import Warning! ${fullMsg}`,
+                            "warning"
+                        );
+                    }
+
+                    // 4. حفظ العناصر الصالحة وغير المكررة في Supabase
+                    if (validItems.length > 0) {
+                        const { error } = await supabase.from('inventory').insert(validItems);
+                        if (error) throw error;
+
+                        await fetchInventoryFromDB();
+
+                        const successMsg = currentLang === 'ar' 
+                            ? `تم إضافة ${validItems.length} صنف جديد بنجاح إلى قاعدة البيانات.` 
+                            : `Successfully saved ${validItems.length} new items to database.`;
+
+                        showNotification(successMsg, duplicateInDB.length > 0 || duplicateInFile.length > 0 ? "warning" : "success");
+                    } else if (errorDetails.length > 0) {
+                        showNotification(
+                            currentLang === 'ar' ? "لم يتم إضافة أي صنف جديد لأن جميع الأكواد المرفوقة مكررة!" : "No items were added because all SKUs in the file already exist!",
+                            "error"
+                        );
+                    }
+
                     e.target.value = '';
                 } catch (err) {
                     console.error("Upload error:", err);
-                    showNotification(currentLang === 'ar' ? "حدث خطأ أثناء حفظ شيت الإكسيل" : "Error uploading Excel sheet", "error");
+                    showNotification(
+                        currentLang === 'ar' ? "حدث خطأ غير متوقع أثناء حفظ البيانات في قاعدة البيانات" : "Unexpected database error during upload", 
+                        "error"
+                    );
                 }
             };
             reader.readAsText(file, "UTF-8");
         }
 
-        // 6. تصدير البيانات إلى CSV
         function downloadCSV() {
             if (inventoryItems.length === 0) {
                 showNotification(currentLang === 'ar' ? "لا توجد بيانات للتصدير" : "No items to export", "warning");
@@ -670,7 +739,6 @@
             showNotification(currentLang === 'ar' ? "تم تصدير البيانات بنجاح" : "Data exported successfully", "success");
         }
 
-        // 7. إدارة النوافذ والعمليات على الأصناف
         function openEditModal(id) {
             const item = inventoryItems.find(i => String(i.id) === String(id));
             if (!item) return;
@@ -715,7 +783,18 @@
                 return;
             }
 
-            // تحديث إشارة الحالة تلقائياً بحسب الكمية والحد الأدنى
+            // فحص إذا كان الكود المعدل موجوداً مسبقاً لصنف آخر
+            const duplicateCheck = inventoryItems.find(item => String(item.id) !== String(id) && (item.sku || '').toLowerCase().trim() === sku.toLowerCase());
+            if (duplicateCheck) {
+                showNotification(
+                    currentLang === 'ar' 
+                        ? `خطأ: الكود [ ${sku} ] مخصص مسبقاً للصنف (${duplicateCheck.name_ar || duplicateCheck.name_en})!` 
+                        : `Error: SKU [ ${sku} ] is already assigned to (${duplicateCheck.name_en || duplicateCheck.name_ar})!`,
+                    "error"
+                );
+                return;
+            }
+
             if (qty === 0) status = 'out';
             else if (qty <= min) status = 'low';
 
@@ -735,7 +814,7 @@
                 const { error } = await supabase.from('inventory').update(payload).eq('id', id);
                 if (error) throw error;
 
-                showNotification(currentLang === 'ar' ? "تم تحديث البيانات بنجاح!" : "Item updated successfully!", "success");
+                showNotification(currentLang === 'ar' ? "تم تحديث بيانات الصنف بنجاح!" : "Item updated successfully!", "success");
                 closeModal();
                 await fetchInventoryFromDB();
             } catch (err) {
@@ -744,7 +823,6 @@
             }
         }
 
-        // 8. تحديد العناصر والحذف الجماعي
         function toggleSelectAll(master) {
             const checkboxes = document.querySelectorAll('.row-checkbox');
             checkboxes.forEach(cb => cb.checked = master.checked);
@@ -775,7 +853,7 @@
 
             showConfirmModal(
                 currentLang === 'ar' ? "تأكيد الحذف الجماعي" : "Confirm Bulk Delete",
-                currentLang === 'ar' ? `هل أنت تأكد من رغبتك في حذف ${idsToDelete.length} صنف نهائياً من قاعدة البيانات؟` : `Are you sure you want to delete ${idsToDelete.length} items from the database?`,
+                currentLang === 'ar' ? `هل أنت متأكد من رغبتك في حذف ${idsToDelete.length} صنف نهائياً من قاعدة البيانات؟` : `Are you sure you want to delete ${idsToDelete.length} items from the database?`,
                 async () => {
                     try {
                         const { error } = await supabase.from('inventory').delete().in('id', idsToDelete);
@@ -793,7 +871,6 @@
             );
         }
 
-        // 9. التحديثات الإحصائية والعدادات
         function updateStatsAndCounter(count, total) {
             let lowCount = 0;
             let outCount = 0;
@@ -813,7 +890,6 @@
             document.getElementById('results-counter').innerText = infoText;
         }
 
-        // 10. تغيير اللغة وتسجيل الخروج
         function toggleLanguage() {
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
             localStorage.setItem('lang', currentLang);
@@ -857,7 +933,7 @@
             );
         }
 
-        // تصدير الدوال لنطاق window لتتمكن الأحداث المباشرة من استدعائها
+        // ربط الدوال بكائن window لضمان عملها مع onClick
         window.logoutUser = logoutUser;
         window.toggleLanguage = toggleLanguage;
         window.filterInventory = filterInventory;
