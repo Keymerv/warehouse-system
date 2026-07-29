@@ -33,8 +33,23 @@
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden text-xs">
 
-    <!-- نظام التنبيهات العائمة الاحترافي (Toast Container) -->
-    <div id="toast-container" class="fixed bottom-5 left-5 z-[100] flex flex-col gap-2.5 pointer-events-none max-w-md w-full"></div>
+    <!-- نظام التنبيهات السريعة (Toast Container للعمليات الناجحة فقط) -->
+    <div id="toast-container" class="fixed bottom-5 left-5 z-[80] flex flex-col gap-2.5 pointer-events-none max-w-md w-full"></div>
+
+    <!-- 📌 نافذة التنبيهات والأخطاء المركزية المثبتة (Centered Alert Modal) -->
+    <div id="alert-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-[100] p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-md p-6 space-y-4 shadow-2xl relative">
+            <button type="button" onclick="closeAlertModal()" class="absolute top-4 left-4 text-slate-400 hover:text-white font-bold text-base">&times;</button>
+            <div class="flex flex-col items-center text-center space-y-2">
+                <div id="alert-icon" class="w-12 h-12 rounded-full bg-rose-500/10 text-rose-400 flex items-center justify-center font-bold text-2xl">⚠️</div>
+                <h3 id="alert-title" class="font-bold text-slate-200 text-sm">تنبيه مهم</h3>
+                <div id="alert-message" class="text-slate-300 text-xs leading-relaxed text-right w-full bg-slate-950/60 p-3.5 rounded-lg border border-slate-800 max-h-60 overflow-y-auto space-y-2"></div>
+            </div>
+            <div class="pt-2 border-t border-slate-800 flex justify-end">
+                <button type="button" onclick="closeAlertModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg text-xs font-semibold transition">فهمت ذلك (إغلاق)</button>
+            </div>
+        </div>
+    </div>
 
     <!-- نافذة تأكيد الإجراءات (Custom Confirm Dialog) -->
     <div id="confirm-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-[90] p-4">
@@ -71,7 +86,6 @@
             </nav>
         </div>
 
-        <!-- معلومات المستخدم الديناميكية -->
         <div class="p-3 border-t border-slate-800 flex items-center justify-between">
             <div class="overflow-hidden">
                 <p class="font-bold text-slate-200 text-xs truncate" id="user-name">...</p>
@@ -280,7 +294,7 @@
         </div>
     </div>
 
-    <!-- كود JavaScript مع فحص الأكواد المكررة وتوضيح سبب الخطأ -->
+    <!-- كود JavaScript مع النافذة المركزية المحدثة -->
     <script type="module">
         import { supabase } from './assets/js/supabase.js';
 
@@ -380,7 +394,38 @@
             }
         };
 
-        // --- نظام التنبيهات العائمة ---
+        // --- 1. النافذة المركزية المخصصة للأخطاء والتحذيرات (تثبت حتى يغلقها المستخدم) ---
+        function showAlertModal(title, htmlContent, type = 'error') {
+            const modal = document.getElementById('alert-modal');
+            const titleEl = document.getElementById('alert-title');
+            const messageEl = document.getElementById('alert-message');
+            const iconEl = document.getElementById('alert-icon');
+
+            titleEl.innerText = title;
+            messageEl.innerHTML = htmlContent;
+
+            if (type === 'error') {
+                iconEl.className = 'w-12 h-12 rounded-full bg-rose-500/10 text-rose-400 flex items-center justify-center font-bold text-2xl';
+                iconEl.innerText = '❌';
+            } else if (type === 'warning') {
+                iconEl.className = 'w-12 h-12 rounded-full bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold text-2xl';
+                iconEl.innerText = '⚠️';
+            } else {
+                iconEl.className = 'w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-2xl';
+                iconEl.innerText = '✅';
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeAlertModal() {
+            const modal = document.getElementById('alert-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // --- 2. التنبيه العائم السريع (للعمليات الناجحة والتلميحات العادية) ---
         function showNotification(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -388,13 +433,7 @@
             let bgBorder = 'bg-slate-900/95 border-emerald-500/40 text-emerald-300';
             let icon = '✅';
             
-            if (type === 'error') {
-                bgBorder = 'bg-slate-900/95 border-rose-500/40 text-rose-300';
-                icon = '❌';
-            } else if (type === 'warning') {
-                bgBorder = 'bg-slate-900/95 border-amber-500/40 text-amber-300';
-                icon = '⚠️';
-            } else if (type === 'info') {
+            if (type === 'info') {
                 bgBorder = 'bg-slate-900/95 border-indigo-500/40 text-indigo-300';
                 icon = 'ℹ️';
             }
@@ -412,7 +451,7 @@
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'transition', 'duration-300');
                 setTimeout(() => toast.remove(), 300);
-            }, 6000);
+            }, 4000);
         }
 
         function showConfirmModal(title, message, onConfirm) {
@@ -502,7 +541,11 @@
                 console.error('Error fetching inventory:', err);
                 inventoryItems = [];
                 renderTable();
-                showNotification(currentLang === 'ar' ? "تعذر جلب بيانات المخزون" : "Failed to load inventory data", "error");
+                showAlertModal(
+                    currentLang === 'ar' ? "خطأ الاتصال" : "Connection Error",
+                    currentLang === 'ar' ? "تعذر جلب بيانات المخزون من قاعدة البيانات!" : "Failed to load inventory data!",
+                    "error"
+                );
             }
         }
 
@@ -577,7 +620,7 @@
         }
 
         // =========================================================
-        // 📌 الخوارزمية المحدثة: قراءة الإكسيل + فحص الأكواد المكررة وبيان الخطأ
+        // 📌 قراءة شيت الإكسيل وعرض أخطاء الأكواد المكررة في النافذة المركزية
         // =========================================================
         async function importExcelFile(e) {
             const file = e.target.files[0];
@@ -590,15 +633,15 @@
                     const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
                     
                     if (lines.length < 2) {
-                        showNotification(
-                            currentLang === 'ar' ? "خطأ: شيت الإكسيل فارغ أو لا يحتوي على صفوف بيانات." : "Error: File is empty or missing data rows.", 
+                        showAlertModal(
+                            currentLang === 'ar' ? "ملف فارغ" : "Empty File",
+                            currentLang === 'ar' ? "<p>شيت الإكسيل المرفوع فارغ أو لا يحتوي على صفوف بيانات مقبولة.</p>" : "<p>Uploaded file is empty.</p>",
                             "error"
                         );
                         e.target.value = '';
                         return;
                     }
 
-                    // 1. جلب جميع أكواد SKU الموجودة حالياً في قاعدة البيانات
                     const existingSKUs = new Set(inventoryItems.map(item => (item.sku || '').toString().toLowerCase().trim()));
                     
                     const seenInFile = new Set();
@@ -614,20 +657,17 @@
 
                             const skuLower = rawSku.toLowerCase();
 
-                            // فحص التكرار داخل الشيت نفسه
                             if (seenInFile.has(skuLower)) {
                                 if (!duplicateInFile.includes(rawSku)) duplicateInFile.push(rawSku);
                                 continue;
                             }
                             seenInFile.add(skuLower);
 
-                            // فحص التكرار مع الأكواد المسجلة مسبقاً في قاعدة البيانات
                             if (existingSKUs.has(skuLower)) {
                                 if (!duplicateInDB.includes(rawSku)) duplicateInDB.push(rawSku);
                                 continue;
                             }
 
-                            // تجميع العناصر الصالحة للرفع
                             const qty = parseInt(cols[5]) || 0;
                             const min = parseInt(cols[6]) || 10;
                             let status = 'available';
@@ -648,33 +688,28 @@
                         }
                     }
 
-                    // 2. صياغة التنبيه بالخطأ في حال وجود أكواد مكررة
-                    let errorDetails = [];
+                    // تجهيز الرسالة بتنسيق جميل وواضح داخل النافذة
+                    let htmlMessage = '';
                     if (duplicateInDB.length > 0) {
-                        errorDetails.push(
-                            currentLang === 'ar' 
-                                ? `أكواد مسجلة مسبقاً في النظام: [ ${duplicateInDB.join(', ')} ]` 
-                                : `Already in system: [ ${duplicateInDB.join(', ')} ]`
-                        );
+                        htmlMessage += `
+                            <p class="text-rose-400 font-bold mb-1">❌ أكواد مضافة مسبقاً في النظام (${duplicateInDB.length}):</p>
+                            <p class="text-slate-300 bg-slate-900 p-2 rounded border border-slate-800 font-mono text-[11px] break-all">${duplicateInDB.join(', ')}</p>
+                        `;
                     }
                     if (duplicateInFile.length > 0) {
-                        errorDetails.push(
-                            currentLang === 'ar' 
-                                ? `أكواد مكررة داخل ملف الإكسيل: [ ${duplicateInFile.join(', ')} ]` 
-                                : `Duplicates inside file: [ ${duplicateInFile.join(', ')} ]`
-                        );
+                        htmlMessage += `
+                            <p class="text-amber-400 font-bold mt-2 mb-1">⚠️ أكواد مكررة أكثر من مرة داخل شيت الإكسيل (${duplicateInFile.length}):</p>
+                            <p class="text-slate-300 bg-slate-900 p-2 rounded border border-slate-800 font-mono text-[11px] break-all">${duplicateInFile.join(', ')}</p>
+                        `;
                     }
 
-                    // 3. إظهار التنبيه التفصيلي للمستخدم
-                    if (errorDetails.length > 0) {
-                        const fullMsg = errorDetails.join(' | ');
-                        showNotification(
-                            currentLang === 'ar' ? `⚠️ تعذر إدخال بعض العناصر! ${fullMsg}` : `⚠️ Import Warning! ${fullMsg}`,
-                            "warning"
-                        );
+                    // إظهار النافذة بوسط الشاشة
+                    if (duplicateInDB.length > 0 || duplicateInFile.length > 0) {
+                        const alertTitle = currentLang === 'ar' ? "تنبيه: تم كشف أكواد SKU مكررة!" : "Warning: Duplicate SKUs Detected!";
+                        showAlertModal(alertTitle, htmlMessage, "warning");
                     }
 
-                    // 4. حفظ العناصر الصالحة وغير المكررة في Supabase
+                    // حفظ الأصناف السليمة غير المكررة
                     if (validItems.length > 0) {
                         const { error } = await supabase.from('inventory').insert(validItems);
                         if (error) throw error;
@@ -682,13 +717,14 @@
                         await fetchInventoryFromDB();
 
                         const successMsg = currentLang === 'ar' 
-                            ? `تم إضافة ${validItems.length} صنف جديد بنجاح إلى قاعدة البيانات.` 
-                            : `Successfully saved ${validItems.length} new items to database.`;
+                            ? `تم رفع وتخزين ${validItems.length} صنف جديد بنجاح.` 
+                            : `Successfully saved ${validItems.length} new items.`;
 
-                        showNotification(successMsg, duplicateInDB.length > 0 || duplicateInFile.length > 0 ? "warning" : "success");
-                    } else if (errorDetails.length > 0) {
-                        showNotification(
-                            currentLang === 'ar' ? "لم يتم إضافة أي صنف جديد لأن جميع الأكواد المرفوقة مكررة!" : "No items were added because all SKUs in the file already exist!",
+                        showNotification(successMsg, "success");
+                    } else if (duplicateInDB.length > 0 || duplicateInFile.length > 0) {
+                        showAlertModal(
+                            currentLang === 'ar' ? "فشل الاستيراد بالكامل" : "Import Failed",
+                            currentLang === 'ar' ? "<p class='text-rose-400 font-bold'>لم يتم إضافة أي صنف لأن كل الأكواد المرفقة بالشيت مكررة وموجودة مسبقاً!</p>" : "<p>All SKUs in file are duplicates.</p>",
                             "error"
                         );
                     }
@@ -696,8 +732,9 @@
                     e.target.value = '';
                 } catch (err) {
                     console.error("Upload error:", err);
-                    showNotification(
-                        currentLang === 'ar' ? "حدث خطأ غير متوقع أثناء حفظ البيانات في قاعدة البيانات" : "Unexpected database error during upload", 
+                    showAlertModal(
+                        currentLang === 'ar' ? "خطأ بالرفع" : "Upload Error",
+                        currentLang === 'ar' ? "<p>حدث خطأ غير متوقع أثناء حفظ البيانات في Supabase.</p>" : "<p>Unexpected Database Error.</p>",
                         "error"
                     );
                 }
@@ -707,7 +744,11 @@
 
         function downloadCSV() {
             if (inventoryItems.length === 0) {
-                showNotification(currentLang === 'ar' ? "لا توجد بيانات للتصدير" : "No items to export", "warning");
+                showAlertModal(
+                    currentLang === 'ar' ? "تنبيه" : "Notice",
+                    currentLang === 'ar' ? "<p>لا توجد أي بيانات في الجدول لتصديرها.</p>" : "<p>No items to export.</p>",
+                    "warning"
+                );
                 return;
             }
 
@@ -779,17 +820,21 @@
             let status = document.getElementById('modal-status').value;
 
             if (!sku || !nameAr || !catAr) {
-                showNotification(currentLang === 'ar' ? "الرجاء تعبئة جميع الحقول المطلوبة (*)" : "Please fill required fields (*)", "warning");
+                showAlertModal(
+                    currentLang === 'ar' ? "حقول مفقودة" : "Missing Fields",
+                    currentLang === 'ar' ? "<p>يرجى إكمال جميع الحقول الإجبارية (*)</p>" : "<p>Please fill required fields (*)</p>",
+                    "warning"
+                );
                 return;
             }
 
-            // فحص إذا كان الكود المعدل موجوداً مسبقاً لصنف آخر
             const duplicateCheck = inventoryItems.find(item => String(item.id) !== String(id) && (item.sku || '').toLowerCase().trim() === sku.toLowerCase());
             if (duplicateCheck) {
-                showNotification(
+                showAlertModal(
+                    currentLang === 'ar' ? "الكود مستخدم مسبقاً" : "SKU Already Exists",
                     currentLang === 'ar' 
-                        ? `خطأ: الكود [ ${sku} ] مخصص مسبقاً للصنف (${duplicateCheck.name_ar || duplicateCheck.name_en})!` 
-                        : `Error: SKU [ ${sku} ] is already assigned to (${duplicateCheck.name_en || duplicateCheck.name_ar})!`,
+                        ? `<p>كود SKU هذا <strong>[ ${sku} ]</strong> محجوز مسبقاً لصنف آخر وهو: <br><strong class='text-amber-400'>(${duplicateCheck.name_ar || duplicateCheck.name_en})</strong></p>`
+                        : `<p>SKU [ ${sku} ] is already assigned to another item.</p>`,
                     "error"
                 );
                 return;
@@ -819,7 +864,11 @@
                 await fetchInventoryFromDB();
             } catch (err) {
                 console.error("Update error:", err);
-                showNotification(currentLang === 'ar' ? "حدث خطأ أثناء حفظ التحديثات" : "Error saving updates", "error");
+                showAlertModal(
+                    currentLang === 'ar' ? "خطأ بالتحديث" : "Update Error",
+                    currentLang === 'ar' ? "<p>حدث خطأ أثناء حفظ التحديثات في قاعدة البيانات.</p>" : "<p>Database Update Error.</p>",
+                    "error"
+                );
             }
         }
 
@@ -865,7 +914,11 @@
                         await fetchInventoryFromDB();
                     } catch (err) {
                         console.error("Delete error:", err);
-                        showNotification(currentLang === 'ar' ? "حدث خطأ أثناء تنفيذ عملية الحذف" : "Error performing deletion", "error");
+                        showAlertModal(
+                            currentLang === 'ar' ? "خطأ أثناء الحذف" : "Deletion Error",
+                            currentLang === 'ar' ? "<p>حدث خطأ أثناء تنفيذ عملية الحذف من قاعدة البيانات.</p>" : "<p>Error deleting records.</p>",
+                            "error"
+                        );
                     }
                 }
             );
@@ -933,7 +986,8 @@
             );
         }
 
-        // ربط الدوال بكائن window لضمان عملها مع onClick
+        // ربط الدوال لكائن window
+        window.closeAlertModal = closeAlertModal;
         window.logoutUser = logoutUser;
         window.toggleLanguage = toggleLanguage;
         window.filterInventory = filterInventory;
