@@ -1,606 +1,797 @@
 <!DOCTYPE html>
-<html id="html-root" lang="ar" dir="rtl" class="dark">
+<html lang="ar" dir="rtl" id="html-root">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Keymerv - إدارة المخزون</title>
-    <!-- Tailwind CSS CDN -->
+    <title data-i18n="inventory_title">إدارة المخزون - Keymerv Warehouse</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Supabase JS CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Tajawal Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
     <style>
-        body { font-family: 'Tajawal', sans-serif; }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #020617;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+        @keyframes toastIn {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .toast-animate {
+            animation: toastIn 0.25s ease-out forwards;
+        }
     </style>
+    <script type="module" src="assets/js/auth-guard.js"></script>
 </head>
-<body class="bg-slate-950 text-slate-100 flex h-screen overflow-hidden">
+<body class="bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden text-xs">
 
-    <!-- 1. الشريط الجانبي (Sidebar) -->
-    <aside id="sidebar" class="w-64 bg-slate-900 border-l border-slate-800 flex flex-col justify-between shrink-0 transition-all duration-300">
-        <div>
-            <!-- شعار النظام Keymerv -->
-            <div class="h-16 flex items-center gap-3 px-6 border-b border-slate-800">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center font-bold text-white text-lg shadow-lg shadow-indigo-500/20">
-                    K
-                </div>
+    <!-- نظام التنبيهات السريعة (Toast Container للعمليات الناجحة فقط) -->
+    <div id="toast-container" class="fixed bottom-5 left-5 z-[80] flex flex-col gap-2.5 pointer-events-none max-w-md w-full"></div>
+
+    <!-- 📌 نافذة التنبيهات والأخطاء المركزية المثبتة (Centered Alert Modal) -->
+    <div id="alert-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-[100] p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-md p-6 space-y-4 shadow-2xl relative">
+            <button type="button" onclick="closeAlertModal()" class="absolute top-4 left-4 text-slate-400 hover:text-white font-bold text-base">&times;</button>
+            <div class="flex flex-col items-center text-center space-y-2">
+                <div id="alert-icon" class="w-12 h-12 rounded-full bg-rose-500/10 text-rose-400 flex items-center justify-center font-bold text-2xl">⚠️</div>
+                <h3 id="alert-title" class="font-bold text-slate-200 text-sm">تنبيه مهم</h3>
+                <div id="alert-message" class="text-slate-300 text-xs leading-relaxed text-right w-full bg-slate-950/60 p-3.5 rounded-lg border border-slate-800 max-h-60 overflow-y-auto space-y-2"></div>
+            </div>
+            <div class="pt-2 border-t border-slate-800 flex justify-end">
+                <button type="button" onclick="closeAlertModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg text-xs font-semibold transition">فهمت ذلك (إغلاق)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة تأكيد الإجراءات (Custom Confirm Dialog) -->
+    <div id="confirm-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-[90] p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-md p-5 space-y-4 shadow-2xl">
+            <div class="flex items-center gap-3">
+                <div id="confirm-icon" class="w-10 h-10 rounded-lg bg-rose-500/10 text-rose-400 flex items-center justify-center font-bold text-lg shrink-0">⚠️</div>
                 <div>
-                    <h1 class="font-bold text-slate-100 tracking-wide text-base">Keymerv</h1>
-                    <p class="text-[10px] text-slate-400" data-i18n="subtitle">نظام إدارة المخزون</p>
+                    <h3 id="confirm-title" class="font-bold text-slate-200 text-sm">تأكيد الإجراء</h3>
+                    <p id="confirm-message" class="text-slate-400 text-xs mt-0.5">هل أنت متأكد من متابعة هذه العملية؟</p>
                 </div>
             </div>
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+                <button type="button" id="confirm-cancel-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-1.5 rounded-lg text-xs font-medium transition">إلغاء</button>
+                <button type="button" id="confirm-action-btn" class="bg-rose-600 hover:bg-rose-500 text-white px-4 py-1.5 rounded-lg text-xs font-semibold transition">تأكيد</button>
+            </div>
+        </div>
+    </div>
 
-            <!-- قائمة التنقل Sidebar Navigation -->
-            <nav class="p-4 space-y-1.5 text-sm">
-                <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-indigo-600/15 text-indigo-400 font-semibold border border-indigo-500/20">
-                    <span>📦</span> <span data-i18n="nav_inventory">إدارة المخزون</span>
-                </a>
-                <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition font-medium">
-                    <span>📊</span> <span data-i18n="nav_analytics">التقارير والإحصائيات</span>
-                </a>
-                <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition font-medium">
-                    <span>⚙️</span> <span data-i18n="nav_settings">الإعدادات</span>
-                </a>
+    <!-- القائمة الجانبية (Sidebar) -->
+    <aside class="w-64 bg-slate-900 border-l border-slate-800 flex flex-col justify-between shrink-0">
+        <div>
+            <div class="p-4 border-b border-slate-800 flex items-center gap-2">
+                <div class="bg-indigo-600 text-white font-bold px-2 py-1 rounded-lg text-xs">K</div>
+                <span class="font-bold text-xs tracking-tight text-slate-200" data-i18n="brand_name">Keymerv Warehouse</span>
+            </div>
+
+            <nav class="p-3 space-y-1.5">
+                <a href="dashboard.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_overview">الرئيسية</a>
+                <a href="orders.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_orders">طلبات التغذية</a>
+                <a href="supply.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_supply">التوريد والموردين</a>
+                <a href="inventory.html" class="flex items-center gap-2.5 px-3 py-2 bg-indigo-600 text-white rounded-lg font-medium transition" data-i18n="nav_inventory">إدارة المخزون</a>
+                <a href="branches.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_branches">الفروع</a>
+                <a href="settings.html" class="flex items-center gap-2.5 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg font-medium transition" data-i18n="nav_settings">الإعدادات</a>
             </nav>
         </div>
 
-        <!-- أسفل الشريط الجانبي (تسجيل الخروج) -->
-        <div class="p-4 border-t border-slate-800">
-            <button onclick="logoutUser()" class="w-full flex items-center justify-center gap-2 px-3.5 py-2.5 text-xs font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-xl transition" data-i18n="logout">
-                <span>🚪</span> <span>تسجيل الخروج</span>
-            </button>
+        <div class="p-3 border-t border-slate-800 flex items-center justify-between">
+            <div class="overflow-hidden">
+                <p class="font-bold text-slate-200 text-xs truncate" id="user-name">...</p>
+                <p class="text-[10px] text-indigo-400 font-semibold truncate" id="user-role">...</p>
+                <p class="text-[10px] text-slate-500 truncate" id="user-email">...</p>
+            </div>
+            <button type="button" onclick="logoutUser()" class="text-rose-400 hover:text-rose-300 text-[11px] font-semibold shrink-0" data-i18n="logout">خروج</button>
         </div>
     </aside>
 
-    <!-- 2. منطقة المحتوى الرئيسية Main Container -->
-    <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
-
-        <!-- الهيدر العلوي Top Navbar -->
-        <header class="bg-slate-900/80 border-b border-slate-800 backdrop-blur sticky top-0 z-30 h-16 flex items-center justify-between px-6 shrink-0">
+    <!-- المحتوى الرئيسي -->
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+        <header class="bg-slate-900 border-b border-slate-800 px-5 py-3 flex justify-between items-center">
+            <h1 class="text-sm font-bold" data-i18n="inventory_header">إدارة المخزون الرئيسي</h1>
             <div class="flex items-center gap-3">
-                <h2 class="text-base font-bold text-slate-200" data-i18n="page_title">قائمة المنتجات والمخزون</h2>
-            </div>
-            
-            <div class="flex items-center gap-3">
-                <button onclick="toggleLanguage()" id="lang-btn" class="px-3 py-1.5 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition">
+                <button type="button" onclick="toggleLanguage()" id="lang-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-md text-xs font-medium transition">
                     English
                 </button>
             </div>
         </header>
 
-        <!-- جسم الصفحة الرئيسي Main Body -->
-        <main class="p-6 space-y-6 flex-1">
-
-            <!-- Stat Cards / بطاقات الإحصائيات -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
+        <div class="p-5 space-y-4">
+            
+            <!-- إحصائيات المخزون -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div>
-                        <p class="text-xs font-medium text-slate-400" data-i18n="stat_total">إجمالي المنتجات</p>
-                        <h3 id="stat-total" class="text-2xl font-bold text-slate-100 mt-1">0</h3>
+                        <p class="text-slate-400 text-[11px]" data-i18n="stat_total_items">إجمالي الأصناف</p>
+                        <h3 id="stat-total" class="text-lg font-extrabold mt-0.5 text-indigo-400">0</h3>
                     </div>
-                    <div class="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-xl">
-                        📦
-                    </div>
+                    <div class="w-9 h-9 bg-indigo-600/10 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-sm">📦</div>
                 </div>
-
-                <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div>
-                        <p class="text-xs font-medium text-slate-400" data-i18n="stat_low">موشك على النفاد</p>
-                        <h3 id="stat-low" class="text-2xl font-bold text-amber-400 mt-1">0</h3>
+                        <p class="text-slate-400 text-[11px]" data-i18n="stat_low_stock">أصناف وشيك نفاذها</p>
+                        <h3 id="stat-low" class="text-lg font-extrabold mt-0.5 text-amber-400">0</h3>
                     </div>
-                    <div class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 text-xl">
-                        ⚠️
-                    </div>
+                    <div class="w-9 h-9 bg-amber-600/10 text-amber-400 rounded-lg flex items-center justify-center font-bold text-sm">⚠️</div>
                 </div>
-
-                <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div>
-                        <p class="text-xs font-medium text-slate-400" data-i18n="stat_out">منتهي من المخزون</p>
-                        <h3 id="stat-out" class="text-2xl font-bold text-rose-400 mt-1">0</h3>
+                        <p class="text-slate-400 text-[11px]" data-i18n="stat_out_stock">أصناف منتهية</p>
+                        <h3 id="stat-out" class="text-lg font-extrabold mt-0.5 text-rose-400">0</h3>
                     </div>
-                    <div class="w-10 h-10 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 text-xl">
-                        🚫
-                    </div>
+                    <div class="w-9 h-9 bg-rose-600/10 text-rose-400 rounded-lg flex items-center justify-center font-bold text-sm">❌</div>
                 </div>
             </div>
 
-            <!-- شريط أدوات التحكم والبحث Controls Toolbar -->
-            <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4">
-                <!-- البحث والتصفية -->
-                <div class="flex flex-wrap items-center gap-3 flex-grow max-w-2xl">
-                    <div class="relative flex-grow">
-                        <input type="text" id="search-input" onkeyup="filterInventory()" data-i18n-placeholder="search_placeholder" placeholder="بحث باسم المنتج، SKU، أو التصنيف..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
-                    </div>
+            <!-- شريط الأدوات والتحكم -->
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 bg-slate-900 border border-slate-800 p-3 rounded-xl">
+                
+                <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                    <input type="text" id="search-input" onkeyup="filterInventory()" data-i18n-placeholder="search_placeholder" placeholder="ابحث عن صنف أو كود SKU..." class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 w-full sm:w-64">
                     
-                    <select id="status-filter" onchange="filterInventory()" class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-indigo-500">
-                        <option value="all" data-i18n="filter_all">كل الحالات</option>
-                        <option value="available" data-i18n="status_available">متوفر</option>
-                        <option value="low" data-i18n="status_low">موشك على النفاد</option>
-                        <option value="out" data-i18n="status_out">منتهي</option>
-                    </select>
-
-                    <select id="items-per-page" onchange="renderTable()" class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-indigo-500">
-                        <option value="10">10 / صفحة</option>
-                        <option value="25" selected>25 / صفحة</option>
-                        <option value="50">50 / صفحة</option>
+                    <select id="status-filter" onchange="filterInventory()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                        <option value="all" data-i18n="filter_all">جميع الأصناف</option>
+                        <option value="available" data-i18n="filter_available">الأصناف المتوفرة</option>
+                        <option value="low" data-i18n="filter_low">قاربت على النفاذ</option>
+                        <option value="out" data-i18n="filter_out">الأصناف المنتهية</option>
                     </select>
                 </div>
 
-                <!-- الأزرار والإجراءات -->
-                <div class="flex items-center gap-2 flex-wrap">
-                    <button id="bulk-delete-btn" onclick="deleteSelected()" class="hidden bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 px-3 py-2 rounded-lg text-xs font-semibold transition">
-                        <span data-i18n="btn_delete_selected">حذف المحدّد</span> (<span id="selected-count">0</span>)
+                <!-- أزرار العمليات والإكسيل -->
+                <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end">
+                    <button type="button" id="bulk-delete-btn" onclick="deleteSelected()" class="hidden bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-600/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5" data-i18n="delete_selected_btn">
+                        🗑️ حذف المحدد (<span id="selected-count">0</span>)
                     </button>
 
-                    <button onclick="openCreateModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow-lg shadow-indigo-600/20">
-                        <span>➕</span> <span data-i18n="btn_add_item">إضافة صنف جديد</span>
+                    <button type="button" onclick="downloadExcelTemplate()" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer" data-i18n="download_template_btn">
+                        📄 تنزيل نموذج الإكسيل
                     </button>
 
-                    <label class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-2 rounded-lg text-xs font-semibold cursor-pointer transition">
-                        <span data-i18n="btn_import">استيراد CSV</span>
-                        <input type="file" accept=".csv" onchange="importExcelFile(event)" class="hidden">
+                    <label class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-md shadow-emerald-600/20 cursor-pointer flex items-center gap-1.5">
+                        <span data-i18n="upload_excel_btn">📊 رفع شيت الإكسيل</span>
+                        <input type="file" id="excel-file-input" accept=".csv" onchange="importExcelFile(event)" class="hidden">
                     </label>
 
-                    <button onclick="downloadCSV()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-2 rounded-lg text-xs font-semibold transition" data-i18n="btn_export">
-                        تصدير CSV
+                    <button type="button" onclick="downloadCSV()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 border border-slate-700" data-i18n="download_all_btn">
+                        📥 تصدير الأصناف
                     </button>
                 </div>
             </div>
 
-            <!-- جدول عرض المنتجات Table Container -->
-            <div class="bg-slate-900/60 border border-slate-800 rounded-xl overflow-hidden shadow-xl">
+            <!-- جدول البيانات -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pb-3 border-b border-slate-800 text-[11px] text-slate-400">
+                    <div class="flex items-center gap-2">
+                        <span data-i18n="pagination_show">عرض</span>
+                        <select id="items-per-page" onchange="renderTable()" class="bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-slate-200 focus:outline-none focus:border-indigo-500 text-xs">
+                            <option value="25">25</option>
+                            <option value="75">75</option>
+                            <option value="125">125</option>
+                            <option value="200">200</option>
+                        </select>
+                        <span data-i18n="pagination_per_page">صنف لكل صفحة</span>
+                    </div>
+                    <div>
+                        <span id="results-counter" class="font-bold text-indigo-400" data-i18n="pagination_info">عرض 0 من أصل 0 صنف</span>
+                    </div>
+                </div>
+
                 <div class="overflow-x-auto">
-                    <table class="w-full text-right text-sm">
-                        <thead class="bg-slate-950/80 text-slate-400 border-b border-slate-800 text-xs">
-                            <tr>
-                                <th class="py-3 px-3 text-center">
-                                    <input type="checkbox" id="select-all" onchange="toggleSelectAll(this)" class="rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0 cursor-pointer">
+                    <table class="w-full text-right border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 text-[11px]">
+                                <th class="py-2.5 px-3 text-center w-8">
+                                    <input type="checkbox" id="select-all" onclick="toggleSelectAll(this)" class="rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0 cursor-pointer">
                                 </th>
-                                <th class="py-3 px-3 text-center" data-i18n="th_image">الصورة</th>
-                                <th class="py-3 px-3" data-i18n="th_sku">SKU</th>
-                                <th class="py-3 px-3" data-i18n="th_name">اسم الصنف</th>
-                                <th class="py-3 px-3" data-i18n="th_category">التصنيف</th>
-                                <th class="py-3 px-3" data-i18n="th_quantity">الكمية</th>
-                                <th class="py-3 px-3" data-i18n="th_min_limit">الحد الأدنى</th>
-                                <th class="py-3 px-3" data-i18n="th_unit">الوحدة</th>
-                                <th class="py-3 px-3" data-i18n="th_status">الحالة</th>
-                                <th class="py-3 px-3 text-center" data-i18n="th_actions">الإجراءات</th>
+                                <th class="py-2.5 px-3" data-i18n="th_sku">كود SKU</th>
+                                <th class="py-2.5 px-3" data-i18n="th_item_name">اسم الصنف</th>
+                                <th class="py-2.5 px-3" data-i18n="th_category">التصنيف</th>
+                                <th class="py-2.5 px-3" data-i18n="th_quantity">الكمية الحالية</th>
+                                <th class="py-2.5 px-3" data-i18n="th_min_limit">الحد الأدنى</th>
+                                <th class="py-2.5 px-3" data-i18n="th_unit">الوحدة</th>
+                                <th class="py-2.5 px-3" data-i18n="th_status">الحالة</th>
+                                <th class="py-2.5 px-3 text-center" data-i18n="th_actions">الإجراءات</th>
                             </tr>
                         </thead>
-                        <tbody id="inventory-table-body" class="divide-y divide-slate-800/40">
-                            <!-- توليد الصفوف ديناميكياً -->
+                        <tbody class="text-xs divide-y divide-slate-800/40" id="inventory-table-body">
+                            <!-- يتم تعبئته ديناميكياً -->
                         </tbody>
                     </table>
                 </div>
-                
-                <div class="p-3 bg-slate-950/40 border-t border-slate-800 text-xs text-slate-400 flex items-center justify-between">
-                    <span id="results-counter">جاري تحميل البيانات...</span>
-                </div>
             </div>
+        </div>
+    </main>
 
-        </main>
-    </div>
-
-    <!-- Modal النافذة المنبثقة للإضافة والتعديل -->
-    <div id="item-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
-            <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
-                <h3 id="modal-title" class="font-bold text-slate-100 text-base" data-i18n="modal_title_add">تفاصيل الصنف</h3>
-                <button type="button" onclick="closeModal()" class="text-slate-400 hover:text-slate-200">✕</button>
+    <!-- Modal نافذة التعديل -->
+    <div id="item-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-lg p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 id="modal-title" class="font-bold text-slate-200 text-sm" data-i18n="modal_edit_title">تعديل صنف</h3>
+                <button type="button" onclick="closeModal()" class="text-slate-400 hover:text-white text-lg font-bold">&times;</button>
             </div>
-
-            <form id="item-form" onsubmit="handleFormSubmit(event)" class="p-6 space-y-4">
+            
+            <form id="item-form" onsubmit="handleFormSubmit(event)" novalidate class="space-y-3">
                 <input type="hidden" id="modal-item-id">
+                
+                <div class="field-container">
+                    <label class="block text-[11px] text-slate-400 mb-1">كود SKU <span class="text-rose-500">*</span></label>
+                    <input type="text" id="modal-sku" class="form-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="lbl_sku">رمز SKU *</label>
-                        <input type="text" id="modal-sku" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="field-container">
+                        <label class="block text-[11px] text-slate-400 mb-1">اسم الصنف (بالعربي) <span class="text-rose-500">*</span></label>
+                        <input type="text" id="modal-name-ar" class="form-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
                     </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="lbl_unit">الوحدة</label>
-                        <select id="modal-unit" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
-                            <option value="piece">قطعة (Piece)</option>
-                            <option value="box">صندوق (Box)</option>
-                            <option value="kg">كيلوجرام (KG)</option>
-                            <option value="meter">متر (Meter)</option>
+
+                    <div class="field-container">
+                        <label class="block text-[11px] text-slate-400 mb-1">Item Name (English)</label>
+                        <input type="text" id="modal-name-en" dir="ltr" class="form-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="field-container">
+                        <label class="block text-[11px] text-slate-400 mb-1">التصنيف (بالعربي) <span class="text-rose-500">*</span></label>
+                        <input type="text" id="modal-cat-ar" class="form-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                    </div>
+
+                    <div class="field-container">
+                        <label class="block text-[11px] text-slate-400 mb-1">Category (English)</label>
+                        <input type="text" id="modal-cat-en" dir="ltr" class="form-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="field-container">
+                        <label class="block text-[11px] text-slate-400 mb-1">الكمية الحالية <span class="text-rose-500">*</span></label>
+                        <input type="number" id="modal-qty" min="0" class="form-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                    </div>
+
+                    <div class="field-container">
+                        <label class="block text-[11px] text-amber-400 mb-1">الحد الأدنى للتنبيه ⚠️</label>
+                        <input type="number" id="modal-min" min="1" placeholder="مثال: 50" class="form-input w-full bg-slate-950 border border-amber-500/30 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-amber-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="field-container">
+                        <label class="block text-[11px] text-slate-400 mb-1">الوحدة <span class="text-rose-500">*</span></label>
+                        <select id="modal-unit" class="form-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                            <option value="piece" data-i18n="unit_piece">قطعة</option>
+                            <option value="bag" data-i18n="unit_bag">كيس</option>
+                            <option value="carton" data-i18n="unit_carton">كرتون</option>
+                            <option value="gram" data-i18n="unit_gram">بالغرام</option>
+                        </select>
+                    </div>
+
+                    <div class="field-container">
+                        <label class="block text-[11px] text-slate-400 mb-1">الحالة</label>
+                        <select id="modal-status" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
+                            <option value="available" data-i18n="status_available">متوفر</option>
+                            <option value="low" data-i18n="status_low">قارب على النفاذ</option>
+                            <option value="out" data-i18n="status_out">منتهي</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- حقل رابط صورة المنتج خارجي -->
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="lbl_image">رابط صورة المنتج (Image URL)</label>
-                    <input type="url" id="modal-image-url" placeholder="https://example.com/image.jpg" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 text-left dir-ltr">
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="lbl_name_ar">اسم الصنف (بالعربي) *</label>
-                        <input type="text" id="modal-name-ar" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="lbl_name_en">اسم الصنف (بالإنجليزي)</label>
-                        <input type="text" id="modal-name-en" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 text-left dir-ltr">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="lbl_cat_ar">التصنيف (بالعربي) *</label>
-                        <input type="text" id="modal-cat-ar" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="lbl_cat_en">التصنيف (بالإنجليزي)</label>
-                        <input type="text" id="modal-cat-en" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 text-left dir-ltr">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-3 gap-3">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="lbl_qty">الكمية الحالية</label>
-                        <input type="number" id="modal-qty" min="0" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="lbl_min">الحد الأدنى</label>
-                        <input type="number" id="modal-min" min="0" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="lbl_status">الحالة</label>
-                        <select id="modal-status" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
-                            <option value="available">متوفر</option>
-                            <option value="low">موشك على النفاد</option>
-                            <option value="out">منتهي</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="pt-4 flex items-center justify-end gap-3 border-t border-slate-800">
-                    <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 transition" data-i18n="btn_cancel">إلغاء</button>
-                    <button type="submit" class="px-4 py-2 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-lg shadow-indigo-600/20" data-i18n="btn_save">حفظ التغيرات</button>
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closeModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs transition">إلغاء</button>
+                    <button type="submit" id="save-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded-lg text-xs font-semibold transition">حفظ التغييرات</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Alert Modal (رسائل التنبيه والخطأ) -->
-    <div id="alert-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm p-6 text-center space-y-4">
-            <div id="alert-icon" class="text-4xl">⚠️</div>
-            <h4 id="alert-title" class="font-bold text-slate-100 text-lg">تنبيه</h4>
-            <p id="alert-message" class="text-sm text-slate-400 leading-relaxed"></p>
-            <button onclick="closeAlertModal()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg transition">موافق</button>
-        </div>
-    </div>
+    <!-- كود JavaScript مع النافذة المركزية المحدثة -->
+    <script type="module">
+        import { supabase } from './assets/js/supabase.js';
 
-    <!-- JavaScript Script Code -->
-    <script>
-        // 1. تهيئة Supabase
-        const SUPABASE_URL = 'https://YOUR_SUPABASE_PROJECT_URL.supabase.co';
-        const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
-        const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
-
-        // 2. المتغيرات العامة والترجمة
         let inventoryItems = [];
         let currentLang = localStorage.getItem('lang') || 'ar';
 
         const inventoryTranslations = {
             ar: {
-                subtitle: "نظام إدارة المخزون",
+                inventory_title: "إدارة المخزون - Keymerv Warehouse",
+                brand_name: "Keymerv Warehouse",
+                nav_overview: "الرئيسية",
+                nav_orders: "طلبات التغذية",
+                nav_supply: "التوريد والموردين",
                 nav_inventory: "إدارة المخزون",
-                nav_analytics: "التقارير والإحصائيات",
+                nav_branches: "الفروع",
                 nav_settings: "الإعدادات",
-                page_title: "قائمة المنتجات والمخزون",
-                logout: "تسجيل الخروج",
-                stat_total: "إجمالي المنتجات",
-                stat_low: "موشك على النفاد",
-                stat_out: "منتهي من المخزون",
-                search_placeholder: "بحث باسم المنتج، SKU، أو التصنيف...",
-                filter_all: "كل الحالات",
-                status_available: "متوفر",
-                status_low: "موشك على النفاد",
-                status_out: "منتهي",
-                btn_delete_selected: "حذف المحدّد",
-                btn_add_item: "إضافة صنف جديد",
-                btn_import: "استيراد CSV",
-                btn_export: "تصدير CSV",
-                th_image: "الصورة",
-                th_sku: "SKU",
-                th_name: "اسم الصنف",
+                logout: "خروج",
+                inventory_header: "إدارة المخزون الرئيسي",
+                stat_total_items: "إجمالي الأصناف",
+                stat_low_stock: "أصناف وشيك نفاذها",
+                stat_out_stock: "أصناف منتهية",
+                search_placeholder: "ابحث عن صنف أو كود SKU...",
+                filter_all: "جميع الأصناف",
+                filter_available: "الأصناف المتوفرة",
+                filter_low: "قاربت على النفاذ",
+                filter_out: "الأصناف المنتهية",
+                delete_selected_btn: "🗑️ حذف المحدد",
+                download_template_btn: "📄 تنزيل نموذج الإكسيل",
+                upload_excel_btn: "📊 رفع شيت الإكسيل",
+                download_all_btn: "📥 تصدير الأصناف",
+                pagination_show: "عرض",
+                pagination_per_page: "صنف لكل صفحة",
+                pagination_info: "عرض {count} من أصل {total} صنف",
+                th_sku: "كود SKU",
+                th_item_name: "اسم الصنف",
                 th_category: "التصنيف",
-                th_quantity: "الكمية",
+                th_quantity: "الكمية الحالية",
                 th_min_limit: "الحد الأدنى",
                 th_unit: "الوحدة",
                 th_status: "الحالة",
                 th_actions: "الإجراءات",
                 edit_btn: "تعديل",
-                no_data: "لا توجد أصناف في المخزون حالياً",
-                pagination_info: "عرض {count} من إجمالي {total} صنف",
+                status_available: "متوفر",
+                status_low: "قارب على النفاذ",
+                status_out: "منتهي",
                 unit_piece: "قطعة",
-                unit_box: "صندوق",
-                unit_kg: "كيلوجرام",
-                unit_meter: "متر",
-                modal_title_add: "إضافة صنف جديد",
-                modal_title_edit: "تعديل بيانات الصنف",
-                lbl_sku: "رمز SKU *",
-                lbl_image: "رابط صورة المنتج (Image URL)",
-                lbl_unit: "الوحدة",
-                lbl_name_ar: "اسم الصنف (بالعربي) *",
-                lbl_name_en: "اسم الصنف (بالإنجليزي)",
-                lbl_cat_ar: "التصنيف (بالعربي) *",
-                lbl_cat_en: "التصنيف (بالإنجليزي)",
-                lbl_qty: "الكمية الحالية",
-                lbl_min: "الحد الأدنى",
-                lbl_status: "الحالة",
-                btn_cancel: "إلغاء",
-                btn_save: "حفظ التغيرات"
+                unit_bag: "كيس",
+                unit_carton: "كرتون",
+                unit_gram: "بالغرام",
+                modal_edit_title: "تعديل صنف",
+                no_data: "لا يوجد بيانات في قاعدة البيانات"
             },
             en: {
-                subtitle: "Inventory System",
-                nav_inventory: "Inventory",
-                nav_analytics: "Analytics",
+                inventory_title: "Inventory Management - Keymerv Warehouse",
+                brand_name: "Keymerv Warehouse",
+                nav_overview: "Overview",
+                nav_orders: "Replenishment Orders",
+                nav_supply: "Supply & Suppliers",
+                nav_inventory: "Inventory Management",
+                nav_branches: "Branches",
                 nav_settings: "Settings",
-                page_title: "Products & Inventory",
                 logout: "Logout",
-                stat_total: "Total Items",
-                stat_low: "Low Stock",
-                stat_out: "Out of Stock",
-                search_placeholder: "Search by item name, SKU, or category...",
-                filter_all: "All Statuses",
-                status_available: "In Stock",
-                status_low: "Low Stock",
-                status_out: "Out of Stock",
-                btn_delete_selected: "Delete Selected",
-                btn_add_item: "Add New Item",
-                btn_import: "Import CSV",
-                btn_export: "Export CSV",
-                th_image: "Image",
-                th_sku: "SKU",
-                th_name: "Item Name",
+                inventory_header: "Main Inventory Management",
+                stat_total_items: "Total Items",
+                stat_low_stock: "Low Stock Items",
+                stat_out_stock: "Out of Stock",
+                search_placeholder: "Search item name or SKU...",
+                filter_all: "All Items",
+                filter_available: "Available Items",
+                filter_low: "Low Stock",
+                filter_out: "Out of Stock",
+                delete_selected_btn: "🗑️ Delete Selected",
+                download_template_btn: "📄 Download Template",
+                upload_excel_btn: "📊 Upload Excel Sheet",
+                download_all_btn: "📥 Export Items",
+                pagination_show: "Show",
+                pagination_per_page: "items per page",
+                pagination_info: "Showing {count} of {total} items",
+                th_sku: "SKU Code",
+                th_item_name: "Item Name",
                 th_category: "Category",
-                th_quantity: "Quantity",
+                th_quantity: "Current Qty",
                 th_min_limit: "Min Limit",
                 th_unit: "Unit",
                 th_status: "Status",
                 th_actions: "Actions",
                 edit_btn: "Edit",
-                no_data: "No items found in inventory",
-                pagination_info: "Showing {count} of {total} items",
+                status_available: "Available",
+                status_low: "Low Stock",
+                status_out: "Out of Stock",
                 unit_piece: "Piece",
-                unit_box: "Box",
-                unit_kg: "KG",
-                unit_meter: "Meter",
-                modal_title_add: "Add New Item",
-                modal_title_edit: "Edit Item",
-                lbl_sku: "SKU Code *",
-                lbl_image: "Image URL",
-                lbl_unit: "Unit",
-                lbl_name_ar: "Arabic Name *",
-                lbl_name_en: "English Name",
-                lbl_cat_ar: "Arabic Category *",
-                lbl_cat_en: "English Category",
-                lbl_qty: "Current Quantity",
-                lbl_min: "Min Limit",
-                lbl_status: "Status",
-                btn_cancel: "Cancel",
-                btn_save: "Save Changes"
+                unit_bag: "Bag",
+                unit_carton: "Carton",
+                unit_gram: "Gram",
+                modal_edit_title: "Edit Item",
+                no_data: "No items in database"
             }
         };
 
-        // 3. جلب بيانات المخزون من Supabase
-        async function fetchInventoryFromDB() {
-            if (!supabase) return;
+        // --- 1. النافذة المركزية المخصصة للأخطاء والتحذيرات (تثبت حتى يغلقها المستخدم) ---
+        function showAlertModal(title, htmlContent, type = 'error') {
+            const modal = document.getElementById('alert-modal');
+            const titleEl = document.getElementById('alert-title');
+            const messageEl = document.getElementById('alert-message');
+            const iconEl = document.getElementById('alert-icon');
+
+            titleEl.innerText = title;
+            messageEl.innerHTML = htmlContent;
+
+            if (type === 'error') {
+                iconEl.className = 'w-12 h-12 rounded-full bg-rose-500/10 text-rose-400 flex items-center justify-center font-bold text-2xl';
+                iconEl.innerText = '❌';
+            } else if (type === 'warning') {
+                iconEl.className = 'w-12 h-12 rounded-full bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold text-2xl';
+                iconEl.innerText = '⚠️';
+            } else {
+                iconEl.className = 'w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-2xl';
+                iconEl.innerText = '✅';
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeAlertModal() {
+            const modal = document.getElementById('alert-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // --- 2. التنبيه العائم السريع (للعمليات الناجحة والتلميحات العادية) ---
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let bgBorder = 'bg-slate-900/95 border-emerald-500/40 text-emerald-300';
+            let icon = '✅';
+            
+            if (type === 'info') {
+                bgBorder = 'bg-slate-900/95 border-indigo-500/40 text-indigo-300';
+                icon = 'ℹ️';
+            }
+
+            toast.className = `toast-animate pointer-events-auto border backdrop-blur-md p-3.5 rounded-xl shadow-2xl flex items-center justify-between gap-3 text-xs font-semibold ${bgBorder}`;
+            toast.innerHTML = `
+                <div class="flex items-start gap-2.5">
+                    <span class="text-base shrink-0 mt-0.5">${icon}</span>
+                    <span class="leading-relaxed">${message}</span>
+                </div>
+                <button type="button" onclick="this.parentElement.remove()" class="text-slate-400 hover:text-white font-bold ml-2 text-sm shrink-0">&times;</button>
+            `;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'transition', 'duration-300');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        function showConfirmModal(title, message, onConfirm) {
+            const modal = document.getElementById('confirm-modal');
+            document.getElementById('confirm-title').innerText = title;
+            document.getElementById('confirm-message').innerText = message;
+            
+            const actionBtn = document.getElementById('confirm-action-btn');
+            const cancelBtn = document.getElementById('confirm-cancel-btn');
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            const handleConfirm = () => {
+                cleanup();
+                onConfirm();
+            };
+
+            const cleanup = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                actionBtn.removeEventListener('click', handleConfirm);
+                cancelBtn.removeEventListener('click', cleanup);
+            };
+
+            actionBtn.addEventListener('click', handleConfirm);
+            cancelBtn.addEventListener('click', cleanup);
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadLoggedInUser();
+            await fetchInventoryFromDB();
+            applyInventoryLanguage(currentLang);
+        });
+
+        async function loadLoggedInUser() {
+            let userName = "";
+            let userRole = "";
+            let userEmail = "";
+
             try {
-                const { data, error } = await supabase
-                    .from('inventory')
-                    .select('*')
-                    .order('created_at', { ascending: false });
+                if (supabase) {
+                    const { data: { session } } = await supabase.auth.getSession();
+                    if (session?.user) {
+                        userEmail = session.user.email || "";
+                        const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+                        if (profile) {
+                            userName = profile.full_name || profile.name || "";
+                            userRole = profile.role_title || profile.role || "";
+                        }
+                    }
+                }
+            } catch (err) {
+                console.warn("User fetch error:", err);
+            }
 
+            document.getElementById('user-name').innerText = userName || (currentLang === 'ar' ? "مستخدم مسجل" : "User");
+            document.getElementById('user-role').innerText = userRole || (currentLang === 'ar' ? "مدير النظام" : "Manager");
+            document.getElementById('user-email').innerText = userEmail || "user@keymerv.com";
+        }
+
+        function downloadExcelTemplate() {
+            const headers = ["كود SKU", "اسم الصنف بالعربي", "اسم الصنف بالانجليزي", "التصنيف بالعربي", "التصنيف بالانجليزي", "الكمية الحالية", "الحد الادنى", "الوحدة"];
+            const exampleRow = ["SKU-1001", "ماء ميني 200 مل", "Mini Water 200ml", "المشروبات", "Beverages", "500", "50", "piece"];
+            
+            const csvContent = "\uFEFF" + [headers.join(","), exampleRow.join(",")].join("\n");
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "نموذج_إدخال_المخزون.csv";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showNotification(currentLang === 'ar' ? "تم تحميل النموذج بنجاح" : "Template downloaded successfully", "info");
+        }
+
+        async function fetchInventoryFromDB() {
+            try {
+                const { data, error } = await supabase.from('inventory').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
-
                 inventoryItems = data || [];
-                updateStats();
                 renderTable();
             } catch (err) {
-                console.error("Fetch inventory error:", err);
+                console.error('Error fetching inventory:', err);
+                inventoryItems = [];
+                renderTable();
                 showAlertModal(
-                    currentLang === 'ar' ? 'خطأ في جلب البيانات' : 'Error Fetching Data',
-                    err.message || (currentLang === 'ar' ? 'تعذر الاتصال بقاعدة البيانات' : 'Failed to connect to database'),
-                    'error'
+                    currentLang === 'ar' ? "خطأ الاتصال" : "Connection Error",
+                    currentLang === 'ar' ? "تعذر جلب بيانات المخزون من قاعدة البيانات!" : "Failed to load inventory data!",
+                    "error"
                 );
             }
         }
 
-        // 4. تحديث بطاقات الإحصائيات
-        function updateStats() {
-            const total = inventoryItems.length;
-            const low = inventoryItems.filter(item => item.status === 'low' || (item.quantity <= (item.min_limit || 0) && item.quantity > 0)).length;
-            const out = inventoryItems.filter(item => item.status === 'out' || item.quantity <= 0).length;
-
-            document.getElementById('stat-total').innerText = total;
-            document.getElementById('stat-low').innerText = low;
-            document.getElementById('stat-out').innerText = out;
-        }
-
-        // 5. تصفية وعرض الجدول
-        function filterInventory() {
-            renderTable();
-        }
-
-        function getFilteredData() {
-            const query = (document.getElementById('search-input').value || '').toLowerCase().trim();
-            const statusFilter = document.getElementById('status-filter').value;
-
-            return inventoryItems.filter(item => {
-                const nameAr = (item.name_ar || '').toLowerCase();
-                const nameEn = (item.name_en || '').toLowerCase();
-                const sku = (item.sku || '').toLowerCase();
-                const catAr = (item.category_ar || '').toLowerCase();
-                const catEn = (item.category_en || '').toLowerCase();
-
-                const matchesSearch = nameAr.includes(query) || nameEn.includes(query) || sku.includes(query) || catAr.includes(query) || catEn.includes(query);
-                
-                let matchesStatus = true;
-                if (statusFilter !== 'all') {
-                    if (statusFilter === 'available') matchesStatus = item.status === 'available' || (item.quantity > (item.min_limit || 0));
-                    else if (statusFilter === 'low') matchesStatus = item.status === 'low' || (item.quantity <= (item.min_limit || 0) && item.quantity > 0);
-                    else if (statusFilter === 'out') matchesStatus = item.status === 'out' || item.quantity <= 0;
-                }
-
-                return matchesSearch && matchesStatus;
-            });
-        }
-
         function renderTable() {
             const tbody = document.getElementById('inventory-table-body');
-            const filtered = getFilteredData();
-            const itemsPerPage = parseInt(document.getElementById('items-per-page').value) || 25;
-            const displayedItems = filtered.slice(0, itemsPerPage);
+            tbody.innerHTML = '';
 
-            const counterText = inventoryTranslations[currentLang].pagination_info
-                .replace('{count}', displayedItems.length)
-                .replace('{total}', filtered.length);
-            document.getElementById('results-counter').innerText = counterText;
+            const searchTerm = (document.getElementById('search-input').value || '').toLowerCase();
+            const filterStatus = document.getElementById('status-filter').value;
 
-            if (displayedItems.length === 0) {
+            const filtered = inventoryItems.filter(item => {
+                const nameAr = item.name_ar || '';
+                const nameEn = item.name_en || '';
+                const sku = item.sku || '';
+
+                const matchSearch = sku.toLowerCase().includes(searchTerm) || 
+                                    nameAr.toLowerCase().includes(searchTerm) || 
+                                    nameEn.toLowerCase().includes(searchTerm);
+                const matchStatus = filterStatus === 'all' || item.status === filterStatus;
+                return matchSearch && matchStatus;
+            });
+
+            if (filtered.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="10" class="py-8 text-center text-slate-500 font-medium">
+                        <td colspan="9" class="py-12 text-center text-slate-500 font-medium text-xs">
                             ${inventoryTranslations[currentLang].no_data}
                         </td>
                     </tr>
                 `;
-                updateBulkDeleteVisibility();
+                updateStatsAndCounter(0, inventoryItems.length);
                 return;
             }
 
-            tbody.innerHTML = displayedItems.map(item => {
+            filtered.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'inventory-row hover:bg-slate-800/40 transition';
+                tr.setAttribute('data-id', item.id);
+
                 const name = currentLang === 'ar' ? (item.name_ar || item.name_en) : (item.name_en || item.name_ar);
-                const category = currentLang === 'ar' ? (item.category_ar || item.category_en) : (item.category_en || item.category_ar);
-                const unitKey = `unit_${item.unit || 'piece'}`;
-                const unitLabel = inventoryTranslations[currentLang][unitKey] || item.unit;
+                const category = currentLang === 'ar' ? (item.cat_ar || item.cat_en) : (item.cat_en || item.cat_ar);
+                const unitText = inventoryTranslations[currentLang][`unit_${item.unit}`] || item.unit;
+                const statusText = inventoryTranslations[currentLang][`status_${item.status}`] || item.status;
 
-                // صورة افتراضية في حال عدم توفر رابط أو فشل التحميل
-                const fallbackImg = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=100&auto=format&fit=crop&q=80';
-                const imageSrc = (item.image_url && item.image_url.trim() !== '') ? item.image_url.trim() : fallbackImg;
+                let statusBadgeClass = 'bg-emerald-500/10 text-emerald-400';
+                if (item.status === 'low') statusBadgeClass = 'bg-amber-500/10 text-amber-400';
+                if (item.status === 'out') statusBadgeClass = 'bg-rose-500/10 text-rose-400';
 
-                let statusBadge = '';
-                if (item.quantity <= 0 || item.status === 'out') {
-                    statusBadge = `<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded-full text-[10px] font-semibold">${inventoryTranslations[currentLang].status_out}</span>`;
-                } else if (item.quantity <= (item.min_limit || 0) || item.status === 'low') {
-                    statusBadge = `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full text-[10px] font-semibold">${inventoryTranslations[currentLang].status_low}</span>`;
-                } else {
-                    statusBadge = `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full text-[10px] font-semibold">${inventoryTranslations[currentLang].status_available}</span>`;
-                }
-
-                return `
-                    <tr class="hover:bg-slate-800/50 transition border-b border-slate-800/40">
-                        <td class="py-2.5 px-3 text-center">
-                            <input type="checkbox" value="${item.id}" onchange="updateBulkDeleteVisibility()" class="item-checkbox rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0 cursor-pointer">
-                        </td>
-                        <td class="py-2.5 px-3 text-center">
-                            <img src="${imageSrc}" alt="${name}" class="w-9 h-9 object-cover rounded-lg border border-slate-700/60 mx-auto bg-slate-900" onerror="this.onerror=null;this.src='${fallbackImg}';">
-                        </td>
-                        <td class="py-2.5 px-3 font-mono text-slate-300 font-semibold">${item.sku || '-'}</td>
-                        <td class="py-2.5 px-3 font-medium text-slate-100">${name || '-'}</td>
-                        <td class="py-2.5 px-3 text-slate-400">${category || '-'}</td>
-                        <td class="py-2.5 px-3 font-bold text-slate-200">${item.quantity ?? 0}</td>
-                        <td class="py-2.5 px-3 text-amber-400 font-medium">${item.min_limit ?? 0}</td>
-                        <td class="py-2.5 px-3 text-slate-400">${unitLabel}</td>
-                        <td class="py-2.5 px-3">${statusBadge}</td>
-                        <td class="py-2.5 px-3 text-center">
-                            <div class="flex items-center justify-center gap-1.5">
-                                <button type="button" onclick="openEditModal('${item.id}')" class="bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white px-2.5 py-1 rounded transition text-[11px] font-medium">
-                                    ${inventoryTranslations[currentLang].edit_btn}
-                                </button>
-                                <button type="button" onclick="deleteSingleItem('${item.id}')" class="bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white px-2 py-1 rounded transition text-[11px]">
-                                    🗑️
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                tr.innerHTML = `
+                    <td class="py-3 px-3 text-center">
+                        <input type="checkbox" onchange="updateSelection()" class="row-checkbox rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0 cursor-pointer">
+                    </td>
+                    <td class="py-3 px-3 font-mono text-indigo-300">${item.sku}</td>
+                    <td class="py-3 px-3 font-bold text-slate-200">${name}</td>
+                    <td class="py-3 px-3 text-slate-400">${category}</td>
+                    <td class="py-3 px-3 font-bold ${Number(item.quantity) <= Number(item.min_limit) ? 'text-amber-400' : 'text-indigo-400'}">${Number(item.quantity).toLocaleString()}</td>
+                    <td class="py-3 px-3 font-semibold text-slate-400">${item.min_limit}</td>
+                    <td class="py-3 px-3 text-slate-400">${unitText}</td>
+                    <td class="py-3 px-3"><span class="${statusBadgeClass} px-2 py-0.5 rounded-full text-[11px]">${statusText}</span></td>
+                    <td class="py-3 px-3 text-center">
+                        <button type="button" onclick="openEditModal('${item.id}')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded text-[11px] font-medium transition" data-i18n="edit_btn">تعديل</button>
+                    </td>
                 `;
-            }).join('');
+                tbody.appendChild(tr);
+            });
 
-            updateBulkDeleteVisibility();
+            updateStatsAndCounter(filtered.length, inventoryItems.length);
         }
 
-        // 6. تحديد الكل والحذف الجماعي
-        function toggleSelectAll(masterCheckbox) {
-            const checkboxes = document.querySelectorAll('.item-checkbox');
-            checkboxes.forEach(cb => cb.checked = masterCheckbox.checked);
-            updateBulkDeleteVisibility();
+        function filterInventory() {
+            renderTable();
         }
 
-        function updateBulkDeleteVisibility() {
-            const checkedBoxes = document.querySelectorAll('.item-checkbox:checked');
-            const bulkBtn = document.getElementById('bulk-delete-btn');
-            const countSpan = document.getElementById('selected-count');
+        // =========================================================
+        // 📌 قراءة شيت الإكسيل وعرض أخطاء الأكواد المكررة في النافذة المركزية
+        // =========================================================
+        async function importExcelFile(e) {
+            const file = e.target.files[0];
+            if (!file) return;
 
-            if (checkedBoxes.length > 0) {
-                bulkBtn.classList.remove('hidden');
-                countSpan.innerText = checkedBoxes.length;
-            } else {
-                bulkBtn.classList.add('hidden');
-                const selectAll = document.getElementById('select-all');
-                if (selectAll) selectAll.checked = false;
-            }
-        }
-
-        async function deleteSelected() {
-            const checkedBoxes = document.querySelectorAll('.item-checkbox:checked');
-            const ids = Array.from(checkedBoxes).map(cb => cb.value);
-
-            if (ids.length === 0) return;
-
-            if (confirm(currentLang === 'ar' ? `هل أنت متأكد من حذف ${ids.length} صنف بشكل نهائي؟` : `Are you sure you want to delete ${ids.length} items?`)) {
+            const reader = new FileReader();
+            reader.onload = async function(evt) {
                 try {
-                    const { error } = await supabase.from('inventory').delete().in('id', ids);
-                    if (error) throw error;
-                    await fetchInventoryFromDB();
+                    const text = evt.target.result;
+                    const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+                    
+                    if (lines.length < 2) {
+                        showAlertModal(
+                            currentLang === 'ar' ? "ملف فارغ" : "Empty File",
+                            currentLang === 'ar' ? "<p>شيت الإكسيل المرفوع فارغ أو لا يحتوي على صفوف بيانات مقبولة.</p>" : "<p>Uploaded file is empty.</p>",
+                            "error"
+                        );
+                        e.target.value = '';
+                        return;
+                    }
+
+                    const existingSKUs = new Set(inventoryItems.map(item => (item.sku || '').toString().toLowerCase().trim()));
+                    
+                    const seenInFile = new Set();
+                    const duplicateInFile = [];
+                    const duplicateInDB = [];
+                    const validItems = [];
+
+                    for (let i = 1; i < lines.length; i++) {
+                        const cols = lines[i].split(",").map(c => c.replace(/^"|"$/g, '').trim());
+                        if (cols.length >= 2) {
+                            const rawSku = (cols[0] || '').trim();
+                            if (!rawSku) continue;
+
+                            const skuLower = rawSku.toLowerCase();
+
+                            if (seenInFile.has(skuLower)) {
+                                if (!duplicateInFile.includes(rawSku)) duplicateInFile.push(rawSku);
+                                continue;
+                            }
+                            seenInFile.add(skuLower);
+
+                            if (existingSKUs.has(skuLower)) {
+                                if (!duplicateInDB.includes(rawSku)) duplicateInDB.push(rawSku);
+                                continue;
+                            }
+
+                            const qty = parseInt(cols[5]) || 0;
+                            const min = parseInt(cols[6]) || 10;
+                            let status = 'available';
+                            if (qty === 0) status = 'out';
+                            else if (qty <= min) status = 'low';
+
+                            validItems.push({
+                                sku: rawSku,
+                                name_ar: cols[1] || 'صنف جديد',
+                                name_en: cols[2] || cols[1] || 'New Item',
+                                cat_ar: cols[3] || 'عام',
+                                cat_en: cols[4] || 'General',
+                                quantity: qty,
+                                min_limit: min,
+                                unit: cols[7] || 'piece',
+                                status: status
+                            });
+                        }
+                    }
+
+                    // تجهيز الرسالة بتنسيق جميل وواضح داخل النافذة
+                    let htmlMessage = '';
+                    if (duplicateInDB.length > 0) {
+                        htmlMessage += `
+                            <p class="text-rose-400 font-bold mb-1">❌ أكواد مضافة مسبقاً في النظام (${duplicateInDB.length}):</p>
+                            <p class="text-slate-300 bg-slate-900 p-2 rounded border border-slate-800 font-mono text-[11px] break-all">${duplicateInDB.join(', ')}</p>
+                        `;
+                    }
+                    if (duplicateInFile.length > 0) {
+                        htmlMessage += `
+                            <p class="text-amber-400 font-bold mt-2 mb-1">⚠️ أكواد مكررة أكثر من مرة داخل شيت الإكسيل (${duplicateInFile.length}):</p>
+                            <p class="text-slate-300 bg-slate-900 p-2 rounded border border-slate-800 font-mono text-[11px] break-all">${duplicateInFile.join(', ')}</p>
+                        `;
+                    }
+
+                    // إظهار النافذة بوسط الشاشة
+                    if (duplicateInDB.length > 0 || duplicateInFile.length > 0) {
+                        const alertTitle = currentLang === 'ar' ? "تنبيه: تم كشف أكواد SKU مكررة!" : "Warning: Duplicate SKUs Detected!";
+                        showAlertModal(alertTitle, htmlMessage, "warning");
+                    }
+
+                    // حفظ الأصناف السليمة غير المكررة
+                    if (validItems.length > 0) {
+                        const { error } = await supabase.from('inventory').insert(validItems);
+                        if (error) throw error;
+
+                        await fetchInventoryFromDB();
+
+                        const successMsg = currentLang === 'ar' 
+                            ? `تم رفع وتخزين ${validItems.length} صنف جديد بنجاح.` 
+                            : `Successfully saved ${validItems.length} new items.`;
+
+                        showNotification(successMsg, "success");
+                    } else if (duplicateInDB.length > 0 || duplicateInFile.length > 0) {
+                        showAlertModal(
+                            currentLang === 'ar' ? "فشل الاستيراد بالكامل" : "Import Failed",
+                            currentLang === 'ar' ? "<p class='text-rose-400 font-bold'>لم يتم إضافة أي صنف لأن كل الأكواد المرفقة بالشيت مكررة وموجودة مسبقاً!</p>" : "<p>All SKUs in file are duplicates.</p>",
+                            "error"
+                        );
+                    }
+
+                    e.target.value = '';
                 } catch (err) {
-                    showAlertModal(currentLang === 'ar' ? 'خطأ أثناء الحذف' : 'Delete Error', err.message, 'error');
+                    console.error("Upload error:", err);
+                    showAlertModal(
+                        currentLang === 'ar' ? "خطأ بالرفع" : "Upload Error",
+                        currentLang === 'ar' ? "<p>حدث خطأ غير متوقع أثناء حفظ البيانات في Supabase.</p>" : "<p>Unexpected Database Error.</p>",
+                        "error"
+                    );
                 }
-            }
+            };
+            reader.readAsText(file, "UTF-8");
         }
 
-        async function deleteSingleItem(id) {
-            if (confirm(currentLang === 'ar' ? "هل أنت متأكد من حذف هذا الصنف؟" : "Are you sure you want to delete this item?")) {
-                try {
-                    const { error } = await supabase.from('inventory').delete().eq('id', id);
-                    if (error) throw error;
-                    await fetchInventoryFromDB();
-                } catch (err) {
-                    showAlertModal(currentLang === 'ar' ? 'خطأ أثناء الحذف' : 'Delete Error', err.message, 'error');
-                }
+        function downloadCSV() {
+            if (inventoryItems.length === 0) {
+                showAlertModal(
+                    currentLang === 'ar' ? "تنبيه" : "Notice",
+                    currentLang === 'ar' ? "<p>لا توجد أي بيانات في الجدول لتصديرها.</p>" : "<p>No items to export.</p>",
+                    "warning"
+                );
+                return;
             }
-        }
 
-        // 7. إدارة Modal الإضافة والتعديل
-        function openCreateModal() {
-            document.getElementById('item-form').reset();
-            document.getElementById('modal-item-id').value = '';
-            document.getElementById('modal-title').innerText = inventoryTranslations[currentLang].modal_title_add;
-            
-            const modal = document.getElementById('item-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            const headers = ["ID", "SKU", "Name Ar", "Name En", "Cat Ar", "Cat En", "Quantity", "Min Limit", "Unit", "Status"];
+            const rows = inventoryItems.map(item => [
+                item.id,
+                `"${item.sku || ''}"`,
+                `"${item.name_ar || ''}"`,
+                `"${item.name_en || ''}"`,
+                `"${item.cat_ar || ''}"`,
+                `"${item.cat_en || ''}"`,
+                item.quantity || 0,
+                item.min_limit || 0,
+                item.unit || '',
+                item.status || ''
+            ]);
+
+            const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `inventory_export_${new Date().toISOString().slice(0,10)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification(currentLang === 'ar' ? "تم تصدير البيانات بنجاح" : "Data exported successfully", "success");
         }
 
         function openEditModal(id) {
             const item = inventoryItems.find(i => String(i.id) === String(id));
             if (!item) return;
 
-            document.getElementById('modal-title').innerText = inventoryTranslations[currentLang].modal_title_edit;
             document.getElementById('modal-item-id').value = item.id;
             document.getElementById('modal-sku').value = item.sku || '';
-            document.getElementById('modal-image-url').value = item.image_url || '';
             document.getElementById('modal-name-ar').value = item.name_ar || '';
             document.getElementById('modal-name-en').value = item.name_en || '';
-            document.getElementById('modal-cat-ar').value = item.category_ar || '';
-            document.getElementById('modal-cat-en').value = item.category_en || '';
-            document.getElementById('modal-qty').value = item.quantity ?? 0;
-            document.getElementById('modal-min').value = item.min_limit ?? 0;
+            document.getElementById('modal-cat-ar').value = item.cat_ar || '';
+            document.getElementById('modal-cat-en').value = item.cat_en || '';
+            document.getElementById('modal-qty').value = item.quantity || 0;
+            document.getElementById('modal-min').value = item.min_limit || 10;
             document.getElementById('modal-unit').value = item.unit || 'piece';
             document.getElementById('modal-status').value = item.status || 'available';
 
@@ -613,223 +804,203 @@
             const modal = document.getElementById('item-modal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
-            document.getElementById('item-form').reset();
         }
 
         async function handleFormSubmit(e) {
             e.preventDefault();
-
             const id = document.getElementById('modal-item-id').value;
             const sku = document.getElementById('modal-sku').value.trim();
-            const imageUrl = document.getElementById('modal-image-url').value.trim();
             const nameAr = document.getElementById('modal-name-ar').value.trim();
             const nameEn = document.getElementById('modal-name-en').value.trim();
             const catAr = document.getElementById('modal-cat-ar').value.trim();
             const catEn = document.getElementById('modal-cat-en').value.trim();
             const qty = parseInt(document.getElementById('modal-qty').value) || 0;
-            const min = parseInt(document.getElementById('modal-min').value) || 0;
+            const min = parseInt(document.getElementById('modal-min').value) || 10;
             const unit = document.getElementById('modal-unit').value;
-            const status = document.getElementById('modal-status').value;
+            let status = document.getElementById('modal-status').value;
 
             if (!sku || !nameAr || !catAr) {
                 showAlertModal(
-                    currentLang === 'ar' ? 'حقول مطلوبة' : 'Required Fields',
-                    currentLang === 'ar' ? 'يرجى ملء جميع الحقول المفروضة (SKU، الاسم بالعربي، التصنيف).' : 'Please fill in required fields.',
-                    'warning'
+                    currentLang === 'ar' ? "حقول مفقودة" : "Missing Fields",
+                    currentLang === 'ar' ? "<p>يرجى إكمال جميع الحقول الإجبارية (*)</p>" : "<p>Please fill required fields (*)</p>",
+                    "warning"
                 );
                 return;
             }
 
+            const duplicateCheck = inventoryItems.find(item => String(item.id) !== String(id) && (item.sku || '').toLowerCase().trim() === sku.toLowerCase());
+            if (duplicateCheck) {
+                showAlertModal(
+                    currentLang === 'ar' ? "الكود مستخدم مسبقاً" : "SKU Already Exists",
+                    currentLang === 'ar' 
+                        ? `<p>كود SKU هذا <strong>[ ${sku} ]</strong> محجوز مسبقاً لصنف آخر وهو: <br><strong class='text-amber-400'>(${duplicateCheck.name_ar || duplicateCheck.name_en})</strong></p>`
+                        : `<p>SKU [ ${sku} ] is already assigned to another item.</p>`,
+                    "error"
+                );
+                return;
+            }
+
+            if (qty === 0) status = 'out';
+            else if (qty <= min) status = 'low';
+
             const payload = {
                 sku,
-                image_url: imageUrl,
                 name_ar: nameAr,
-                name_en: nameEn,
-                category_ar: catAr,
-                category_en: catEn,
+                name_en: nameEn || nameAr,
+                cat_ar: catAr,
+                cat_en: catEn || catAr,
                 quantity: qty,
                 min_limit: min,
                 unit,
-                status,
-                updated_at: new Date().toISOString()
+                status
             };
 
             try {
-                let error;
-                if (id) {
-                    ({ error } = await supabase.from('inventory').update(payload).eq('id', id));
-                } else {
-                    ({ error } = await supabase.from('inventory').insert([payload]));
-                }
-
+                const { error } = await supabase.from('inventory').update(payload).eq('id', id);
                 if (error) throw error;
 
+                showNotification(currentLang === 'ar' ? "تم تحديث بيانات الصنف بنجاح!" : "Item updated successfully!", "success");
                 closeModal();
                 await fetchInventoryFromDB();
             } catch (err) {
-                showAlertModal(currentLang === 'ar' ? 'خطأ في الحفظ' : 'Save Error', err.message, 'error');
+                console.error("Update error:", err);
+                showAlertModal(
+                    currentLang === 'ar' ? "خطأ بالتحديث" : "Update Error",
+                    currentLang === 'ar' ? "<p>حدث خطأ أثناء حفظ التحديثات في قاعدة البيانات.</p>" : "<p>Database Update Error.</p>",
+                    "error"
+                );
             }
         }
 
-        // 8. الاستيراد والتصدير
-        async function importExcelFile(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        function toggleSelectAll(master) {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(cb => cb.checked = master.checked);
+            updateSelection();
+        }
 
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                try {
-                    const text = e.target.result;
-                    const lines = text.split(/\r\n|\n/).filter(line => line.trim() !== '');
-                    if (lines.length <= 1) throw new Error("الملف فارغ");
+        function updateSelection() {
+            const selectedRows = document.querySelectorAll('.row-checkbox:checked');
+            const bulkBtn = document.getElementById('bulk-delete-btn');
+            const countSpan = document.getElementById('selected-count');
 
-                    const rows = lines.slice(1);
-                    const newItems = [];
+            countSpan.innerText = selectedRows.length;
+            if (selectedRows.length > 0) {
+                bulkBtn.classList.remove('hidden');
+            } else {
+                bulkBtn.classList.add('hidden');
+            }
+        }
 
-                    rows.forEach(row => {
-                        const cols = row.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-                        if (cols.length >= 2 && cols[0]) {
-                            newItems.push({
-                                sku: cols[0],
-                                image_url: cols[1] || '',
-                                name_ar: cols[2] || cols[3] || '',
-                                name_en: cols[3] || '',
-                                category_ar: cols[4] || cols[5] || 'عام',
-                                category_en: cols[5] || 'General',
-                                quantity: parseInt(cols[6]) || 0,
-                                min_limit: parseInt(cols[7]) || 0,
-                                unit: cols[8] || 'piece',
-                                status: (parseInt(cols[6]) || 0) <= 0 ? 'out' : 'available'
-                            });
-                        }
-                    });
+        function deleteSelected() {
+            const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+            const idsToDelete = Array.from(selectedCheckboxes).map(cb => {
+                const row = cb.closest('tr');
+                return row.getAttribute('data-id');
+            });
 
-                    if (newItems.length === 0) throw new Error("لا توجد بيانات صالحة");
+            if (idsToDelete.length === 0) return;
 
-                    const { error } = await supabase.from('inventory').upsert(newItems, { onConflict: 'sku' });
-                    if (error) throw error;
+            showConfirmModal(
+                currentLang === 'ar' ? "تأكيد الحذف الجماعي" : "Confirm Bulk Delete",
+                currentLang === 'ar' ? `هل أنت متأكد من رغبتك في حذف ${idsToDelete.length} صنف نهائياً من قاعدة البيانات؟` : `Are you sure you want to delete ${idsToDelete.length} items from the database?`,
+                async () => {
+                    try {
+                        const { error } = await supabase.from('inventory').delete().in('id', idsToDelete);
+                        if (error) throw error;
 
-                    await fetchInventoryFromDB();
-                } catch (err) {
-                    showAlertModal(currentLang === 'ar' ? 'خطأ في الاستيراد' : 'Import Error', err.message, 'error');
-                } finally {
-                    event.target.value = '';
+                        showNotification(currentLang === 'ar' ? `تم حذف ${idsToDelete.length} صنف بنجاح` : `Deleted ${idsToDelete.length} items successfully`, "success");
+                        document.getElementById('select-all').checked = false;
+                        updateSelection();
+                        await fetchInventoryFromDB();
+                    } catch (err) {
+                        console.error("Delete error:", err);
+                        showAlertModal(
+                            currentLang === 'ar' ? "خطأ أثناء الحذف" : "Deletion Error",
+                            currentLang === 'ar' ? "<p>حدث خطأ أثناء تنفيذ عملية الحذف من قاعدة البيانات.</p>" : "<p>Error deleting records.</p>",
+                            "error"
+                        );
+                    }
                 }
-            };
-            reader.readAsText(file, 'UTF-8');
+            );
         }
 
-        function downloadCSV() {
-            const filtered = getFilteredData();
-            if (filtered.length === 0) return;
+        function updateStatsAndCounter(count, total) {
+            let lowCount = 0;
+            let outCount = 0;
 
-            const headers = ["SKU", "Image URL", "اسم الصنف (عربي)", "Item Name (EN)", "التصنيف (عربي)", "Category (EN)", "الكمية", "الحد الأدنى", "الوحدة", "الحالة"];
-            const rows = filtered.map(i => [
-                `"${i.sku || ''}"`,
-                `"${i.image_url || ''}"`,
-                `"${i.name_ar || ''}"`,
-                `"${i.name_en || ''}"`,
-                `"${i.category_ar || ''}"`,
-                `"${i.category_en || ''}"`,
-                i.quantity ?? 0,
-                i.min_limit ?? 0,
-                `"${i.unit || 'piece'}"`,
-                `"${i.status || 'available'}"`
-            ]);
+            inventoryItems.forEach(i => {
+                if (i.status === 'low') lowCount++;
+                if (i.status === 'out') outCount++;
+            });
 
-            const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
-            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `Keymerv_Inventory_${new Date().toISOString().slice(0,10)}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            document.getElementById('stat-total').innerText = total.toLocaleString();
+            document.getElementById('stat-low').innerText = lowCount.toLocaleString();
+            document.getElementById('stat-out').innerText = outCount.toLocaleString();
+
+            const infoText = inventoryTranslations[currentLang].pagination_info
+                .replace('{count}', count)
+                .replace('{total}', total);
+            document.getElementById('results-counter').innerText = infoText;
         }
 
-        // 9. إدارة اللغات واتجاه الشريط الجانبي
         function toggleLanguage() {
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
             localStorage.setItem('lang', currentLang);
             applyInventoryLanguage(currentLang);
-            renderTable();
         }
 
         function applyInventoryLanguage(lang) {
-            const root = document.getElementById('html-root');
-            root.dir = lang === 'ar' ? 'rtl' : 'ltr';
-            root.lang = lang;
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('lang', lang);
+            htmlRoot.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+
             document.getElementById('lang-btn').innerText = lang === 'ar' ? 'English' : 'عربي';
 
-            // تبديل حدود الشريط الجانبي بحسب اتجاه اللغة (يمين/يسار)
-            const sidebar = document.getElementById('sidebar');
-            if (sidebar) {
-                if (lang === 'ar') {
-                    sidebar.classList.remove('border-r');
-                    sidebar.classList.add('border-l');
-                } else {
-                    sidebar.classList.remove('border-l');
-                    sidebar.classList.add('border-r');
-                }
-            }
-
-            const dict = inventoryTranslations[lang];
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (dict[key]) el.innerText = dict[key];
+                if (inventoryTranslations[lang][key]) {
+                    el.innerText = inventoryTranslations[lang][key];
+                }
             });
 
             document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
                 const key = el.getAttribute('data-i18n-placeholder');
-                if (dict[key]) el.placeholder = dict[key];
+                if (inventoryTranslations[lang][key]) {
+                    el.placeholder = inventoryTranslations[lang][key];
+                }
             });
-        }
 
-        function showAlertModal(title, msg, type = 'warning') {
-            document.getElementById('alert-title').innerText = title;
-            document.getElementById('alert-message').innerText = msg;
-            document.getElementById('alert-icon').innerText = type === 'error' ? '❌' : '⚠️';
-            const alertModal = document.getElementById('alert-modal');
-            alertModal.classList.remove('hidden');
-            alertModal.classList.add('flex');
-        }
-
-        function closeAlertModal() {
-            const alertModal = document.getElementById('alert-modal');
-            alertModal.classList.add('hidden');
-            alertModal.classList.remove('flex');
+            renderTable();
         }
 
         async function logoutUser() {
-            if (supabase) await supabase.auth.signOut();
-            window.location.href = 'login.html';
+            showConfirmModal(
+                currentLang === 'ar' ? "تسجيل الخروج" : "Logout",
+                currentLang === 'ar' ? "هل تريد تسجيل الخروج من النظام؟" : "Do you want to log out of the system?",
+                async () => {
+                    if (supabase) {
+                        await supabase.auth.signOut();
+                    }
+                    window.location.href = 'login.html';
+                }
+            );
         }
 
-        // 10. التشغيل الأولي عند تحميل الصفحة
-        document.addEventListener('DOMContentLoaded', () => {
-            applyInventoryLanguage(currentLang);
-            fetchInventoryFromDB();
-        });
-
-        // تصدير الدوال للـ Window Scope
+        // ربط الدوال لكائن window
         window.closeAlertModal = closeAlertModal;
-        window.toggleLanguage = toggleLanguage;
         window.logoutUser = logoutUser;
+        window.toggleLanguage = toggleLanguage;
+        window.filterInventory = filterInventory;
+        window.deleteSelected = deleteSelected;
+        window.downloadExcelTemplate = downloadExcelTemplate;
         window.importExcelFile = importExcelFile;
         window.downloadCSV = downloadCSV;
-        window.filterInventory = filterInventory;
         window.renderTable = renderTable;
         window.toggleSelectAll = toggleSelectAll;
-        window.deleteSelected = deleteSelected;
-        window.deleteSingleItem = deleteSingleItem;
-        window.openCreateModal = openCreateModal;
+        window.updateSelection = updateSelection;
         window.openEditModal = openEditModal;
         window.closeModal = closeModal;
         window.handleFormSubmit = handleFormSubmit;
-        window.updateBulkDeleteVisibility = updateBulkDeleteVisibility;
     </script>
 </body>
 </html>
