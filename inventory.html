@@ -21,10 +21,37 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #334155;
         }
+        @keyframes toastIn {
+            from { transform: translateY(100%) opacity: 0; }
+            to { transform: translateY(0) opacity: 1; }
+        }
+        .toast-animate {
+            animation: toastIn 0.25s ease-out forwards;
+        }
     </style>
     <script type="module" src="assets/js/auth-guard.js"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden text-xs">
+
+    <!-- نظام التنبيهات العائمة الاحترافي (Toast Container) -->
+    <div id="toast-container" class="fixed bottom-5 left-5 z-[100] flex flex-col gap-2.5 pointer-events-none max-w-sm w-full"></div>
+
+    <!-- نافذة تأكيد الإجراءات الاحترافية (Custom Confirm Dialog) -->
+    <div id="confirm-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-[90] p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-md p-5 space-y-4 shadow-2xl">
+            <div class="flex items-center gap-3">
+                <div id="confirm-icon" class="w-10 h-10 rounded-lg bg-rose-500/10 text-rose-400 flex items-center justify-center font-bold text-lg shrink-0">⚠️</div>
+                <div>
+                    <h3 id="confirm-title" class="font-bold text-slate-200 text-sm">تأكيد الإجراء</h3>
+                    <p id="confirm-message" class="text-slate-400 text-xs mt-0.5">هل أنت تأكد من متابعة هذه العملية؟</p>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+                <button type="button" id="confirm-cancel-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-1.5 rounded-lg text-xs font-medium transition">إلغاء</button>
+                <button type="button" id="confirm-action-btn" class="bg-rose-600 hover:bg-rose-500 text-white px-4 py-1.5 rounded-lg text-xs font-semibold transition">تأكيد</button>
+            </div>
+        </div>
+    </div>
 
     <!-- القائمة الجانبية (Sidebar) -->
     <aside class="w-64 bg-slate-900 border-l border-slate-800 flex flex-col justify-between shrink-0">
@@ -113,12 +140,10 @@
                         🗑️ حذف المحدد (<span id="selected-count">0</span>)
                     </button>
 
-                    <!-- تنزيل نموذج الإكسيل -->
                     <button type="button" onclick="downloadExcelTemplate()" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer" data-i18n="download_template_btn">
                         📄 تنزيل نموذج الإكسيل
                     </button>
 
-                    <!-- رفع شيت الإكسيل -->
                     <label class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-md shadow-emerald-600/20 cursor-pointer flex items-center gap-1.5">
                         <span data-i18n="upload_excel_btn">📊 رفع شيت الإكسيل</span>
                         <input type="file" id="excel-file-input" accept=".csv" onchange="importExcelFile(event)" class="hidden">
@@ -255,7 +280,7 @@
         </div>
     </div>
 
-    <!-- استدعاء Supabase الحقيقي المباشر من ملف المشروع assets/js/supabase.js -->
+    <!-- كود JavaScript للربط المباشر مع Supabase وإدارة التنبيهات -->
     <script type="module">
         import { supabase } from './assets/js/supabase.js';
 
@@ -355,6 +380,68 @@
             }
         };
 
+        // --- نظام التنبيهات الاحترافي البديل لـ alert و confirm ---
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let bgBorder = 'bg-slate-900/95 border-emerald-500/40 text-emerald-300';
+            let icon = '✅';
+            
+            if (type === 'error') {
+                bgBorder = 'bg-slate-900/95 border-rose-500/40 text-rose-300';
+                icon = '❌';
+            } else if (type === 'warning') {
+                bgBorder = 'bg-slate-900/95 border-amber-500/40 text-amber-300';
+                icon = '⚠️';
+            } else if (type === 'info') {
+                bgBorder = 'bg-slate-900/95 border-indigo-500/40 text-indigo-300';
+                icon = 'ℹ️';
+            }
+
+            toast.className = `toast-animate pointer-events-auto border backdrop-blur-md p-3.5 rounded-xl shadow-2xl flex items-center justify-between gap-3 text-xs font-semibold ${bgBorder}`;
+            toast.innerHTML = `
+                <div class="flex items-center gap-2.5">
+                    <span class="text-base">${icon}</span>
+                    <span>${message}</span>
+                </div>
+                <button type="button" onclick="this.parentElement.remove()" class="text-slate-400 hover:text-white font-bold ml-2 text-sm">&times;</button>
+            `;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'transition', 'duration-300');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        function showConfirmModal(title, message, onConfirm) {
+            const modal = document.getElementById('confirm-modal');
+            document.getElementById('confirm-title').innerText = title;
+            document.getElementById('confirm-message').innerText = message;
+            
+            const actionBtn = document.getElementById('confirm-action-btn');
+            const cancelBtn = document.getElementById('confirm-cancel-btn');
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            const handleConfirm = () => {
+                cleanup();
+                onConfirm();
+            };
+
+            const cleanup = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                actionBtn.removeEventListener('click', handleConfirm);
+                cancelBtn.removeEventListener('click', cleanup);
+            };
+
+            actionBtn.addEventListener('click', handleConfirm);
+            cancelBtn.addEventListener('click', cleanup);
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             await loadLoggedInUser();
             await fetchInventoryFromDB();
@@ -404,6 +491,7 @@
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
+            showNotification(currentLang === 'ar' ? "تم تحميل النموذج بنجاح" : "Template downloaded successfully", "info");
         }
 
         // 3. جلب المخزون الحقيقي من Supabase
@@ -417,6 +505,7 @@
                 console.error('Error fetching inventory:', err);
                 inventoryItems = [];
                 renderTable();
+                showNotification(currentLang === 'ar' ? "تعذر جلب بيانات المخزون" : "Failed to load inventory data", "error");
             }
         }
 
@@ -502,7 +591,7 @@
                     const text = evt.target.result;
                     const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
                     if (lines.length < 2) {
-                        alert("الملف فارغ أو غير صالح.");
+                        showNotification(currentLang === 'ar' ? "الملف فارغ أو غير صالح." : "File is empty or invalid.", "error");
                         return;
                     }
 
@@ -535,57 +624,67 @@
                         if (error) throw error;
                         
                         await fetchInventoryFromDB();
-                        alert(`تم حفظ ${newItems.length} صنف في قاعدة البيانات بنجاح!`);
+                        showNotification(currentLang === 'ar' ? `تم حفظ ${newItems.length} صنف بنجاح!` : `Saved ${newItems.length} items successfully!`, "success");
                     }
                     e.target.value = '';
                 } catch (err) {
                     console.error("Upload error:", err);
-                    alert("حدث خطأ أثناء حفظ شيت الإكسيل في قاعدة البيانات.");
+                    showNotification(currentLang === 'ar' ? "حدث خطأ أثناء حفظ شيت الإكسيل" : "Error uploading Excel sheet", "error");
                 }
             };
             reader.readAsText(file, "UTF-8");
         }
 
-        // 6. تصدير البيانات
+        // 6. تصدير البيانات إلى CSV
         function downloadCSV() {
             if (inventoryItems.length === 0) {
-                alert("لا توجد بيانات للتصدير.");
+                showNotification(currentLang === 'ar' ? "لا توجد بيانات للتصدير" : "No items to export", "warning");
                 return;
             }
 
-            const headers = ["كود SKU", "اسم الصنف (عربي)", "اسم الصنف (انجليزي)", "التصنيف (عربي)", "التصنيف (انجليزي)", "الكمية", "الحد الادنى", "الوحدة", "الحالة"];
-            const rows = inventoryItems.map(i => [
-                `"${i.sku}"`, `"${i.name_ar}"`, `"${i.name_en || ''}"`, `"${i.cat_ar}"`, `"${i.cat_en || ''}"`, i.quantity, i.min_limit, i.unit, i.status
-            ].join(","));
+            const headers = ["ID", "SKU", "Name Ar", "Name En", "Cat Ar", "Cat En", "Quantity", "Min Limit", "Unit", "Status"];
+            const rows = inventoryItems.map(item => [
+                item.id,
+                `"${item.sku || ''}"`,
+                `"${item.name_ar || ''}"`,
+                `"${item.name_en || ''}"`,
+                `"${item.cat_ar || ''}"`,
+                `"${item.cat_en || ''}"`,
+                item.quantity || 0,
+                item.min_limit || 0,
+                item.unit || '',
+                item.status || ''
+            ]);
 
-            const csvContent = "\uFEFF" + [headers.join(","), ...rows].join("\n");
+            const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
             const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
             const url = URL.createObjectURL(blob);
-            
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = `تصدير_المخزون_${new Date().toISOString().slice(0,10)}.csv`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `inventory_export_${new Date().toISOString().slice(0,10)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            showNotification(currentLang === 'ar' ? "تم تصدير البيانات بنجاح" : "Data exported successfully", "success");
         }
 
-        // 7. فتح وإغلاق تعديل الصنف وحفظ التعديل في Supabase
+        // 7. إدارة النوافذ والعمليات على الأصناف
         function openEditModal(id) {
             const item = inventoryItems.find(i => String(i.id) === String(id));
             if (!item) return;
 
             document.getElementById('modal-item-id').value = item.id;
-            document.getElementById('modal-sku').value = item.sku;
-            document.getElementById('modal-name-ar').value = item.name_ar;
+            document.getElementById('modal-sku').value = item.sku || '';
+            document.getElementById('modal-name-ar').value = item.name_ar || '';
             document.getElementById('modal-name-en').value = item.name_en || '';
-            document.getElementById('modal-cat-ar').value = item.cat_ar;
+            document.getElementById('modal-cat-ar').value = item.cat_ar || '';
             document.getElementById('modal-cat-en').value = item.cat_en || '';
-            document.getElementById('modal-qty').value = item.quantity;
-            document.getElementById('modal-min').value = item.min_limit;
-            document.getElementById('modal-unit').value = item.unit;
-            document.getElementById('modal-status').value = item.status;
+            document.getElementById('modal-qty').value = item.quantity || 0;
+            document.getElementById('modal-min').value = item.min_limit || 10;
+            document.getElementById('modal-unit').value = item.unit || 'piece';
+            document.getElementById('modal-status').value = item.status || 'available';
 
             const modal = document.getElementById('item-modal');
             modal.classList.remove('hidden');
@@ -600,53 +699,52 @@
 
         async function handleFormSubmit(e) {
             e.preventDefault();
-
             const id = document.getElementById('modal-item-id').value;
+            const sku = document.getElementById('modal-sku').value.trim();
+            const nameAr = document.getElementById('modal-name-ar').value.trim();
+            const nameEn = document.getElementById('modal-name-en').value.trim();
+            const catAr = document.getElementById('modal-cat-ar').value.trim();
+            const catEn = document.getElementById('modal-cat-en').value.trim();
             const qty = parseInt(document.getElementById('modal-qty').value) || 0;
-            const min = parseInt(document.getElementById('modal-min').value) || 0;
+            const min = parseInt(document.getElementById('modal-min').value) || 10;
+            const unit = document.getElementById('modal-unit').value;
             let status = document.getElementById('modal-status').value;
 
+            if (!sku || !nameAr || !catAr) {
+                showNotification(currentLang === 'ar' ? "الرجاء تعبئة جميع الحقول المطلوبة (*)" : "Please fill required fields (*)", "warning");
+                return;
+            }
+
+            // تحديث إشارة الحالة تلقائياً بحسب الكمية والحد الأدنى
             if (qty === 0) status = 'out';
             else if (qty <= min) status = 'low';
 
-            const updatedData = {
-                sku: document.getElementById('modal-sku').value,
-                name_ar: document.getElementById('modal-name-ar').value,
-                name_en: document.getElementById('modal-name-en').value,
-                cat_ar: document.getElementById('modal-cat-ar').value,
-                cat_en: document.getElementById('modal-cat-en').value,
+            const payload = {
+                sku,
+                name_ar: nameAr,
+                name_en: nameEn || nameAr,
+                cat_ar: catAr,
+                cat_en: catEn || catAr,
                 quantity: qty,
                 min_limit: min,
-                unit: document.getElementById('modal-unit').value,
-                status: status
+                unit,
+                status
             };
 
             try {
-                const { error } = await supabase.from('inventory').update(updatedData).eq('id', id);
+                const { error } = await supabase.from('inventory').update(payload).eq('id', id);
                 if (error) throw error;
-                
-                await fetchInventoryFromDB();
+
+                showNotification(currentLang === 'ar' ? "تم تحديث البيانات بنجاح!" : "Item updated successfully!", "success");
                 closeModal();
+                await fetchInventoryFromDB();
             } catch (err) {
                 console.error("Update error:", err);
-                alert("حدث خطأ أثناء تحديث الصنف في قاعدة البيانات.");
+                showNotification(currentLang === 'ar' ? "حدث خطأ أثناء حفظ التحديثات" : "Error saving updates", "error");
             }
         }
 
-        // 8. تحديث العدادات والتحديد والحذف
-        function updateStatsAndCounter(showingCount, totalCount) {
-            const total = inventoryItems.length;
-            const low = inventoryItems.filter(i => i.status === 'low').length;
-            const out = inventoryItems.filter(i => i.status === 'out').length;
-
-            document.getElementById('stat-total').innerText = total.toLocaleString();
-            document.getElementById('stat-low').innerText = low.toLocaleString();
-            document.getElementById('stat-out').innerText = out.toLocaleString();
-
-            const counterTemplate = inventoryTranslations[currentLang].pagination_info;
-            document.getElementById('results-counter').innerText = counterTemplate.replace('{count}', showingCount).replace('{total}', totalCount);
-        }
-
+        // 8. تحديد العناصر والحذف الجماعي
         function toggleSelectAll(master) {
             const checkboxes = document.querySelectorAll('.row-checkbox');
             checkboxes.forEach(cb => cb.checked = master.checked);
@@ -654,88 +752,125 @@
         }
 
         function updateSelection() {
-            const selected = document.querySelectorAll('.row-checkbox:checked');
-            const btn = document.getElementById('bulk-delete-btn');
+            const selectedRows = document.querySelectorAll('.row-checkbox:checked');
+            const bulkBtn = document.getElementById('bulk-delete-btn');
             const countSpan = document.getElementById('selected-count');
-            
-            if (selected.length > 0) {
-                btn.classList.remove('hidden');
-                countSpan.innerText = selected.length;
+
+            countSpan.innerText = selectedRows.length;
+            if (selectedRows.length > 0) {
+                bulkBtn.classList.remove('hidden');
             } else {
-                btn.classList.add('hidden');
+                bulkBtn.classList.add('hidden');
             }
         }
 
-        async function deleteSelected() {
-            const selectedBoxes = document.querySelectorAll('.row-checkbox:checked');
-            const idsToDelete = Array.from(selectedBoxes).map(cb => cb.closest('tr').getAttribute('data-id'));
-            
+        function deleteSelected() {
+            const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+            const idsToDelete = Array.from(selectedCheckboxes).map(cb => {
+                const row = cb.closest('tr');
+                return row.getAttribute('data-id');
+            });
+
             if (idsToDelete.length === 0) return;
-            if (!confirm(`هل أنت تأكد من حذف المحدد؟`)) return;
 
-            try {
-                const { error } = await supabase.from('inventory').delete().in('id', idsToDelete);
-                if (error) throw error;
-                
-                await fetchInventoryFromDB();
-                document.getElementById('select-all').checked = false;
-                updateSelection();
-            } catch (err) {
-                console.error("Delete error:", err);
-                alert("حدث خطأ أثناء الحذف من قاعدة البيانات.");
-            }
+            showConfirmModal(
+                currentLang === 'ar' ? "تأكيد الحذف الجماعي" : "Confirm Bulk Delete",
+                currentLang === 'ar' ? `هل أنت تأكد من رغبتك في حذف ${idsToDelete.length} صنف نهائياً من قاعدة البيانات؟` : `Are you sure you want to delete ${idsToDelete.length} items from the database?`,
+                async () => {
+                    try {
+                        const { error } = await supabase.from('inventory').delete().in('id', idsToDelete);
+                        if (error) throw error;
+
+                        showNotification(currentLang === 'ar' ? `تم حذف ${idsToDelete.length} صنف بنجاح` : `Deleted ${idsToDelete.length} items successfully`, "success");
+                        document.getElementById('select-all').checked = false;
+                        updateSelection();
+                        await fetchInventoryFromDB();
+                    } catch (err) {
+                        console.error("Delete error:", err);
+                        showNotification(currentLang === 'ar' ? "حدث خطأ أثناء تنفيذ عملية الحذف" : "Error performing deletion", "error");
+                    }
+                }
+            );
         }
 
-        // 9. تغيير اللغة والخروج
+        // 9. التحديثات الإحصائية والعدادات
+        function updateStatsAndCounter(count, total) {
+            let lowCount = 0;
+            let outCount = 0;
+
+            inventoryItems.forEach(i => {
+                if (i.status === 'low') lowCount++;
+                if (i.status === 'out') outCount++;
+            });
+
+            document.getElementById('stat-total').innerText = total.toLocaleString();
+            document.getElementById('stat-low').innerText = lowCount.toLocaleString();
+            document.getElementById('stat-out').innerText = outCount.toLocaleString();
+
+            const infoText = inventoryTranslations[currentLang].pagination_info
+                .replace('{count}', count)
+                .replace('{total}', total);
+            document.getElementById('results-counter').innerText = infoText;
+        }
+
+        // 10. تغيير اللغة وتسجيل الخروج
         function toggleLanguage() {
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
             localStorage.setItem('lang', currentLang);
             applyInventoryLanguage(currentLang);
-            loadLoggedInUser();
-            renderTable();
         }
 
         function applyInventoryLanguage(lang) {
-            document.getElementById('html-root').dir = lang === 'ar' ? 'rtl' : 'ltr';
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('lang', lang);
+            htmlRoot.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+
             document.getElementById('lang-btn').innerText = lang === 'ar' ? 'English' : 'عربي';
 
-            const elements = document.querySelectorAll('[data-i18n]');
-            elements.forEach(el => {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (inventoryTranslations[lang][key]) {
                     el.innerText = inventoryTranslations[lang][key];
                 }
             });
 
-            const placeholders = document.querySelectorAll('[data-i18n-placeholder]');
-            placeholders.forEach(el => {
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
                 const key = el.getAttribute('data-i18n-placeholder');
                 if (inventoryTranslations[lang][key]) {
                     el.placeholder = inventoryTranslations[lang][key];
                 }
             });
+
+            renderTable();
         }
 
         async function logoutUser() {
-            if (supabase) await supabase.auth.signOut();
-            localStorage.removeItem('user_session');
-            window.location.href = 'login.html';
+            showConfirmModal(
+                currentLang === 'ar' ? "تسجيل الخروج" : "Logout",
+                currentLang === 'ar' ? "هل تريد تسجيل الخروج من النظام؟" : "Do you want to log out of the system?",
+                async () => {
+                    if (supabase) {
+                        await supabase.auth.signOut();
+                    }
+                    window.location.href = 'login.html';
+                }
+            );
         }
 
-        // ربط جميع الدوال بالـ Window لكي تعمل أحداث onclick / onkeyup في HTML بدون أخطاء
-        window.downloadExcelTemplate = downloadExcelTemplate;
+        // تصدير الدوال لنطاق window لتتمكن الأحداث المباشرة من استدعائها
+        window.logoutUser = logoutUser;
+        window.toggleLanguage = toggleLanguage;
         window.filterInventory = filterInventory;
+        window.deleteSelected = deleteSelected;
+        window.downloadExcelTemplate = downloadExcelTemplate;
         window.importExcelFile = importExcelFile;
         window.downloadCSV = downloadCSV;
+        window.renderTable = renderTable;
+        window.toggleSelectAll = toggleSelectAll;
+        window.updateSelection = updateSelection;
         window.openEditModal = openEditModal;
         window.closeModal = closeModal;
         window.handleFormSubmit = handleFormSubmit;
-        window.toggleSelectAll = toggleSelectAll;
-        window.updateSelection = updateSelection;
-        window.deleteSelected = deleteSelected;
-        window.toggleLanguage = toggleLanguage;
-        window.logoutUser = logoutUser;
-        window.renderTable = renderTable;
     </script>
 </body>
 </html>
