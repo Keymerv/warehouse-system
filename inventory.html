@@ -46,12 +46,12 @@
             </nav>
         </div>
 
-        <!-- معلومات المستخدم والوظيفة والبريد الإلكتروني (ديناميكي من الداتابيز/الجلسة) -->
+        <!-- معلومات المستخدم والوظيفة والبريد الإلكتروني -->
         <div class="p-3 border-t border-slate-800 flex items-center justify-between">
             <div class="overflow-hidden">
-                <p class="font-bold text-slate-200 text-xs truncate" id="user-name" data-i18n="user_name">جاري التحميل...</p>
-                <p class="text-[10px] text-indigo-400 font-semibold truncate" id="user-role" data-i18n="user_role">---</p>
-                <p class="text-[10px] text-slate-500 truncate" id="user-email">---</p>
+                <p class="font-bold text-slate-200 text-xs truncate" id="user-name" data-i18n="user_name">أحمد الغامدي</p>
+                <p class="text-[10px] text-indigo-400 font-semibold truncate" id="user-role" data-i18n="user_role">مدير المستودع الرئيسي</p>
+                <p class="text-[10px] text-slate-500 truncate" id="user-email">a.alghamdi@keymerv.com</p>
             </div>
             <button onclick="logoutUser()" class="text-rose-400 hover:text-rose-300 text-[11px] font-semibold shrink-0" data-i18n="logout">خروج</button>
         </div>
@@ -109,7 +109,7 @@
                     </select>
                 </div>
 
-                <!-- أزرار الإكسيل فقط دون زر الإضافة -->
+                <!-- أزرار الإكسيل والعمليات -->
                 <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end">
                     <button id="bulk-delete-btn" onclick="deleteSelected()" class="hidden bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-600/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5" data-i18n="delete_selected_btn">
                         🗑️ حذف المحدد (<span id="selected-count">0</span>)
@@ -271,12 +271,13 @@
         </div>
     </div>
 
-    <!-- JavaScript المحدث بالكامل مع ربط الداتابيز وجلب بيانات المستخدم -->
+    <!-- JavaScript المحدث بالكامل -->
     <script>
-        // إعداد Supabase (استبدل القيم بقيم مشروعك إن لزم)
         const SUPABASE_URL = "https://your-supabase-project.supabase.co"; 
         const SUPABASE_ANON_KEY = "your-anon-key";
-        const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+        const supabase = (window.supabase && SUPABASE_URL.indexOf("your-supabase-project") === -1) 
+            ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) 
+            : null;
 
         let inventoryItems = [];
         let currentLang = localStorage.getItem('lang') || 'ar';
@@ -326,7 +327,8 @@
                 unit_bag: "كيس",
                 unit_carton: "كرتون",
                 unit_gram: "بالغرام",
-                modal_edit_title: "تعديل صنف"
+                modal_edit_title: "تعديل صنف",
+                no_data: "لا يوجد بيانات"
             },
             en: {
                 inventory_title: "Inventory Management - Keymerv Warehouse",
@@ -372,7 +374,8 @@
                 unit_bag: "Bag",
                 unit_carton: "Carton",
                 unit_gram: "Gram",
-                modal_edit_title: "Edit Item"
+                modal_edit_title: "Edit Item",
+                no_data: "No data available"
             }
         };
 
@@ -388,7 +391,7 @@
             });
         });
 
-        // 1. جلب معلومات المستخدم المسجل دخول وعرضها في السايد بار
+        // 1. جلب معلومات المستخدم المسجل وعرضها بثبات دون الوقوف على "جاري التحميل..."
         async function loadLoggedInUser() {
             try {
                 let user = null;
@@ -403,7 +406,6 @@
                     }
                 }
 
-                // الاستعانة بـ localStorage كخيار ثانٍ
                 const storedUser = JSON.parse(localStorage.getItem('user_session') || '{}');
 
                 const name = profile?.full_name || storedUser.name || user?.user_metadata?.full_name || "أحمد الغامدي";
@@ -415,16 +417,18 @@
                 document.getElementById('user-email').innerText = email;
             } catch (err) {
                 console.error("Error loading user info:", err);
+                document.getElementById('user-name').innerText = "أحمد الغامدي";
+                document.getElementById('user-role').innerText = "مدير المستودع الرئيسي";
+                document.getElementById('user-email').innerText = "a.alghamdi@keymerv.com";
             }
         }
 
-        // 2. جلب الأصناف مباشرة من الداتابيز
+        // 2. جلب الأصناف
         async function fetchInventoryFromDB() {
             if (!supabase) {
-                // بيانات افتراضية في حال عدم توفر الاتصال
                 inventoryItems = [
-                    { id: 1, sku: 'SKU-BRG-001', name_ar: 'لحم برجر مجمد (أصلي)', name_en: 'Frozen Beef Burger (Original)', cat_ar: 'مستودع اللحوم', cat_en: 'Meat Warehouse', quantity: 1450, min_limit: 200, unit: 'piece', status: 'available' },
-                    { id: 2, sku: 'SKU-BAK-042', name_ar: 'خبز برجر بطاطس', name_en: 'Potato Burger Bun', cat_ar: 'المخابز والمخازن الجافة', cat_en: 'Bakery & Dry Storage', quantity: 85, min_limit: 100, unit: 'bag', status: 'low' }
+                    { id: '1', sku: 'SKU-BRG-001', name_ar: 'لحم برجر مجمد (أصلي)', name_en: 'Frozen Beef Burger (Original)', cat_ar: 'مستودع اللحوم', cat_en: 'Meat Warehouse', quantity: 1450, min_limit: 200, unit: 'piece', status: 'available' },
+                    { id: '2', sku: 'SKU-BAK-042', name_ar: 'خبز برجر بطاطس', name_en: 'Potato Burger Bun', cat_ar: 'المخابز والمخازن الجافة', cat_en: 'Bakery & Dry Storage', quantity: 85, min_limit: 100, unit: 'bag', status: 'low' }
                 ];
                 renderTable();
                 return;
@@ -440,12 +444,12 @@
             }
         }
 
-        // 3. عرض البيانات في الجدول
+        // 3. عرض البيانات أو إظهار "لا يوجد بيانات"
         function renderTable() {
             const tbody = document.getElementById('inventory-table-body');
             tbody.innerHTML = '';
 
-            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const searchTerm = (document.getElementById('search-input').value || '').toLowerCase();
             const filterStatus = document.getElementById('status-filter').value;
 
             const filtered = inventoryItems.filter(item => {
@@ -456,11 +460,24 @@
                 return matchSearch && matchStatus;
             });
 
+            // حالة خلو الجدول من البيانات
+            if (filtered.length === 0) {
+                const noDataText = inventoryTranslations[currentLang].no_data;
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="py-10 text-center text-slate-500 font-medium text-xs">
+                            ${noDataText}
+                        </td>
+                    </tr>
+                `;
+                updateStatsAndCounter(0, inventoryItems.length);
+                return;
+            }
+
             filtered.forEach(item => {
                 const tr = document.createElement('tr');
-                tr.className = 'inventory-row';
+                tr.className = 'inventory-row hover:bg-slate-800/40 transition';
                 tr.setAttribute('data-id', item.id);
-                tr.setAttribute('data-status', item.status);
 
                 const name = currentLang === 'ar' ? item.name_ar : (item.name_en || item.name_ar);
                 const category = currentLang === 'ar' ? item.cat_ar : (item.cat_en || item.cat_ar);
@@ -478,7 +495,7 @@
                     <td class="py-3 px-3 font-mono text-indigo-300">${item.sku}</td>
                     <td class="py-3 px-3 font-bold text-slate-200">${name}</td>
                     <td class="py-3 px-3 text-slate-400">${category}</td>
-                    <td class="py-3 px-3 font-bold ${item.quantity <= item.min_limit ? 'text-amber-400' : 'text-indigo-400'}">${item.quantity.toLocaleString()}</td>
+                    <td class="py-3 px-3 font-bold ${Number(item.quantity) <= Number(item.min_limit) ? 'text-amber-400' : 'text-indigo-400'}">${Number(item.quantity).toLocaleString()}</td>
                     <td class="py-3 px-3 font-semibold text-slate-400">${item.min_limit}</td>
                     <td class="py-3 px-3 text-slate-400">${unitText}</td>
                     <td class="py-3 px-3"><span class="${statusBadgeClass} px-2 py-0.5 rounded-full text-[11px]">${statusText}</span></td>
@@ -492,7 +509,112 @@
             updateStatsAndCounter(filtered.length, inventoryItems.length);
         }
 
-        // 4. فتح النافذة لتعديل البيانات
+        function filterInventory() {
+            renderTable();
+        }
+
+        // 4. تنزيل نموذج الإكسيل الصحيح باللغة العربية
+        function downloadExcelTemplate() {
+            const headers = ["كود SKU", "اسم الصنف بالعربي", "اسم الصنف بالانجليزي", "التصنيف بالعربي", "التصنيف بالانجليزي", "الكمية الحالية", "الحد الادنى", "الوحدة"];
+            const exampleRow = ["SKU-1001", "ماء ميني 200 مل", "Mini Water 200ml", "المشروبات", "Beverages", "500", "50", "piece"];
+            
+            const csvContent = "\uFEFF" + [headers.join(","), exampleRow.join(",")].join("\n");
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "نموذج_إدخال_المخزون.csv";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // 5. رفع شيت الإكسيل (CSV) وإدراج البيانات
+        function importExcelFile(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(evt) {
+                try {
+                    const text = evt.target.result;
+                    const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+                    if (lines.length < 2) {
+                        alert("الملف المرفوع فارغ أو لا يحتوي على بيانات.");
+                        return;
+                    }
+
+                    const newItems = [];
+                    // تخطي السطر الأول (الهيدر)
+                    for (let i = 1; i < lines.length; i++) {
+                        const cols = lines[i].split(",").map(c => c.replace(/^"|"$/g, '').trim());
+                        if (cols.length >= 6) {
+                            const qty = parseInt(cols[5]) || 0;
+                            const min = parseInt(cols[6]) || 10;
+                            let status = 'available';
+                            if (qty === 0) status = 'out';
+                            else if (qty <= min) status = 'low';
+
+                            newItems.push({
+                                id: Date.now() + i,
+                                sku: cols[0] || `SKU-${Math.floor(Math.random()*10000)}`,
+                                name_ar: cols[1] || 'صنف جديد',
+                                name_en: cols[2] || cols[1] || 'New Item',
+                                cat_ar: cols[3] || 'عام',
+                                cat_en: cols[4] || 'General',
+                                quantity: qty,
+                                min_limit: min,
+                                unit: cols[7] || 'piece',
+                                status: status
+                            });
+                        }
+                    }
+
+                    if (supabase && newItems.length > 0) {
+                        const dbItems = newItems.map(({id, ...rest}) => rest);
+                        await supabase.from('inventory').insert(dbItems);
+                        await fetchInventoryFromDB();
+                    } else {
+                        inventoryItems = [...newItems, ...inventoryItems];
+                        renderTable();
+                    }
+
+                    alert(`تم استيراد ${newItems.length} صنف بنجاح!`);
+                    e.target.value = '';
+                } catch (err) {
+                    console.error("Error importing file:", err);
+                    alert("حدث خطأ أثناء قراءة الملف. تأكد من رفعه بصيغة CSV صحيحة.");
+                }
+            };
+            reader.readAsText(file, "UTF-8");
+        }
+
+        // 6. تصدير جميع الأصناف
+        function downloadCSV() {
+            if (inventoryItems.length === 0) {
+                alert("لا توجد بيانات للتصدير.");
+                return;
+            }
+
+            const headers = ["كود SKU", "اسم الصنف (عربي)", "اسم الصنف (انجليزي)", "التصنيف (عربي)", "التصنيف (انجليزي)", "الكمية", "الحد الادنى", "الوحدة", "الحالة"];
+            const rows = inventoryItems.map(i => [
+                `"${i.sku}"`, `"${i.name_ar}"`, `"${i.name_en || ''}"`, `"${i.cat_ar}"`, `"${i.cat_en || ''}"`, i.quantity, i.min_limit, i.unit, i.status
+            ].join(","));
+
+            const csvContent = "\uFEFF" + [headers.join(","), ...rows].join("\n");
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `تقرير_المخزون_${new Date().toISOString().slice(0,10)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // 7. إدارة النوافذ والنموذج
         function openEditModal(id) {
             const item = inventoryItems.find(i => String(i.id) === String(id));
             if (!item) return;
@@ -508,113 +630,138 @@
             document.getElementById('modal-unit').value = item.unit;
             document.getElementById('modal-status').value = item.status;
 
-            document.getElementById('item-modal').classList.remove('hidden');
-            document.getElementById('item-modal').classList.add('flex');
+            const modal = document.getElementById('item-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
         }
 
-        // 5. حفظ التعديل مباشرة في الداتابيز
+        function closeModal() {
+            const modal = document.getElementById('item-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
         async function handleFormSubmit(e) {
             e.preventDefault();
             if (!validateModalForm()) return;
 
             const id = document.getElementById('modal-item-id').value;
+            const qty = parseInt(document.getElementById('modal-qty').value) || 0;
+            const min = parseInt(document.getElementById('modal-min').value) || 0;
+            let status = document.getElementById('modal-status').value;
+
+            if (qty === 0) status = 'out';
+            else if (qty <= min) status = 'low';
+
             const updatedData = {
-                sku: document.getElementById('modal-sku').value.trim(),
-                name_ar: document.getElementById('modal-name-ar').value.trim(),
-                name_en: document.getElementById('modal-name-en').value.trim(),
-                cat_ar: document.getElementById('modal-cat-ar').value.trim(),
-                cat_en: document.getElementById('modal-cat-en').value.trim(),
-                quantity: parseInt(document.getElementById('modal-qty').value),
-                min_limit: parseInt(document.getElementById('modal-min').value),
+                sku: document.getElementById('modal-sku').value,
+                name_ar: document.getElementById('modal-name-ar').value,
+                name_en: document.getElementById('modal-name-en').value,
+                cat_ar: document.getElementById('modal-cat-ar').value,
+                cat_en: document.getElementById('modal-cat-en').value,
+                quantity: qty,
+                min_limit: min,
                 unit: document.getElementById('modal-unit').value,
-                status: document.getElementById('modal-status').value
+                status: status
             };
 
-            const saveBtn = document.getElementById('save-btn');
-            saveBtn.disabled = true;
-            saveBtn.innerText = currentLang === 'ar' ? 'جاري الحفظ...' : 'Saving...';
-
-            try {
-                if (supabase) {
-                    const { error } = await supabase.from('inventory').update(updatedData).eq('id', id);
-                    if (error) throw error;
-                }
-
-                // التحديث المحلي للتجاوب السريع
+            if (supabase) {
+                await supabase.from('inventory').update(updatedData).eq('id', id);
+                await fetchInventoryFromDB();
+            } else {
                 const index = inventoryItems.findIndex(i => String(i.id) === String(id));
                 if (index !== -1) {
                     inventoryItems[index] = { ...inventoryItems[index], ...updatedData };
+                    renderTable();
                 }
+            }
 
-                closeModal();
-                renderTable();
-            } catch (err) {
-                console.error('Failed to update DB:', err);
-                alert(currentLang === 'ar' ? 'حدث خطأ أثناء حفظ البيانات في الداتابيز' : 'Failed to save changes to Database');
-            } finally {
-                saveBtn.disabled = false;
-                saveBtn.innerText = currentLang === 'ar' ? 'حفظ التغييرات' : 'Save Changes';
+            closeModal();
+        }
+
+        function validateModalForm() {
+            let valid = true;
+            const sku = document.getElementById('modal-sku');
+            const nameAr = document.getElementById('modal-name-ar');
+            
+            if (!sku.value.trim()) { showFieldError(sku, 'كود SKU مطلوب'); valid = false; }
+            if (!nameAr.value.trim()) { showFieldError(nameAr, 'الاسم بالعربي مطلوب'); valid = false; }
+            return valid;
+        }
+
+        function showFieldError(input, msg) {
+            input.classList.add('border-rose-500');
+            const parent = input.closest('.field-container');
+            if (parent) {
+                const errSpan = parent.querySelector('.error-msg');
+                if (errSpan) {
+                    errSpan.innerText = msg;
+                    errSpan.classList.remove('hidden');
+                }
             }
         }
 
-        function closeModal() {
-            document.getElementById('item-modal').classList.add('hidden');
-            document.getElementById('item-modal').classList.remove('flex');
+        function clearFieldError(input) {
+            input.classList.remove('border-rose-500');
+            const parent = input.closest('.field-container');
+            if (parent) {
+                const errSpan = parent.querySelector('.error-msg');
+                if (errSpan) errSpan.classList.add('hidden');
+            }
         }
 
-        function filterInventory() {
-            renderTable();
-        }
-
-        function updateStatsAndCounter(shownCount = 0, totalCount = 0) {
+        // 8. الإحصائيات الفورية واختيار الصفوف
+        function updateStatsAndCounter(showingCount, totalCount) {
             const total = inventoryItems.length;
             const low = inventoryItems.filter(i => i.status === 'low').length;
             const out = inventoryItems.filter(i => i.status === 'out').length;
 
-            document.getElementById('stat-total').innerText = total;
-            document.getElementById('stat-low').innerText = low;
-            document.getElementById('stat-out').innerText = out;
+            document.getElementById('stat-total').innerText = total.toLocaleString();
+            document.getElementById('stat-low').innerText = low.toLocaleString();
+            document.getElementById('stat-out').innerText = out.toLocaleString();
 
-            const info = inventoryTranslations[currentLang]['pagination_info']
-                .replace('{count}', shownCount)
-                .replace('{total}', totalCount);
-            document.getElementById('results-counter').innerText = info;
+            const counterTemplate = inventoryTranslations[currentLang].pagination_info;
+            document.getElementById('results-counter').innerText = counterTemplate.replace('{count}', showingCount).replace('{total}', totalCount);
         }
 
-        function clearFieldError(input) {
-            const container = input.closest('.field-container');
-            if (!container) return;
-            const errorSpan = container.querySelector('.error-msg');
-            input.classList.remove('border-rose-500');
-            if (errorSpan) errorSpan.classList.add('hidden');
+        function toggleSelectAll(master) {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(cb => cb.checked = master.checked);
+            updateSelection();
         }
 
-        function showFieldError(input, message) {
-            const container = input.closest('.field-container');
-            if (!container) return;
-            const errorSpan = container.querySelector('.error-msg');
-            input.classList.add('border-rose-500');
-            if (errorSpan) {
-                errorSpan.innerText = message;
-                errorSpan.classList.remove('hidden');
+        function updateSelection() {
+            const selected = document.querySelectorAll('.row-checkbox:checked');
+            const btn = document.getElementById('bulk-delete-btn');
+            const countSpan = document.getElementById('selected-count');
+            
+            if (selected.length > 0) {
+                btn.classList.remove('hidden');
+                countSpan.innerText = selected.length;
+            } else {
+                btn.classList.add('hidden');
             }
         }
 
-        function validateModalForm() {
-            let isValid = true;
-            const fields = ['modal-sku', 'modal-name-ar', 'modal-name-en', 'modal-cat-ar', 'modal-cat-en', 'modal-qty', 'modal-min', 'modal-unit'];
-            fields.forEach(id => {
-                const input = document.getElementById(id);
-                if (!input || !input.value || !input.value.trim()) {
-                    showFieldError(input, currentLang === 'ar' ? 'هذا الحقل مطلوب' : 'Required field');
-                    isValid = false;
-                } else {
-                    clearFieldError(input);
-                }
-            });
-            return isValid;
+        async function deleteSelected() {
+            const selectedBoxes = document.querySelectorAll('.row-checkbox:checked');
+            const idsToDelete = Array.from(selectedBoxes).map(cb => cb.closest('tr').getAttribute('data-id'));
+            
+            if (idsToDelete.length === 0) return;
+            if (!confirm(`هل أنت تأكد من حذف ${idsToDelete.length} صنف/أصناف؟`)) return;
+
+            if (supabase) {
+                await supabase.from('inventory').delete().in('id', idsToDelete);
+                await fetchInventoryFromDB();
+            } else {
+                inventoryItems = inventoryItems.filter(i => !idsToDelete.includes(String(i.id)));
+                renderTable();
+            }
+            document.getElementById('select-all').checked = false;
+            updateSelection();
         }
 
+        // 9. دعم اللغات وتسجيل الخروج
         function toggleLanguage() {
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
             localStorage.setItem('lang', currentLang);
@@ -623,21 +770,21 @@
         }
 
         function applyInventoryLanguage(lang) {
-            const htmlRoot = document.getElementById('html-root');
-            htmlRoot.setAttribute('lang', lang);
-            htmlRoot.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+            document.getElementById('html-root').dir = lang === 'ar' ? 'rtl' : 'ltr';
             document.getElementById('lang-btn').innerText = lang === 'ar' ? 'English' : 'عربي';
 
-            document.querySelectorAll('[data-i18n]').forEach(el => {
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (inventoryTranslations[lang] && inventoryTranslations[lang][key]) {
+                if (inventoryTranslations[lang][key]) {
                     el.innerText = inventoryTranslations[lang][key];
                 }
             });
 
-            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const placeholders = document.querySelectorAll('[data-i18n-placeholder]');
+            placeholders.forEach(el => {
                 const key = el.getAttribute('data-i18n-placeholder');
-                if (inventoryTranslations[lang] && inventoryTranslations[lang][key]) {
+                if (inventoryTranslations[lang][key]) {
                     el.placeholder = inventoryTranslations[lang][key];
                 }
             });
@@ -648,30 +795,6 @@
             localStorage.removeItem('user_session');
             window.location.href = 'login.html';
         }
-
-        function toggleSelectAll(master) {
-            const checkboxes = document.querySelectorAll('.row-checkbox');
-            checkboxes.forEach(cb => cb.checked = master.checked);
-            updateSelection();
-        }
-
-        function updateSelection() {
-            const selected = document.querySelectorAll('.row-checkbox:checked').length;
-            const btn = document.getElementById('bulk-delete-btn');
-            document.getElementById('selected-count').innerText = selected;
-            if (selected > 0) btn.classList.remove('hidden');
-            else btn.classList.add('hidden');
-        }
-
-        async function deleteSelected() {
-            if (!confirm(currentLang === 'ar' ? 'هل أنت تأكد من حذف العناصر المحددة؟' : 'Are you sure you want to delete selected items?')) return;
-            // تنفيذ الحذف من الداتابيز
-            renderTable();
-        }
-
-        function downloadExcelTemplate() { alert('تنزيل نموذج الإكسيل'); }
-        function importExcelFile(e) { alert('تم رفع الملف بنجاح'); }
-        function downloadCSV() { alert('تصدير الأصناف'); }
     </script>
 </body>
 </html>
