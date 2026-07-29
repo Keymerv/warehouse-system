@@ -22,8 +22,6 @@
             background: #334155;
         }
     </style>
-    <!-- مكتبة Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="assets/js/auth-guard.js"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans antialiased flex h-screen overflow-hidden text-xs">
@@ -49,9 +47,9 @@
         <!-- معلومات المستخدم الديناميكية -->
         <div class="p-3 border-t border-slate-800 flex items-center justify-between">
             <div class="overflow-hidden">
-                <p class="font-bold text-slate-200 text-xs truncate" id="user-name"></p>
-                <p class="text-[10px] text-indigo-400 font-semibold truncate" id="user-role"></p>
-                <p class="text-[10px] text-slate-500 truncate" id="user-email"></p>
+                <p class="font-bold text-slate-200 text-xs truncate" id="user-name">...</p>
+                <p class="text-[10px] text-indigo-400 font-semibold truncate" id="user-role">...</p>
+                <p class="text-[10px] text-slate-500 truncate" id="user-email">...</p>
             </div>
             <button type="button" onclick="logoutUser()" class="text-rose-400 hover:text-rose-300 text-[11px] font-semibold shrink-0" data-i18n="logout">خروج</button>
         </div>
@@ -257,15 +255,9 @@
         </div>
     </div>
 
-    <!-- السكربت الخالي من التعارضات المصحح بالكامل -->
-    <script>
-        // إعطاء المتغير اسماً خالي من أي تعارض مع مكتبة Supabase العامة
-        const SUPABASE_URL = "https://your-supabase-project.supabase.co"; 
-        const SUPABASE_ANON_KEY = "your-anon-key";
-        
-        const supabaseClient = (window.supabase && typeof window.supabase.createClient === 'function' && !SUPABASE_URL.includes("your-supabase-project")) 
-            ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) 
-            : null;
+    <!-- استدعاء Supabase الحقيقي المباشر من ملف المشروع assets/js/supabase.js -->
+    <script type="module">
+        import { supabase } from './assets/js/supabase.js';
 
         let inventoryItems = [];
         let currentLang = localStorage.getItem('lang') || 'ar';
@@ -314,7 +306,7 @@
                 unit_carton: "كرتون",
                 unit_gram: "بالغرام",
                 modal_edit_title: "تعديل صنف",
-                no_data: "لا يوجد بيانات"
+                no_data: "لا يوجد بيانات في قاعدة البيانات"
             },
             en: {
                 inventory_title: "Inventory Management - Keymerv Warehouse",
@@ -359,7 +351,7 @@
                 unit_carton: "Carton",
                 unit_gram: "Gram",
                 modal_edit_title: "Edit Item",
-                no_data: "No data available"
+                no_data: "No items in database"
             }
         };
 
@@ -369,41 +361,34 @@
             applyInventoryLanguage(currentLang);
         });
 
-        // 1. جلب بيانات المستخدم
+        // 1. تحميل معلومات المستخدم
         async function loadLoggedInUser() {
             let userName = "";
             let userRole = "";
             let userEmail = "";
 
             try {
-                if (supabaseClient) {
-                    const { data: { session } } = await supabaseClient.auth.getSession();
+                if (supabase) {
+                    const { data: { session } } = await supabase.auth.getSession();
                     if (session?.user) {
                         userEmail = session.user.email || "";
-                        const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single();
+                        const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
                         if (profile) {
                             userName = profile.full_name || profile.name || "";
                             userRole = profile.role_title || profile.role || "";
                         }
                     }
                 }
-
-                if (!userName || !userEmail) {
-                    const localData = JSON.parse(localStorage.getItem('user_session') || localStorage.getItem('user') || '{}');
-                    userName = userName || localData.full_name || localData.name || localData.username || "";
-                    userRole = userRole || localData.role_title || localData.role || "";
-                    userEmail = userEmail || localData.email || "";
-                }
             } catch (err) {
-                console.warn("User load info:", err);
+                console.warn("User fetch error:", err);
             }
 
-            document.getElementById('user-name').innerText = userName || (currentLang === 'ar' ? "مستخدم مسجل" : "Registered User");
-            document.getElementById('user-role').innerText = userRole || (currentLang === 'ar' ? "مدير النظام" : "System Manager");
+            document.getElementById('user-name').innerText = userName || (currentLang === 'ar' ? "مستخدم مسجل" : "User");
+            document.getElementById('user-role').innerText = userRole || (currentLang === 'ar' ? "مدير النظام" : "Manager");
             document.getElementById('user-email').innerText = userEmail || "user@keymerv.com";
         }
 
-        // 2. تنزيل نموذج الإكسيل مباشرة مع دعم العربية BOM
+        // 2. تنزيل نموذج الإكسيل
         function downloadExcelTemplate() {
             const headers = ["كود SKU", "اسم الصنف بالعربي", "اسم الصنف بالانجليزي", "التصنيف بالعربي", "التصنيف بالانجليزي", "الكمية الحالية", "الحد الادنى", "الوحدة"];
             const exampleRow = ["SKU-1001", "ماء ميني 200 مل", "Mini Water 200ml", "المشروبات", "Beverages", "500", "50", "piece"];
@@ -421,21 +406,16 @@
             URL.revokeObjectURL(url);
         }
 
-        // 3. جلب البيانات
+        // 3. جلب المخزون الحقيقي من Supabase
         async function fetchInventoryFromDB() {
-            if (!supabaseClient) {
-                inventoryItems = [];
-                renderTable();
-                return;
-            }
-
             try {
-                const { data, error } = await supabaseClient.from('inventory').select('*').order('created_at', { ascending: false });
+                const { data, error } = await supabase.from('inventory').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
                 inventoryItems = data || [];
                 renderTable();
             } catch (err) {
                 console.error('Error fetching inventory:', err);
+                inventoryItems = [];
                 renderTable();
             }
         }
@@ -449,9 +429,13 @@
             const filterStatus = document.getElementById('status-filter').value;
 
             const filtered = inventoryItems.filter(item => {
-                const matchSearch = item.sku.toLowerCase().includes(searchTerm) || 
-                                    item.name_ar.toLowerCase().includes(searchTerm) || 
-                                    (item.name_en && item.name_en.toLowerCase().includes(searchTerm));
+                const nameAr = item.name_ar || '';
+                const nameEn = item.name_en || '';
+                const sku = item.sku || '';
+
+                const matchSearch = sku.toLowerCase().includes(searchTerm) || 
+                                    nameAr.toLowerCase().includes(searchTerm) || 
+                                    nameEn.toLowerCase().includes(searchTerm);
                 const matchStatus = filterStatus === 'all' || item.status === filterStatus;
                 return matchSearch && matchStatus;
             });
@@ -473,8 +457,8 @@
                 tr.className = 'inventory-row hover:bg-slate-800/40 transition';
                 tr.setAttribute('data-id', item.id);
 
-                const name = currentLang === 'ar' ? item.name_ar : (item.name_en || item.name_ar);
-                const category = currentLang === 'ar' ? item.cat_ar : (item.cat_en || item.cat_ar);
+                const name = currentLang === 'ar' ? (item.name_ar || item.name_en) : (item.name_en || item.name_ar);
+                const category = currentLang === 'ar' ? (item.cat_ar || item.cat_en) : (item.cat_en || item.cat_ar);
                 const unitText = inventoryTranslations[currentLang][`unit_${item.unit}`] || item.unit;
                 const statusText = inventoryTranslations[currentLang][`status_${item.status}`] || item.status;
 
@@ -507,8 +491,8 @@
             renderTable();
         }
 
-        // 5. رفع شيت الإكسيل CSV
-        function importExcelFile(e) {
+        // 5. رفع وقراءة CSV والحفظ المباشر بـ Supabase
+        async function importExcelFile(e) {
             const file = e.target.files[0];
             if (!file) return;
 
@@ -518,7 +502,7 @@
                     const text = evt.target.result;
                     const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
                     if (lines.length < 2) {
-                        alert("الملف فارغ أو غير متوافق.");
+                        alert("الملف فارغ أو غير صالح.");
                         return;
                     }
 
@@ -546,25 +530,23 @@
                         }
                     }
 
-                    if (supabaseClient && newItems.length > 0) {
-                        await supabaseClient.from('inventory').insert(newItems);
+                    if (newItems.length > 0) {
+                        const { error } = await supabase.from('inventory').insert(newItems);
+                        if (error) throw error;
+                        
                         await fetchInventoryFromDB();
-                    } else {
-                        inventoryItems = [...newItems.map((item, index) => ({ id: Date.now() + index, ...item })), ...inventoryItems];
-                        renderTable();
+                        alert(`تم حفظ ${newItems.length} صنف في قاعدة البيانات بنجاح!`);
                     }
-
-                    alert(`تم استيراد ${newItems.length} صنف بنجاح!`);
                     e.target.value = '';
                 } catch (err) {
-                    console.error(err);
-                    alert("خطأ في قراءة الملف.");
+                    console.error("Upload error:", err);
+                    alert("حدث خطأ أثناء حفظ شيت الإكسيل في قاعدة البيانات.");
                 }
             };
             reader.readAsText(file, "UTF-8");
         }
 
-        // 6. تصدير الأصناف
+        // 6. تصدير البيانات
         function downloadCSV() {
             if (inventoryItems.length === 0) {
                 alert("لا توجد بيانات للتصدير.");
@@ -589,7 +571,7 @@
             URL.revokeObjectURL(url);
         }
 
-        // 7. إدارة النافذة المنبثقة
+        // 7. فتح وإغلاق تعديل الصنف وحفظ التعديل في Supabase
         function openEditModal(id) {
             const item = inventoryItems.find(i => String(i.id) === String(id));
             if (!item) return;
@@ -639,21 +621,19 @@
                 status: status
             };
 
-            if (supabaseClient) {
-                await supabaseClient.from('inventory').update(updatedData).eq('id', id);
+            try {
+                const { error } = await supabase.from('inventory').update(updatedData).eq('id', id);
+                if (error) throw error;
+                
                 await fetchInventoryFromDB();
-            } else {
-                const index = inventoryItems.findIndex(i => String(i.id) === String(id));
-                if (index !== -1) {
-                    inventoryItems[index] = { ...inventoryItems[index], ...updatedData };
-                    renderTable();
-                }
+                closeModal();
+            } catch (err) {
+                console.error("Update error:", err);
+                alert("حدث خطأ أثناء تحديث الصنف في قاعدة البيانات.");
             }
-
-            closeModal();
         }
 
-        // 8. العدادات والتحديد
+        // 8. تحديث العدادات والتحديد والحذف
         function updateStatsAndCounter(showingCount, totalCount) {
             const total = inventoryItems.length;
             const low = inventoryItems.filter(i => i.status === 'low').length;
@@ -693,18 +673,20 @@
             if (idsToDelete.length === 0) return;
             if (!confirm(`هل أنت تأكد من حذف المحدد؟`)) return;
 
-            if (supabaseClient) {
-                await supabaseClient.from('inventory').delete().in('id', idsToDelete);
+            try {
+                const { error } = await supabase.from('inventory').delete().in('id', idsToDelete);
+                if (error) throw error;
+                
                 await fetchInventoryFromDB();
-            } else {
-                inventoryItems = inventoryItems.filter(i => !idsToDelete.includes(String(i.id)));
-                renderTable();
+                document.getElementById('select-all').checked = false;
+                updateSelection();
+            } catch (err) {
+                console.error("Delete error:", err);
+                alert("حدث خطأ أثناء الحذف من قاعدة البيانات.");
             }
-            document.getElementById('select-all').checked = false;
-            updateSelection();
         }
 
-        // 9. اللغة والخروج
+        // 9. تغيير اللغة والخروج
         function toggleLanguage() {
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
             localStorage.setItem('lang', currentLang);
@@ -734,11 +716,26 @@
             });
         }
 
-        function logoutUser() {
-            if (supabaseClient) supabaseClient.auth.signOut();
+        async function logoutUser() {
+            if (supabase) await supabase.auth.signOut();
             localStorage.removeItem('user_session');
             window.location.href = 'login.html';
         }
+
+        // ربط جميع الدوال بالـ Window لكي تعمل أحداث onclick / onkeyup في HTML بدون أخطاء
+        window.downloadExcelTemplate = downloadExcelTemplate;
+        window.filterInventory = filterInventory;
+        window.importExcelFile = importExcelFile;
+        window.downloadCSV = downloadCSV;
+        window.openEditModal = openEditModal;
+        window.closeModal = closeModal;
+        window.handleFormSubmit = handleFormSubmit;
+        window.toggleSelectAll = toggleSelectAll;
+        window.updateSelection = updateSelection;
+        window.deleteSelected = deleteSelected;
+        window.toggleLanguage = toggleLanguage;
+        window.logoutUser = logoutUser;
+        window.renderTable = renderTable;
     </script>
 </body>
 </html>
