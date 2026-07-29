@@ -22,7 +22,7 @@
             background: #334155;
         }
     </style>
-    <!-- مكتبة Supabase للاتصال بالداتابيز -->
+    <!-- مكتبة Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="assets/js/auth-guard.js"></script>
 </head>
@@ -46,14 +46,14 @@
             </nav>
         </div>
 
-        <!-- معلومات المستخدم والوظيفة والبريد الإلكتروني -->
+        <!-- قسم معلومات المستخدم الديناميكية (تم إزالة النصوص الثابتة) -->
         <div class="p-3 border-t border-slate-800 flex items-center justify-between">
             <div class="overflow-hidden">
-                <p class="font-bold text-slate-200 text-xs truncate" id="user-name" data-i18n="user_name">أحمد الغامدي</p>
-                <p class="text-[10px] text-indigo-400 font-semibold truncate" id="user-role" data-i18n="user_role">مدير المستودع الرئيسي</p>
-                <p class="text-[10px] text-slate-500 truncate" id="user-email">a.alghamdi@keymerv.com</p>
+                <p class="font-bold text-slate-200 text-xs truncate" id="user-name"></p>
+                <p class="text-[10px] text-indigo-400 font-semibold truncate" id="user-role"></p>
+                <p class="text-[10px] text-slate-500 truncate" id="user-email"></p>
             </div>
-            <button onclick="logoutUser()" class="text-rose-400 hover:text-rose-300 text-[11px] font-semibold shrink-0" data-i18n="logout">خروج</button>
+            <button type="button" onclick="logoutUser()" class="text-rose-400 hover:text-rose-300 text-[11px] font-semibold shrink-0" data-i18n="logout">خروج</button>
         </div>
     </aside>
 
@@ -62,7 +62,7 @@
         <header class="bg-slate-900 border-b border-slate-800 px-5 py-3 flex justify-between items-center">
             <h1 class="text-sm font-bold" data-i18n="inventory_header">إدارة المخزون الرئيسي</h1>
             <div class="flex items-center gap-3">
-                <button onclick="toggleLanguage()" id="lang-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-md text-xs font-medium transition">
+                <button type="button" onclick="toggleLanguage()" id="lang-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-md text-xs font-medium transition">
                     English
                 </button>
             </div>
@@ -70,7 +70,7 @@
 
         <div class="p-5 space-y-4">
             
-            <!-- إحصائيات المخزون العلوية -->
+            <!-- إحصائيات المخزون -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between">
                     <div>
@@ -95,7 +95,7 @@
                 </div>
             </div>
 
-            <!-- شريط الأدوات والفلترة واستيراد الإكسيل -->
+            <!-- شريط الأدوات والتحكم -->
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 bg-slate-900 border border-slate-800 p-3 rounded-xl">
                 
                 <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
@@ -109,30 +109,30 @@
                     </select>
                 </div>
 
-                <!-- أزرار الإكسيل والعمليات -->
+                <!-- أزرار العمليات والإكسيل -->
                 <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end">
-                    <button id="bulk-delete-btn" onclick="deleteSelected()" class="hidden bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-600/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5" data-i18n="delete_selected_btn">
+                    <button type="button" id="bulk-delete-btn" onclick="deleteSelected()" class="hidden bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-600/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5" data-i18n="delete_selected_btn">
                         🗑️ حذف المحدد (<span id="selected-count">0</span>)
                     </button>
 
                     <!-- تنزيل نموذج الإكسيل -->
-                    <button onclick="downloadExcelTemplate()" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5" data-i18n="download_template_btn">
+                    <button type="button" onclick="downloadExcelTemplate()" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer" data-i18n="download_template_btn">
                         📄 تنزيل نموذج الإكسيل
                     </button>
 
-                    <!-- رفع ملف إكسيل -->
+                    <!-- رفع شيت الإكسيل -->
                     <label class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-md shadow-emerald-600/20 cursor-pointer flex items-center gap-1.5">
                         <span data-i18n="upload_excel_btn">📊 رفع شيت الإكسيل</span>
                         <input type="file" id="excel-file-input" accept=".csv" onchange="importExcelFile(event)" class="hidden">
                     </label>
 
-                    <button onclick="downloadCSV()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 border border-slate-700" data-i18n="download_all_btn">
+                    <button type="button" onclick="downloadCSV()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 border border-slate-700" data-i18n="download_all_btn">
                         📥 تصدير الأصناف
                     </button>
                 </div>
             </div>
 
-            <!-- جدول المخزون الرئيسي -->
+            <!-- جدول البيانات -->
             <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pb-3 border-b border-slate-800 text-[11px] text-slate-400">
                     <div class="flex items-center gap-2">
@@ -168,7 +168,7 @@
                             </tr>
                         </thead>
                         <tbody class="text-xs divide-y divide-slate-800/40" id="inventory-table-body">
-                            <!-- سيتم التعبئة ديناميكياً من قاعدة البيانات -->
+                            <!-- يتم تعبئته ديناميكياً -->
                         </tbody>
                     </table>
                 </div>
@@ -176,25 +176,23 @@
         </div>
     </main>
 
-    <!-- Modal نافذة التعديل المنبثقة -->
+    <!-- Modal نافذة التعديل -->
     <div id="item-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-lg p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h3 id="modal-title" class="font-bold text-slate-200 text-sm" data-i18n="modal_edit_title">تعديل صنف</h3>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-white text-lg font-bold">&times;</button>
+                <button type="button" onclick="closeModal()" class="text-slate-400 hover:text-white text-lg font-bold">&times;</button>
             </div>
             
             <form id="item-form" onsubmit="handleFormSubmit(event)" novalidate class="space-y-3">
                 <input type="hidden" id="modal-item-id">
                 
-                <!-- كود SKU -->
                 <div class="field-container">
                     <label class="block text-[11px] text-slate-400 mb-1">كود SKU <span class="text-rose-500">*</span></label>
                     <input type="text" id="modal-sku" class="form-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
                     <span class="error-msg hidden text-rose-500 text-[10px] mt-1 block"></span>
                 </div>
 
-                <!-- اسم الصنف بالعربي والانجليزي -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="field-container">
                         <label class="block text-[11px] text-slate-400 mb-1">اسم الصنف (بالعربي) <span class="text-rose-500">*</span></label>
@@ -203,54 +201,44 @@
                     </div>
 
                     <div class="field-container">
-                        <label class="block text-[11px] text-slate-400 mb-1">Item Name (English) <span class="text-rose-500">*</span></label>
+                        <label class="block text-[11px] text-slate-400 mb-1">Item Name (English)</label>
                         <input type="text" id="modal-name-en" dir="ltr" class="form-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
-                        <span class="error-msg hidden text-rose-500 text-[10px] mt-1 block"></span>
                     </div>
                 </div>
 
-                <!-- التصنيف بالعربي والانجليزي -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="field-container">
                         <label class="block text-[11px] text-slate-400 mb-1">التصنيف (بالعربي) <span class="text-rose-500">*</span></label>
                         <input type="text" id="modal-cat-ar" class="form-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
-                        <span class="error-msg hidden text-rose-500 text-[10px] mt-1 block"></span>
                     </div>
 
                     <div class="field-container">
-                        <label class="block text-[11px] text-slate-400 mb-1">Category (English) <span class="text-rose-500">*</span></label>
+                        <label class="block text-[11px] text-slate-400 mb-1">Category (English)</label>
                         <input type="text" id="modal-cat-en" dir="ltr" class="form-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
-                        <span class="error-msg hidden text-rose-500 text-[10px] mt-1 block"></span>
                     </div>
                 </div>
 
-                <!-- الكمية والحد الأدنى -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="field-container">
                         <label class="block text-[11px] text-slate-400 mb-1">الكمية الحالية <span class="text-rose-500">*</span></label>
                         <input type="number" id="modal-qty" min="0" class="form-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
-                        <span class="error-msg hidden text-rose-500 text-[10px] mt-1 block"></span>
                     </div>
 
                     <div class="field-container">
-                        <label class="block text-[11px] text-amber-400 mb-1">الحد الأدنى للتنبيه ⚠️ <span class="text-rose-500">*</span></label>
+                        <label class="block text-[11px] text-amber-400 mb-1">الحد الأدنى للتنبيه ⚠️</label>
                         <input type="number" id="modal-min" min="1" placeholder="مثال: 50" class="form-input w-full bg-slate-950 border border-amber-500/30 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-amber-500">
-                        <span class="error-msg hidden text-rose-500 text-[10px] mt-1 block"></span>
                     </div>
                 </div>
 
-                <!-- الوحدة والحالة -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="field-container">
                         <label class="block text-[11px] text-slate-400 mb-1">الوحدة <span class="text-rose-500">*</span></label>
                         <select id="modal-unit" class="form-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-indigo-500">
-                            <option value="" disabled selected>اختر الوحدة...</option>
                             <option value="piece" data-i18n="unit_piece">قطعة</option>
                             <option value="bag" data-i18n="unit_bag">كيس</option>
                             <option value="carton" data-i18n="unit_carton">كرتون</option>
                             <option value="gram" data-i18n="unit_gram">بالغرام</option>
                         </select>
-                        <span class="error-msg hidden text-rose-500 text-[10px] mt-1 block"></span>
                     </div>
 
                     <div class="field-container">
@@ -271,11 +259,11 @@
         </div>
     </div>
 
-    <!-- JavaScript المحدث بالكامل -->
+    <!-- السكربت المحدث بالكامل -->
     <script>
         const SUPABASE_URL = "https://your-supabase-project.supabase.co"; 
         const SUPABASE_ANON_KEY = "your-anon-key";
-        const supabase = (window.supabase && SUPABASE_URL.indexOf("your-supabase-project") === -1) 
+        const supabase = (window.supabase && !SUPABASE_URL.includes("your-supabase-project")) 
             ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) 
             : null;
 
@@ -292,8 +280,6 @@
                 nav_inventory: "إدارة المخزون",
                 nav_branches: "الفروع",
                 nav_settings: "الإعدادات",
-                user_name: "أحمد الغامدي",
-                user_role: "مدير المستودع الرئيسي",
                 logout: "خروج",
                 inventory_header: "إدارة المخزون الرئيسي",
                 stat_total_items: "إجمالي الأصناف",
@@ -339,8 +325,6 @@
                 nav_inventory: "Inventory Management",
                 nav_branches: "Branches",
                 nav_settings: "Settings",
-                user_name: "Ahmed Al-Ghamdi",
-                user_role: "Main Warehouse Manager",
                 logout: "Logout",
                 inventory_header: "Main Inventory Management",
                 stat_total_items: "Total Items",
@@ -383,53 +367,71 @@
             await loadLoggedInUser();
             await fetchInventoryFromDB();
             applyInventoryLanguage(currentLang);
-
-            const inputs = document.querySelectorAll('.form-input');
-            inputs.forEach(input => {
-                input.addEventListener('input', () => clearFieldError(input));
-                input.addEventListener('change', () => clearFieldError(input));
-            });
         });
 
-        // 1. جلب معلومات المستخدم المسجل وعرضها بثبات دون الوقوف على "جاري التحميل..."
+        // 1. جلب بيانات المستخدم ديناميكياً 100% بدون أي أسماء ثابتة
         async function loadLoggedInUser() {
-            try {
-                let user = null;
-                let profile = null;
+            let userName = "";
+            let userRole = "";
+            let userEmail = "";
 
+            try {
+                // المحاولة الأولى: السحب من Supabase Auth والبروفايل
                 if (supabase) {
                     const { data: { session } } = await supabase.auth.getSession();
-                    if (session && session.user) {
-                        user = session.user;
-                        const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-                        profile = data;
+                    if (session?.user) {
+                        userEmail = session.user.email || "";
+                        const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+                        if (profile) {
+                            userName = profile.full_name || profile.name || "";
+                            userRole = profile.role_title || profile.role || "";
+                        }
                     }
                 }
 
-                const storedUser = JSON.parse(localStorage.getItem('user_session') || '{}');
-
-                const name = profile?.full_name || storedUser.name || user?.user_metadata?.full_name || "أحمد الغامدي";
-                const role = profile?.role_title || storedUser.role || "مدير المستودع الرئيسي";
-                const email = user?.email || storedUser.email || "a.alghamdi@keymerv.com";
-
-                document.getElementById('user-name').innerText = name;
-                document.getElementById('user-role').innerText = role;
-                document.getElementById('user-email').innerText = email;
+                // المحاولة الثانية: السحب من localStorage
+                if (!userName || !userEmail) {
+                    const localData = JSON.parse(localStorage.getItem('user_session') || localStorage.getItem('user') || '{}');
+                    userName = userName || localData.full_name || localData.name || localData.username || "";
+                    userRole = userRole || localData.role_title || localData.role || "";
+                    userEmail = userEmail || localData.email || "";
+                }
             } catch (err) {
-                console.error("Error loading user info:", err);
-                document.getElementById('user-name').innerText = "أحمد الغامدي";
-                document.getElementById('user-role').innerText = "مدير المستودع الرئيسي";
-                document.getElementById('user-email').innerText = "a.alghamdi@keymerv.com";
+                console.warn("User load error:", err);
             }
+
+            // تحديث العناصر بالأكال والمسترجعات أو تركها فارغة إذا لم تكن موجودة
+            document.getElementById('user-name').innerText = userName || (currentLang === 'ar' ? "مستخدم مسجل" : "Registered User");
+            document.getElementById('user-role').innerText = userRole || (currentLang === 'ar' ? "مدير النظام" : "System Manager");
+            document.getElementById('user-email').innerText = userEmail || "user@keymerv.com";
         }
 
-        // 2. جلب الأصناف
+        // 2. دالة تنزيل نموذج الإكسيل (CSV بمميزات UTF-8 وتحميل مضمون)
+        function downloadExcelTemplate() {
+            const headers = ["كود SKU", "اسم الصنف بالعربي", "اسم الصنف بالانجليزي", "التصنيف بالعربي", "التصنيف بالانجليزي", "الكمية الحالية", "الحد الادنى", "الوحدة"];
+            const exampleRow = ["SKU-1001", "ماء ميني 200 مل", "Mini Water 200ml", "المشروبات", "Beverages", "500", "50", "piece"];
+            
+            // إضافة \uFEFF لحل مشكلة اللغة العربية في Microsoft Excel
+            const csvContent = "\uFEFF" + [headers.join(","), exampleRow.join(",")].join("\n");
+            
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "نموذج_إدخال_المخزون.csv");
+            link.style.visibility = "hidden";
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // 3. جلب المخزون
         async function fetchInventoryFromDB() {
             if (!supabase) {
-                inventoryItems = [
-                    { id: '1', sku: 'SKU-BRG-001', name_ar: 'لحم برجر مجمد (أصلي)', name_en: 'Frozen Beef Burger (Original)', cat_ar: 'مستودع اللحوم', cat_en: 'Meat Warehouse', quantity: 1450, min_limit: 200, unit: 'piece', status: 'available' },
-                    { id: '2', sku: 'SKU-BAK-042', name_ar: 'خبز برجر بطاطس', name_en: 'Potato Burger Bun', cat_ar: 'المخابز والمخازن الجافة', cat_en: 'Bakery & Dry Storage', quantity: 85, min_limit: 100, unit: 'bag', status: 'low' }
-                ];
+                inventoryItems = [];
                 renderTable();
                 return;
             }
@@ -441,10 +443,11 @@
                 renderTable();
             } catch (err) {
                 console.error('Error fetching inventory:', err);
+                renderTable();
             }
         }
 
-        // 3. عرض البيانات أو إظهار "لا يوجد بيانات"
+        // 4. عرض جدول البيانات وطباعة "لا يوجد بيانات"
         function renderTable() {
             const tbody = document.getElementById('inventory-table-body');
             tbody.innerHTML = '';
@@ -460,12 +463,12 @@
                 return matchSearch && matchStatus;
             });
 
-            // حالة خلو الجدول من البيانات
+            // طباعة خلو البيانات
             if (filtered.length === 0) {
                 const noDataText = inventoryTranslations[currentLang].no_data;
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="9" class="py-10 text-center text-slate-500 font-medium text-xs">
+                        <td colspan="9" class="py-12 text-center text-slate-500 font-medium text-xs">
                             ${noDataText}
                         </td>
                     </tr>
@@ -500,7 +503,7 @@
                     <td class="py-3 px-3 text-slate-400">${unitText}</td>
                     <td class="py-3 px-3"><span class="${statusBadgeClass} px-2 py-0.5 rounded-full text-[11px]">${statusText}</span></td>
                     <td class="py-3 px-3 text-center">
-                        <button onclick="openEditModal('${item.id}')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded text-[11px] font-medium transition" data-i18n="edit_btn">تعديل</button>
+                        <button type="button" onclick="openEditModal('${item.id}')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded text-[11px] font-medium transition" data-i18n="edit_btn">تعديل</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -513,24 +516,7 @@
             renderTable();
         }
 
-        // 4. تنزيل نموذج الإكسيل الصحيح باللغة العربية
-        function downloadExcelTemplate() {
-            const headers = ["كود SKU", "اسم الصنف بالعربي", "اسم الصنف بالانجليزي", "التصنيف بالعربي", "التصنيف بالانجليزي", "الكمية الحالية", "الحد الادنى", "الوحدة"];
-            const exampleRow = ["SKU-1001", "ماء ميني 200 مل", "Mini Water 200ml", "المشروبات", "Beverages", "500", "50", "piece"];
-            
-            const csvContent = "\uFEFF" + [headers.join(","), exampleRow.join(",")].join("\n");
-            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "نموذج_إدخال_المخزون.csv";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        // 5. رفع شيت الإكسيل (CSV) وإدراج البيانات
+        // 5. رفع شيت إكسيل CSV
         function importExcelFile(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -541,12 +527,11 @@
                     const text = evt.target.result;
                     const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
                     if (lines.length < 2) {
-                        alert("الملف المرفوع فارغ أو لا يحتوي على بيانات.");
+                        alert("الملف فارغ أو غير متوافق.");
                         return;
                     }
 
                     const newItems = [];
-                    // تخطي السطر الأول (الهيدر)
                     for (let i = 1; i < lines.length; i++) {
                         const cols = lines[i].split(",").map(c => c.replace(/^"|"$/g, '').trim());
                         if (cols.length >= 6) {
@@ -557,7 +542,6 @@
                             else if (qty <= min) status = 'low';
 
                             newItems.push({
-                                id: Date.now() + i,
                                 sku: cols[0] || `SKU-${Math.floor(Math.random()*10000)}`,
                                 name_ar: cols[1] || 'صنف جديد',
                                 name_en: cols[2] || cols[1] || 'New Item',
@@ -572,25 +556,24 @@
                     }
 
                     if (supabase && newItems.length > 0) {
-                        const dbItems = newItems.map(({id, ...rest}) => rest);
-                        await supabase.from('inventory').insert(dbItems);
+                        await supabase.from('inventory').insert(newItems);
                         await fetchInventoryFromDB();
                     } else {
-                        inventoryItems = [...newItems, ...inventoryItems];
+                        inventoryItems = [...newItems.map((item, index) => ({ id: Date.now() + index, ...item })), ...inventoryItems];
                         renderTable();
                     }
 
                     alert(`تم استيراد ${newItems.length} صنف بنجاح!`);
                     e.target.value = '';
                 } catch (err) {
-                    console.error("Error importing file:", err);
-                    alert("حدث خطأ أثناء قراءة الملف. تأكد من رفعه بصيغة CSV صحيحة.");
+                    console.error(err);
+                    alert("خطأ في قراءة الملف.");
                 }
             };
             reader.readAsText(file, "UTF-8");
         }
 
-        // 6. تصدير جميع الأصناف
+        // 6. تصدير جميع أصناف الجدول
         function downloadCSV() {
             if (inventoryItems.length === 0) {
                 alert("لا توجد بيانات للتصدير.");
@@ -606,15 +589,17 @@
             const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
             const url = URL.createObjectURL(blob);
             
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `تقرير_المخزون_${new Date().toISOString().slice(0,10)}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `تصدير_المخزون_${new Date().toISOString().slice(0,10)}.csv`);
+            link.style.visibility = "hidden";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
         }
 
-        // 7. إدارة النوافذ والنموذج
+        // 7. إدارة النافذة المنبثقة
         function openEditModal(id) {
             const item = inventoryItems.find(i => String(i.id) === String(id));
             if (!item) return;
@@ -643,7 +628,6 @@
 
         async function handleFormSubmit(e) {
             e.preventDefault();
-            if (!validateModalForm()) return;
 
             const id = document.getElementById('modal-item-id').value;
             const qty = parseInt(document.getElementById('modal-qty').value) || 0;
@@ -679,38 +663,7 @@
             closeModal();
         }
 
-        function validateModalForm() {
-            let valid = true;
-            const sku = document.getElementById('modal-sku');
-            const nameAr = document.getElementById('modal-name-ar');
-            
-            if (!sku.value.trim()) { showFieldError(sku, 'كود SKU مطلوب'); valid = false; }
-            if (!nameAr.value.trim()) { showFieldError(nameAr, 'الاسم بالعربي مطلوب'); valid = false; }
-            return valid;
-        }
-
-        function showFieldError(input, msg) {
-            input.classList.add('border-rose-500');
-            const parent = input.closest('.field-container');
-            if (parent) {
-                const errSpan = parent.querySelector('.error-msg');
-                if (errSpan) {
-                    errSpan.innerText = msg;
-                    errSpan.classList.remove('hidden');
-                }
-            }
-        }
-
-        function clearFieldError(input) {
-            input.classList.remove('border-rose-500');
-            const parent = input.closest('.field-container');
-            if (parent) {
-                const errSpan = parent.querySelector('.error-msg');
-                if (errSpan) errSpan.classList.add('hidden');
-            }
-        }
-
-        // 8. الإحصائيات الفورية واختيار الصفوف
+        // 8. تحديث العدادات وتحديد الصفوف
         function updateStatsAndCounter(showingCount, totalCount) {
             const total = inventoryItems.length;
             const low = inventoryItems.filter(i => i.status === 'low').length;
@@ -748,7 +701,7 @@
             const idsToDelete = Array.from(selectedBoxes).map(cb => cb.closest('tr').getAttribute('data-id'));
             
             if (idsToDelete.length === 0) return;
-            if (!confirm(`هل أنت تأكد من حذف ${idsToDelete.length} صنف/أصناف؟`)) return;
+            if (!confirm(`هل أنت تأكد من حذف المحدد؟`)) return;
 
             if (supabase) {
                 await supabase.from('inventory').delete().in('id', idsToDelete);
@@ -761,11 +714,12 @@
             updateSelection();
         }
 
-        // 9. دعم اللغات وتسجيل الخروج
+        // 9. اللغة والخروج
         function toggleLanguage() {
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
             localStorage.setItem('lang', currentLang);
             applyInventoryLanguage(currentLang);
+            loadLoggedInUser();
             renderTable();
         }
 
